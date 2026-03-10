@@ -674,7 +674,7 @@ html,body{height:100%;background:#0a0a0a;overflow:hidden;}
 <div id="app">
 
 <!-- ═══════════ HOME ═══════════ -->
-<div id="home" class="screen hidden">
+<div id="home" class="screen">
   <div class="topbar">
     <button class="icon-btn">
       <svg class="ico ico-sm" viewBox="0 0 18 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
@@ -1237,14 +1237,7 @@ function show(id){
     s.classList.remove('pushed');
     s.id!==id?s.classList.add('hidden'):s.classList.remove('hidden');
   });
-}
 
-function enterApp(){
-  const s=document.getElementById('splash');
-  s.style.transition='opacity .5s ease,transform .5s ease';
-  s.style.opacity='0';s.style.transform='scale(1.03)';
-  setTimeout(()=>{s.classList.add('hidden');show('home');},480);
-}
 
 function navTo(id){
   const from=document.getElementById(currentMain==='detail'?'home':currentMain);
