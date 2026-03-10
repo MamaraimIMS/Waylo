@@ -1226,8 +1226,6 @@ html,body{height:100%;background:#0a0a0a;overflow:hidden;}
 </div>
 <script>
 // Tick marks
-const tl=document.getElementById('splash-tl');
-for(let i=0;i<60;i++){const m=document.createElement('div');m.className='splash-tl-mark';m.style.marginTop=(i===0?'32':'8')+'px';tl.appendChild(m);}
 
 const mainScreens=['home','explore','trips','profile'];
 let currentMain='home';
@@ -1235,8 +1233,9 @@ let currentMain='home';
 function show(id){
   document.querySelectorAll('.screen').forEach(s=>{
     s.classList.remove('pushed');
-    s.id!==id?s.classList.add('hidden'):s.classList.remove('hidden');
+    s.id!==id ? s.classList.add('hidden') : s.classList.remove('hidden');
   });
+}
 
 
 function navTo(id){
