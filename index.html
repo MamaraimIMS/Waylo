@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waylo Telegram Mini App</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            position: relative;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: #fff;
+            border-bottom: 1px solid #ddd;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #6a5acd; /* Waylo purple */
+        }
+        .greeting {
+            padding: 20px;
+        }
+        .card {
+            background: #fff;
+            border-radius: 10px;
+            margin: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .discover-card {
+            background-image: url('https://example.com/uzbekistan-bg.jpg'); /* Замените на реальное изображение */
+            background-size: cover;
+            color: white;
+            text-shadow: 1px 1px 2px black;
+        }
+        .button {
+            background: #6a5acd;
+            color: white;
+            padding: 10px;
+            border-radius: 20px;
+            text-align: center;
+            margin: 10px;
+        }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            background: white;
+            padding: 10px 0;
+            border-top: 1px solid #ddd;
+        }
+        .nav-item {
+            text-align: center;
+            color: #6a5acd;
+        }
+        /* Экран поездки */
+        .trip-header {
+            background-image: url('https://example.com/samarkand-bg.jpg'); /* Замените */
+            background-size: cover;
+            color: white;
+            padding: 20px;
+            border-radius: 0 0 10px 10px;
+        }
+        .item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .chat {
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 10px;
+        }
+        .add-button {
+            background: #6a5acd;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="home-screen">
+        <div class="header">
+            <div class="logo">WAYLO</div>
+            <div style="flex:1"></div>
+            <img src="https://example.com/bell-icon.png" width="20"> <!-- Иконка уведомлений -->
+        </div>
+        <div class="greeting">
+            <h2>Hello, Michael!</h2>
+            <p>Your Seamless Silk Road Journey</p>
+            <input type="text" placeholder="Explore Samarkand..." style="width:100%; padding:10px; border-radius:20px; border:1px solid #ddd;">
+        </div>
+        <div class="card discover-card">
+            <h2>Discover Uzbekistan</h2>
+            <p>Curated by Waylo AI</p>
+            <p>April 26 - April 30</p>
+            <p>4 Nights, 3 Guests</p>
+            <div class="button" onclick="showTripScreen()">Start Journey</div>
+        </div>
+        <div class="recommended">
+            <h3>Recommended</h3>
+            <div class="card">Hotels</div>
+            <div class="card">Tours</div>
+            <div class="card">Food</div>
+        </div>
+        <div class="tailored">
+            <h3>Tailored for You</h3>
+            <div class="card">
+                <h4>Legends of Samarkand</h4>
+                <p>9.5 Superb</p>
+                <p>210 som · 3-Hour Historical Tour</p>
+            </div>
+        </div>
+        <div class="bottom-nav">
+            <div class="nav-item">Home</div>
+            <div class="nav-item">Explore</div>
+            <div class="nav-item">Trips</div>
+            <div class="nav-item">Profile</div>
+        </div>
+    </div>
+
+    <div class="container" id="trip-screen" style="display:none;">
+        <div class="trip-header">
+            <h2>Trip to Samarkand</h2>
+            <p>April 26 - April 30</p>
+            <p>4 Nights, 3 Guests</p>
+        </div>
+        <div class="item">
+            <div style="background:#9370db; color:white; border-radius:50%; padding:10px; margin-right:10px;">VISA</div>
+            <div>Visa Approved</div>
+        </div>
+        <div class="item">
+            <div style="background:#add8e6; color:white; border-radius:50%; padding:10px; margin-right:10px;">✈️</div>
+            <div>Flight Confirmed: Tashkent - Samarkand<br>April 26, 10:30 - 11:45 AM<br>HY126 - UzAir · 960+</div>
+        </div>
+        <div class="item">
+            <div style="background:#90ee90; color:white; border-radius:50%; padding:10px; margin-right:10px;">🏨</div>
+            <div>Hotel Abdu-S<br>April 26-30 · 4.8 ★ 960 reviews</div>
+        </div>
+        <div class="item">
+            <div style="background:#ffa500; color:white; border-radius:50%; padding:10px; margin-right:10px;">🚗</div>
+            <div>Transfer arranged, 10:30 AM</div>
+        </div>
+        <div class="chat">
+            <img src="https://example.com/timur.jpg" width="40" style="border-radius:50%;"> Timur ★★★★★ 320 feedbacks
+            <p>Hello Michael! I'll meet you after breakfast for our personalized 2 PM city tour. We'll start with the Registan Sq...</p>
+            <div class="add-button">I'd like to add Bibi-Khanym Mosque</div>
+        </div>
+        <div class="bottom-nav">
+            <div class="nav-item">Chat</div>
+            <div class="nav-item">Activities</div>
+            <div class="nav-item">Details</div>
+            <div class="nav-item">Preferences</div>
+        </div>
+    </div>
+
+    <script>
+        Telegram.WebApp.ready();
+        Telegram.WebApp.MainButton.text = 'Book Now';
+        Telegram.WebApp.MainButton.show();
+
+        function showTripScreen() {
+            document.getElementById('home-screen').style.display = 'none';
+            document.getElementById('trip-screen').style.display = 'block';
+            // Интеграция с AI: Классификация интента и вызов DTPA для обновления пакета
+            // Пример: fetch('/api/assemble-package', { method: 'POST', body: JSON.stringify({ trip: 'Samarkand' }) });
+        }
+
+        // Динамика: Обработка чата с гидом (Voice-Bozor для аналоговых партнеров)
+        document.querySelector('.add-button').addEventListener('click', () => {
+            alert('Adding Bibi-Khanym Mosque via Waylo AI... Calculating WAAP adjustment.');
+            // Симуляция WAAP: P_opt + R_sus * K_rel
+            const P_opt = 200; // Базовая цена
+            const R_sus = 0.1; // 10% буфер
+            const K_rel = 1.05; // Надежность
+            const waap = P_opt + (R_sus * K_rel * P_opt);
+            console.log('Updated Price:', waap);
+            // Отправка в DMC для исполнения
+        });
+    </script>
+</body>
+</html>
