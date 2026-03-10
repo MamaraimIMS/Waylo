@@ -1,201 +1,1355 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Waylo Telegram Mini App</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            margin: 0;
-            padding: 0;
-            color: #333;
-        }
-        .container {
-            max-width: 400px;
-            margin: 0 auto;
-            background: white;
-            min-height: 100vh;
-            position: relative;
-        }
-        .header {
-            display: flex;
-            align-items: center;
-            padding: 10px;
-            background: #fff;
-            border-bottom: 1px solid #ddd;
-        }
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #6a5acd; /* Waylo purple */
-        }
-        .greeting {
-            padding: 20px;
-        }
-        .card {
-            background: #fff;
-            border-radius: 10px;
-            margin: 10px;
-            padding: 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .discover-card {
-            background-image: url('Samarkand.jpg'); /* Замените на реальное изображение */
-            background-size: cover;
-            color: white;
-            text-shadow: 1px 1px 2px black;
-        }
-        .button {
-            background: #6a5acd;
-            color: white;
-            padding: 10px;
-            border-radius: 20px;
-            text-align: center;
-            margin: 10px;
-        }
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            display: flex;
-            justify-content: space-around;
-            background: white;
-            padding: 10px 0;
-            border-top: 1px solid #ddd;
-        }
-        .nav-item {
-            text-align: center;
-            color: #6a5acd;
-        }
-        /* Экран поездки */
-        .trip-header {
-            background-image: url('Samarkand.jpg'); /* Замените */
-            background-size: cover;
-            color: white;
-            padding: 20px;
-            border-radius: 0 0 10px 10px;
-        }
-        .item {
-            display: flex;
-            align-items: center;
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
-        }
-        .chat {
-            padding: 10px;
-            background: #f9f9f9;
-            border-radius: 10px;
-        }
-        .add-button {
-            background: #6a5acd;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 20px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Waylo – Silk Road Journeys</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --silk:#f7f3ed;
+  --parchment:#ede6d8;
+  --deep:#150e2e;
+  --ink:#261b4a;
+  --violet:#6b46c1;
+  --violet2:#8b5cf6;
+  --lavender:#c4b5fd;
+  --mint:#10b981;
+  --amber:#f59e0b;
+  --coral:#ef4444;
+  --sky:#0ea5e9;
+  --gold:#d97706;
+  --rose:#f43f5e;
+  --card:#ffffff;
+  --muted:#7c6f9f;
+  --border:#e8e0f5;
+  --nav-h:64px;
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+}
+html,body{height:100%;background:#150e2e;overflow:hidden;}
+#app{
+  max-width:430px;margin:0 auto;height:100vh;
+  display:flex;flex-direction:column;
+  background:var(--silk);position:relative;overflow:hidden;
+}
+
+/* ── SCREENS ── */
+.screen{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  will-change:transform,opacity;
+  transition:transform .44s cubic-bezier(.77,0,.18,1),opacity .35s ease;
+}
+.screen.hidden{transform:translateX(110%);opacity:0;pointer-events:none;}
+.screen.pushed{transform:translateX(-55px);opacity:0;pointer-events:none;}
+
+/* ── SCROLL ── */
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.scroll::-webkit-scrollbar{display:none;}
+.pad-bot{height:calc(var(--nav-h) + 16px);}
+
+/* ══════════════════════
+   SPLASH / ONBOARDING
+══════════════════════ */
+#splash{background:var(--deep);justify-content:flex-end;z-index:100;}
+.splash-bg{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 30%,rgba(107,70,193,.55) 0%,transparent 70%),
+    radial-gradient(ellipse 60% 40% at 80% 60%,rgba(217,119,6,.3) 0%,transparent 60%),
+    linear-gradient(180deg,#0d0820 0%,#1a0f3a 60%,#2d1a60 100%);
+}
+.splash-stars{position:absolute;inset:0;overflow:hidden;}
+.star{
+  position:absolute;border-radius:50%;
+  background:white;animation:twinkle var(--dur,3s) infinite ease-in-out;
+  animation-delay:var(--del,0s);
+}
+@keyframes twinkle{0%,100%{opacity:.15;transform:scale(1);}50%{opacity:.9;transform:scale(1.4);}}
+.splash-dome-svg{
+  position:absolute;bottom:0;left:0;right:0;
+  animation:riseUp .9s .2s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes riseUp{from{transform:translateY(40px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.splash-content{
+  position:relative;z-index:5;
+  padding:0 28px calc(40px + var(--safe-bottom));
+  animation:fadeUp .7s .5s both;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+.splash-logo{
+  font-family:'DM Sans',sans-serif;font-weight:700;font-size:38px;
+  color:white;display:flex;align-items:center;gap:6px;margin-bottom:10px;
+}
+.splash-logo .ww{
+  background:linear-gradient(135deg,#c4b5fd,#8b5cf6,#10b981);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  font-size:44px;
+}
+.splash-tagline{
+  font-family:'Cormorant Garamond',serif;font-style:italic;
+  font-size:22px;color:rgba(255,255,255,.75);line-height:1.35;margin-bottom:32px;
+}
+.splash-cta{
+  background:linear-gradient(135deg,#8b5cf6,#6b46c1);
+  color:white;border:none;border-radius:18px;
+  width:100%;padding:16px;
+  font-family:'DM Sans',sans-serif;font-size:17px;font-weight:600;
+  cursor:pointer;
+  box-shadow:0 8px 32px rgba(107,70,193,.5);
+  transition:transform .15s,box-shadow .15s;
+  letter-spacing:.3px;
+}
+.splash-cta:active{transform:scale(.97);box-shadow:0 4px 16px rgba(107,70,193,.4);}
+.splash-sub{
+  text-align:center;margin-top:14px;
+  font-size:13px;color:rgba(255,255,255,.4);
+}
+
+/* ══════════════════════
+   SHARED TOPBAR
+══════════════════════ */
+.topbar{
+  padding:14px 20px 10px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--silk);position:sticky;top:0;z-index:20;
+  flex-shrink:0;
+}
+.logo{
+  font-family:'DM Sans',sans-serif;font-weight:700;font-size:21px;
+  color:var(--deep);display:flex;align-items:center;gap:3px;
+}
+.logo .wl{
+  background:linear-gradient(135deg,var(--violet),var(--mint));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;font-size:25px;
+}
+.icon-btn{
+  width:38px;height:38px;border-radius:50%;background:white;
+  border:none;display:flex;align-items:center;justify-content:center;
+  font-size:18px;box-shadow:0 2px 12px rgba(107,70,193,.12);cursor:pointer;
+  position:relative;transition:transform .15s;
+}
+.icon-btn:active{transform:scale(.92);}
+.notif-dot{
+  position:absolute;top:6px;right:7px;
+  width:8px;height:8px;background:var(--coral);
+  border-radius:50%;border:2px solid var(--silk);
+}
+
+/* ══════════════════════
+   HOME SCREEN
+══════════════════════ */
+.greeting{padding:4px 20px 16px;}
+.greeting h1{
+  font-family:'DM Sans',sans-serif;font-weight:600;font-size:25px;
+  color:var(--deep);display:flex;align-items:center;gap:10px;
+}
+.av{
+  width:42px;height:42px;border-radius:50%;
+  background:linear-gradient(135deg,var(--violet),var(--lavender));
+  display:flex;align-items:center;justify-content:center;
+  color:white;font-size:16px;font-weight:600;flex-shrink:0;
+}
+.greeting p{font-size:13px;color:var(--muted);margin-top:3px;}
+
+/* search */
+.search-row{
+  margin:0 20px 20px;background:white;border-radius:14px;
+  display:flex;align-items:center;gap:10px;padding:11px 14px;
+  box-shadow:0 2px 12px rgba(107,70,193,.1);border:1.5px solid var(--border);
+}
+.search-row span{font-size:17px;}
+.search-row input{
+  flex:1;border:none;outline:none;
+  font-family:'DM Sans',sans-serif;font-size:14px;color:var(--deep);background:transparent;
+}
+.search-row input::placeholder{color:var(--muted);}
+.filter-dot{
+  width:30px;height:30px;
+  background:linear-gradient(135deg,var(--violet),var(--violet2));
+  border-radius:8px;display:flex;align-items:center;justify-content:center;
+  color:white;font-size:15px;cursor:pointer;
+}
+
+/* hero card */
+.hero{
+  margin:0 20px 24px;border-radius:24px;overflow:hidden;
+  position:relative;height:215px;cursor:pointer;
+  box-shadow:0 10px 40px rgba(107,70,193,.28);
+  transition:transform .2s,box-shadow .2s;
+}
+.hero:active{transform:scale(.985);}
+.hero-bg{
+  position:absolute;inset:0;
+  background:linear-gradient(160deg,#1a0845 0%,#6b46c1 45%,#d97706 100%);
+}
+.hero-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(0,0,0,.05) 0%,rgba(10,5,30,.7) 100%);
+}
+.hero-deco{position:absolute;bottom:0;left:0;right:0;height:100%;}
+.hero-body{
+  position:absolute;inset:0;padding:18px;
+  display:flex;flex-direction:column;justify-content:space-between;
+}
+.hero-top{display:flex;align-items:flex-start;justify-content:space-between;}
+.hero-title{
+  font-family:'Cormorant Garamond',serif;font-style:italic;
+  font-size:30px;font-weight:700;color:white;line-height:1.15;
+  text-shadow:0 2px 16px rgba(0,0,0,.35);
+}
+.ai-chip{
+  background:rgba(255,255,255,.15);backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.25);border-radius:20px;
+  padding:4px 10px;font-size:11px;color:white;font-weight:500;
+}
+.hero-meta{display:flex;align-items:center;gap:8px;margin-bottom:2px;}
+.meta-av{
+  width:28px;height:28px;border-radius:50%;
+  background:linear-gradient(135deg,var(--mint),var(--sky));
+  border:2px solid rgba(255,255,255,.45);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;color:white;font-weight:700;
+}
+.meta-txt{color:rgba(255,255,255,.88);font-size:12px;line-height:1.4;}
+.meta-txt b{display:block;font-size:11px;color:rgba(255,255,255,.6);font-weight:400;}
+.cta-btn{
+  background:linear-gradient(135deg,rgba(139,92,246,.9),rgba(107,70,193,.95));
+  backdrop-filter:blur(8px);
+  color:white;border:none;border-radius:13px;
+  padding:12px 20px;
+  font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;
+  cursor:pointer;width:100%;margin-top:10px;
+  box-shadow:0 4px 20px rgba(107,70,193,.45);
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+
+/* section */
+.sec-head{
+  padding:0 20px 12px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.sec-head h3{font-size:16px;font-weight:600;color:var(--deep);}
+.see-all{font-size:13px;color:var(--violet);font-weight:500;cursor:pointer;}
+
+/* pills */
+.pills{
+  padding:0 20px 20px;display:flex;gap:9px;
+  overflow-x:auto;scrollbar-width:none;
+}
+.pills::-webkit-scrollbar{display:none;}
+.pill{
+  flex-shrink:0;background:white;border:1.5px solid var(--border);
+  border-radius:12px;padding:8px 15px;
+  display:flex;align-items:center;gap:6px;
+  font-size:13.5px;font-weight:500;color:var(--deep);cursor:pointer;
+  box-shadow:0 2px 8px rgba(0,0,0,.04);transition:all .18s;
+}
+.pill.on{
+  background:linear-gradient(135deg,var(--violet),var(--violet2));
+  color:white;border-color:transparent;
+  box-shadow:0 4px 16px rgba(107,70,193,.35);
+}
+.pill:active{transform:scale(.95);}
+
+/* horizontal scroll cards */
+.hscroll{
+  padding:0 20px 22px;display:flex;gap:14px;
+  overflow-x:auto;scrollbar-width:none;
+}
+.hscroll::-webkit-scrollbar{display:none;}
+
+/* destination card */
+.dest-card{
+  flex-shrink:0;width:155px;border-radius:18px;overflow:hidden;
+  position:relative;height:195px;cursor:pointer;
+  box-shadow:0 4px 18px rgba(0,0,0,.15);
+  transition:transform .18s;
+}
+.dest-card:active{transform:scale(.97);}
+.dest-bg{position:absolute;inset:0;}
+.bg-sam{background:linear-gradient(160deg,#4a1f8c 0%,#8b5cf6 50%,#d97706 100%);}
+.bg-buk{background:linear-gradient(160deg,#065f46 0%,#059669 50%,#d97706 100%);}
+.bg-khi{background:linear-gradient(160deg,#1e3a5f 0%,#0ea5e9 60%,#06b6d4 100%);}
+.bg-tas{background:linear-gradient(160deg,#7f1d1d 0%,#dc2626 50%,#f59e0b 100%);}
+.dest-ov{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,transparent 35%,rgba(15,8,40,.78) 100%);
+}
+.dest-deco{
+  position:absolute;bottom:0;left:0;right:0;height:80px;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 155 80'%3E%3Cellipse cx='35' cy='80' rx='28' ry='35' fill='rgba(0,0,0,.2)'/%3E%3Cellipse cx='78' cy='80' rx='22' ry='28' fill='rgba(0,0,0,.18)'/%3E%3Cellipse cx='125' cy='80' rx='26' ry='32' fill='rgba(0,0,0,.16)'/%3E%3Crect x='31' y='40' width='8' height='40' fill='rgba(0,0,0,.18)'/%3E%3Crect x='75' y='46' width='6' height='34' fill='rgba(0,0,0,.15)'/%3E%3Ccircle cx='35' cy='36' r='5' fill='rgba(212,168,67,.7)'/%3E%3Ccircle cx='78' cy='43' r='4' fill='rgba(78,203,164,.6)'/%3E%3C/svg%3E") bottom/cover no-repeat;
+}
+.dest-info{position:absolute;bottom:0;left:0;right:0;padding:12px;}
+.dest-info h4{font-size:16px;font-weight:700;color:white;}
+.dest-info p{font-size:11.5px;color:rgba(255,255,255,.7);margin-top:2px;}
+.dest-star{
+  position:absolute;top:10px;right:10px;
+  background:rgba(0,0,0,.35);backdrop-filter:blur(4px);
+  border-radius:8px;padding:3px 8px;font-size:12px;color:white;font-weight:600;
+}
+
+/* trip card vertical */
+.tcard{
+  margin:0 20px 12px;background:white;border-radius:18px;
+  overflow:hidden;box-shadow:0 2px 14px rgba(107,70,193,.08);
+  cursor:pointer;display:flex;
+  border:1px solid var(--border);transition:transform .18s,box-shadow .18s;
+}
+.tcard:active{transform:scale(.985);}
+.tcard .thumb{width:105px;flex-shrink:0;position:relative;overflow:hidden;min-height:110px;}
+.tcard .tb1{background:linear-gradient(160deg,#2d1b69 0%,#7c5cbf 55%,#d4a843 100%);}
+.tcard .tb2{background:linear-gradient(160deg,#0f4c75 0%,#1b6ca8 55%,#4ecba4 100%);}
+.tcard .tb3{background:linear-gradient(160deg,#1a5c3a 0%,#16a34a 55%,#86efac 100%);}
+.thumb-dome{
+  position:absolute;bottom:0;left:0;right:0;height:65px;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 105 65'%3E%3Cellipse cx='25' cy='65' rx='20' ry='28' fill='rgba(255,255,255,.12)'/%3E%3Cellipse cx='53' cy='65' rx='17' ry='24' fill='rgba(255,255,255,.1)'/%3E%3Cellipse cx='82' cy='65' rx='18' ry='26' fill='rgba(255,255,255,.09)'/%3E%3C/svg%3E") bottom/cover;
+}
+.tcard .rb{
+  position:absolute;top:8px;left:8px;
+  background:rgba(0,0,0,.4);backdrop-filter:blur(3px);
+  border-radius:8px;padding:2px 7px;font-size:12px;color:white;font-weight:600;
+}
+.tcard .ti{flex:1;padding:13px 13px 11px;display:flex;flex-direction:column;justify-content:space-between;}
+.tcard h4{font-size:14.5px;font-weight:600;color:var(--deep);}
+.tcard .tsub{font-size:12px;color:var(--muted);margin-top:2px;display:flex;align-items:center;gap:4px;}
+.tcard .tags{display:flex;gap:5px;margin-top:7px;flex-wrap:wrap;}
+.tag{background:var(--border);color:var(--violet);font-size:10.5px;font-weight:500;padding:2px 7px;border-radius:6px;}
+.tcard .pr{display:flex;align-items:center;justify-content:space-between;margin-top:8px;}
+.tcard .price{font-size:15px;font-weight:700;color:var(--deep);}
+.tcard .price small{font-size:11px;color:var(--muted);font-weight:400;}
+.bk-btn{
+  background:linear-gradient(135deg,var(--violet),var(--violet2));
+  color:white;border:none;border-radius:8px;
+  padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;
+}
+
+/* ══════════════════════
+   TRIP DETAIL SCREEN
+══════════════════════ */
+.dh{position:relative;height:230px;flex-shrink:0;overflow:hidden;}
+.dh-bg{
+  position:absolute;inset:0;
+  background:linear-gradient(160deg,#0d0626 0%,#5b21b6 45%,#b45309 100%);
+}
+.dh-deco{position:absolute;inset:0;}
+.dh-bar{
+  position:absolute;top:0;left:0;right:0;
+  padding:14px 18px;display:flex;align-items:center;justify-content:space-between;z-index:5;
+}
+.dh-bar h2{font-family:'DM Sans',sans-serif;font-size:17px;font-weight:600;color:white;}
+.ibtn{
+  width:36px;height:36px;
+  background:rgba(255,255,255,.18);backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.28);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  color:white;font-size:19px;cursor:pointer;transition:background .15s;
+}
+.ibtn:active{background:rgba(255,255,255,.35);}
+
+/* progress strip */
+.progress-strip{
+  background:white;margin:0 16px;border-radius:16px;
+  padding:14px 16px;
+  box-shadow:0 4px 20px rgba(0,0,0,.1);
+  margin-top:-20px;position:relative;z-index:4;
+  border:1px solid var(--border);
+}
+.ps-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;}
+.ps-top h3{font-size:17px;font-weight:700;color:var(--deep);}
+.ps-top p{font-size:12.5px;color:var(--muted);margin-top:3px;display:flex;align-items:center;gap:5px;}
+.progress-bar{height:5px;background:var(--border);border-radius:999px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--mint),var(--sky));border-radius:999px;transition:width .6s ease;}
+.ps-labels{display:flex;justify-content:space-between;margin-top:5px;}
+.ps-labels span{font-size:11px;color:var(--muted);}
+.ps-labels b{font-size:11px;color:var(--mint);font-weight:600;}
+
+/* check items */
+.cl{padding:12px 16px 0;display:flex;flex-direction:column;gap:10px;}
+.ci{
+  background:white;border-radius:14px;padding:13px 14px;
+  display:flex;align-items:center;gap:11px;
+  box-shadow:0 2px 8px rgba(0,0,0,.05);border:1px solid var(--border);
+  cursor:pointer;transition:transform .15s;
+  animation:slideUp .4s ease both;
+}
+.ci:active{transform:scale(.99);}
+@keyframes slideUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.ci:nth-child(1){animation-delay:.05s;}.ci:nth-child(2){animation-delay:.1s;}
+.ci:nth-child(3){animation-delay:.15s;}.ci:nth-child(4){animation-delay:.2s;}
+.ci:nth-child(5){animation-delay:.25s;}.ci:nth-child(6){animation-delay:.3s;}
+.ci-ico{
+  width:44px;height:44px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;font-size:21px;flex-shrink:0;
+}
+.ic-pur{background:linear-gradient(135deg,#ede9fb,#d8ccf7);}
+.ic-blu{background:linear-gradient(135deg,#e0f2fe,#bfdbfe);}
+.ic-grn{background:linear-gradient(135deg,#d1fae5,#a7f3d0);}
+.ic-amb{background:linear-gradient(135deg,#fef3c7,#fde68a);}
+.ic-ros{background:linear-gradient(135deg,#fee2e2,#fecaca);}
+.ic-sky{background:linear-gradient(135deg,#cffafe,#a5f3fc);}
+.ci-body{flex:1;}
+.ci-body .cit{font-size:14.5px;font-weight:600;color:var(--deep);}
+.ci-body .cis{font-size:12.5px;color:var(--muted);margin-top:2px;line-height:1.4;}
+.ci-right{display:flex;align-items:center;gap:5px;flex-shrink:0;}
+.sdot{width:8px;height:8px;border-radius:50%;}
+.sg{background:var(--mint);}.sa{background:var(--amber);}.sr{background:var(--coral);}
+.stxt{font-size:12px;font-weight:600;}
+.stg{color:var(--mint);}.sta{color:var(--amber);}.str{color:var(--coral);}
+.stars{color:#f59e0b;font-size:12px;}
+.rn{font-size:13px;font-weight:700;color:var(--deep);}
+.rc{font-size:11px;color:var(--muted);}
+
+/* guide card */
+.guide{
+  background:white;border-radius:14px;padding:14px;
+  box-shadow:0 2px 8px rgba(0,0,0,.05);border:1px solid var(--border);
+  cursor:pointer;transition:transform .15s;
+  animation:slideUp .4s .32s ease both;
+}
+.guide:active{transform:scale(.99);}
+.g-top{display:flex;align-items:center;gap:11px;margin-bottom:9px;}
+.g-av{
+  width:46px;height:46px;border-radius:50%;
+  background:linear-gradient(135deg,var(--ink),var(--violet));
+  display:flex;align-items:center;justify-content:center;
+  color:white;font-size:19px;font-weight:700;flex-shrink:0;
+  border:2.5px solid var(--lavender);
+}
+.g-name{font-size:15px;font-weight:600;color:var(--deep);display:flex;align-items:center;gap:6px;}
+.flag{
+  background:linear-gradient(90deg,#1eb53a 50%,#0099b5 50%);
+  color:white;font-size:9.5px;padding:1px 6px;border-radius:4px;font-weight:700;
+}
+.g-fb{background:var(--silk);border-radius:8px;padding:2px 7px;font-size:11px;color:var(--muted);}
+.g-msg{font-size:13.5px;color:#444;line-height:1.55;}
+.g-msg strong{color:var(--deep);font-weight:600;}
+
+/* chat input */
+.chat-bar{
+  margin:12px 16px 0;background:white;border-radius:16px;
+  padding:12px 14px;display:flex;align-items:center;gap:10px;
+  box-shadow:0 2px 12px rgba(0,0,0,.08);border:1.5px solid var(--border);
+  animation:slideUp .4s .38s ease both;
+}
+.chat-bar span{font-size:19px;}
+.chat-bar input{
+  flex:1;border:none;outline:none;
+  font-family:'DM Sans',sans-serif;font-size:14px;color:var(--violet);
+  background:transparent;font-style:italic;
+}
+.mic{
+  width:34px;height:34px;background:linear-gradient(135deg,var(--violet),var(--violet2));
+  border-radius:50%;border:none;display:flex;align-items:center;justify-content:center;
+  color:white;font-size:15px;cursor:pointer;transition:transform .15s;
+}
+.mic:active{transform:scale(.9);}
+
+/* ══════════════════════
+   EXPLORE SCREEN
+══════════════════════ */
+.explore-hero{
+  height:160px;position:relative;flex-shrink:0;overflow:hidden;
+  background:linear-gradient(160deg,#0d0626 0%,#4c1d95 55%,#b45309 100%);
+}
+.exp-hero-content{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  justify-content:flex-end;padding:20px;
+}
+.exp-hero-content h2{
+  font-family:'Cormorant Garamond',serif;font-style:italic;
+  font-size:28px;color:white;font-weight:700;
+}
+.exp-hero-content p{font-size:13px;color:rgba(255,255,255,.7);margin-top:4px;}
+.exp-search{
+  margin:-20px 16px 0;position:relative;z-index:5;
+  background:white;border-radius:14px;
+  display:flex;align-items:center;gap:10px;padding:13px 15px;
+  box-shadow:0 4px 20px rgba(0,0,0,.12);border:1.5px solid var(--border);
+}
+.exp-search span{font-size:17px;}
+.exp-search input{
+  flex:1;border:none;outline:none;
+  font-family:'DM Sans',sans-serif;font-size:14px;color:var(--deep);background:transparent;
+}
+
+/* map-style cards */
+.map-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:12px;
+  padding:20px 16px 0;
+}
+.mg-card{
+  border-radius:16px;overflow:hidden;position:relative;
+  height:130px;cursor:pointer;
+  box-shadow:0 3px 14px rgba(0,0,0,.12);transition:transform .18s;
+}
+.mg-card:active{transform:scale(.97);}
+.mg-card.tall{height:272px;grid-row:span 2;}
+.mg-card .mg-bg{position:absolute;inset:0;}
+.mg-card .mg-ov{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,transparent 40%,rgba(10,5,30,.75) 100%);
+}
+.mg-info{position:absolute;bottom:0;left:0;right:0;padding:10px 12px;}
+.mg-info h4{font-size:14px;font-weight:700;color:white;}
+.mg-info p{font-size:11px;color:rgba(255,255,255,.7);}
+.mg-badge{
+  position:absolute;top:9px;right:9px;
+  background:rgba(0,0,0,.4);backdrop-filter:blur(4px);
+  border-radius:8px;padding:2px 8px;font-size:11.5px;color:white;font-weight:600;
+}
+
+/* filter chips */
+.filter-row{
+  padding:16px 16px 0;display:flex;gap:8px;
+  overflow-x:auto;scrollbar-width:none;
+}
+.filter-row::-webkit-scrollbar{display:none;}
+.fchip{
+  flex-shrink:0;background:white;border:1.5px solid var(--border);
+  border-radius:20px;padding:7px 14px;
+  font-size:13px;font-weight:500;color:var(--deep);cursor:pointer;
+  transition:all .18s;
+}
+.fchip.on{background:var(--deep);color:white;border-color:var(--deep);}
+
+/* ══════════════════════
+   TRIPS SCREEN
+══════════════════════ */
+.trips-header{
+  background:linear-gradient(160deg,#0d0626,#4c1d95);
+  padding:14px 20px 24px;flex-shrink:0;
+}
+.trips-header h2{
+  font-family:'Cormorant Garamond',serif;font-style:italic;
+  font-size:26px;color:white;font-weight:700;margin-bottom:4px;
+}
+.trips-header p{font-size:13px;color:rgba(255,255,255,.65);}
+
+/* timeline trip */
+.timeline{padding:16px 16px 0;}
+.tl-item{
+  display:flex;gap:14px;margin-bottom:20px;
+  animation:slideUp .4s ease both;
+}
+.tl-item:nth-child(1){animation-delay:.05s;}
+.tl-item:nth-child(2){animation-delay:.12s;}
+.tl-item:nth-child(3){animation-delay:.19s;}
+.tl-left{display:flex;flex-direction:column;align-items:center;gap:0;}
+.tl-dot{
+  width:40px;height:40px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:18px;
+  border:2.5px solid var(--border);background:white;
+}
+.tl-dot.active{
+  background:linear-gradient(135deg,var(--violet),var(--violet2));
+  border-color:transparent;
+  box-shadow:0 3px 12px rgba(107,70,193,.4);
+}
+.tl-line{flex:1;width:2px;background:var(--border);margin:4px 0;}
+.tl-card{
+  flex:1;background:white;border-radius:16px;
+  padding:14px;box-shadow:0 2px 10px rgba(107,70,193,.07);
+  border:1px solid var(--border);cursor:pointer;transition:transform .15s;
+}
+.tl-card:active{transform:scale(.99);}
+.tl-card h4{font-size:15px;font-weight:600;color:var(--deep);}
+.tl-card .tl-date{font-size:12px;color:var(--muted);margin:3px 0 8px;display:flex;align-items:center;gap:5px;}
+.tl-status{
+  display:inline-flex;align-items:center;gap:5px;
+  border-radius:8px;padding:3px 9px;font-size:12px;font-weight:600;
+}
+.ts-upcoming{background:#ede9fb;color:var(--violet);}
+.ts-active{background:#d1fae5;color:var(--mint);}
+.ts-done{background:#f3f4f6;color:#9ca3af;}
+.tl-card .tl-places{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;}
+.tplace{
+  background:var(--silk);border-radius:8px;padding:4px 8px;
+  font-size:11.5px;color:var(--deep);font-weight:500;
+  display:flex;align-items:center;gap:4px;
+}
+
+/* ══════════════════════
+   PROFILE SCREEN
+══════════════════════ */
+.prof-hero{
+  background:linear-gradient(160deg,#0d0626,#4c1d95 60%,#1a5c3a);
+  padding:24px 20px 32px;flex-shrink:0;
+  display:flex;align-items:center;gap:16px;
+}
+.prof-av{
+  width:72px;height:72px;border-radius:50%;
+  background:linear-gradient(135deg,var(--lavender),var(--violet));
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;font-weight:700;color:white;flex-shrink:0;
+  border:3px solid rgba(255,255,255,.3);
+  box-shadow:0 4px 20px rgba(0,0,0,.3);
+}
+.prof-info h2{font-size:22px;font-weight:700;color:white;}
+.prof-info p{font-size:13px;color:rgba(255,255,255,.65);margin-top:3px;}
+.prof-badges{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+.pbadge{
+  background:rgba(255,255,255,.15);backdrop-filter:blur(6px);
+  border:1px solid rgba(255,255,255,.2);
+  border-radius:20px;padding:4px 11px;
+  font-size:11.5px;color:white;font-weight:500;
+}
+
+/* stats row */
+.stats-row{
+  display:flex;background:white;margin:0 16px;border-radius:16px;
+  padding:14px 0;margin-top:-18px;position:relative;z-index:3;
+  box-shadow:0 4px 20px rgba(0,0,0,.1);border:1px solid var(--border);
+}
+.stat{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;}
+.stat+.stat{border-left:1px solid var(--border);}
+.stat .sn{font-size:22px;font-weight:700;color:var(--deep);}
+.stat .sl{font-size:11.5px;color:var(--muted);}
+
+/* settings list */
+.slist{padding:20px 16px 0;}
+.slist-group{margin-bottom:20px;}
+.slist-group h4{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;padding:0 2px;}
+.sitem{
+  background:white;border-radius:14px;padding:14px 15px;
+  display:flex;align-items:center;gap:12px;
+  margin-bottom:8px;cursor:pointer;
+  box-shadow:0 2px 8px rgba(0,0,0,.04);border:1px solid var(--border);
+  transition:transform .15s;
+}
+.sitem:active{transform:scale(.99);}
+.sico{
+  width:38px;height:38px;border-radius:11px;
+  display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;
+}
+.sitem .slabel{flex:1;font-size:14.5px;font-weight:500;color:var(--deep);}
+.sitem .schev{font-size:16px;color:#d1d5db;}
+.si-pur{background:linear-gradient(135deg,#ede9fb,#d8ccf7);}
+.si-amb{background:linear-gradient(135deg,#fef3c7,#fde68a);}
+.si-grn{background:linear-gradient(135deg,#d1fae5,#a7f3d0);}
+.si-sky{background:linear-gradient(135deg,#e0f2fe,#bae6fd);}
+.si-ros{background:linear-gradient(135deg,#fee2e2,#fecaca);}
+
+/* ══════════════════════
+   BOTTOM NAV
+══════════════════════ */
+.bnav{
+  background:white;border-top:1px solid var(--border);
+  display:flex;padding:8px 0 max(8px,var(--safe-bottom));
+  flex-shrink:0;position:relative;z-index:30;
+}
+.ni{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;
+  cursor:pointer;padding:4px 0;transition:opacity .15s;
+}
+.ni .nico{font-size:22px;transition:transform .2s;}
+.ni.on .nico{transform:scale(1.15);}
+.ni .nlbl{font-size:10.5px;font-weight:500;color:var(--muted);}
+.ni.on .nlbl{color:var(--violet);font-weight:600;}
+.nav-indicator{
+  position:absolute;top:0;height:2.5px;border-radius:0 0 3px 3px;
+  background:linear-gradient(90deg,var(--violet),var(--violet2));
+  transition:left .3s cubic-bezier(.77,0,.18,1),width .3s;
+}
+
+/* ══════════════════════
+   NOTIFICATIONS PANEL
+══════════════════════ */
+#notif-panel{
+  position:absolute;top:0;right:0;bottom:0;width:88%;
+  background:var(--silk);z-index:50;
+  transform:translateX(110%);transition:transform .38s cubic-bezier(.77,0,.18,1);
+  display:flex;flex-direction:column;
+  box-shadow:-8px 0 40px rgba(0,0,0,.2);
+}
+#notif-panel.open{transform:translateX(0);}
+.np-head{
+  background:white;padding:16px 18px;display:flex;align-items:center;gap:12px;
+  border-bottom:1px solid var(--border);
+}
+.np-head h3{font-size:17px;font-weight:600;color:var(--deep);flex:1;}
+.close-np{font-size:22px;cursor:pointer;color:var(--muted);}
+.notif-list{flex:1;overflow-y:auto;padding:12px 14px;scrollbar-width:none;}
+.notif-list::-webkit-scrollbar{display:none;}
+.nitem{
+  background:white;border-radius:14px;padding:13px 14px;
+  display:flex;gap:11px;margin-bottom:10px;
+  border:1px solid var(--border);
+  box-shadow:0 2px 8px rgba(0,0,0,.04);
+}
+.nitem .nicon{
+  width:40px;height:40px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;
+}
+.nitem .nbody .ntitle{font-size:14px;font-weight:600;color:var(--deep);}
+.nitem .nbody .nsub{font-size:12.5px;color:var(--muted);margin-top:2px;line-height:1.4;}
+.nitem .nbody .ntime{font-size:11px;color:var(--muted);margin-top:4px;}
+.nitem.unread{border-left:3px solid var(--violet);}
+.overlay{
+  position:absolute;inset:0;background:rgba(0,0,0,.4);
+  z-index:49;opacity:0;pointer-events:none;transition:opacity .3s;
+}
+.overlay.vis{opacity:1;pointer-events:all;}
+
+/* MISC */
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.6;}}
+.pulse{animation:pulse 2s infinite;}
+</style>
 </head>
 <body>
-    <div class="container" id="home-screen">
-        <div class="header">
-            <div class="logo">WAYLO</div>
-            <div style="flex:1"></div>
-            <img src="https://example.com/bell-icon.png" width="20"> <!-- Иконка уведомлений -->
+<div id="app">
+
+<!-- ═══════════ SPLASH ═══════════ -->
+<div id="splash" class="screen">
+  <div class="splash-bg"></div>
+  <div class="splash-stars" id="stars"></div>
+  <!-- SVG skyline -->
+  <svg class="splash-dome-svg" viewBox="0 0 430 280" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="sg" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="rgba(107,70,193,0.35)"/>
+        <stop offset="1" stop-color="rgba(107,70,193,0.0)"/>
+      </linearGradient>
+    </defs>
+    <!-- big dome left -->
+    <ellipse cx="90" cy="280" rx="55" ry="70" fill="rgba(255,255,255,.06)"/>
+    <rect x="80" y="200" width="18" height="80" fill="rgba(255,255,255,.07)"/>
+    <ellipse cx="89" cy="198" rx="12" ry="5" fill="rgba(212,168,67,.4)"/>
+    <rect x="87" y="170" width="4" height="30" fill="rgba(255,255,255,.08)"/>
+    <circle cx="89" cy="167" r="5" fill="rgba(212,168,67,.6)" stroke="rgba(212,168,67,1)" stroke-width="1"/>
+    <!-- minaret 1 -->
+    <rect x="50" y="215" width="12" height="65" fill="rgba(255,255,255,.07)"/>
+    <polygon points="56,200 50,217 62,217" fill="rgba(139,92,246,.5)"/>
+    <!-- center dome big -->
+    <ellipse cx="215" cy="280" rx="65" ry="80" fill="rgba(255,255,255,.05)"/>
+    <rect x="205" y="185" width="20" height="95" fill="rgba(255,255,255,.07)"/>
+    <ellipse cx="215" cy="183" rx="14" ry="6" fill="rgba(78,203,164,.35)"/>
+    <rect x="213" y="155" width="4" height="30" fill="rgba(255,255,255,.09)"/>
+    <circle cx="215" cy="152" r="6" fill="rgba(78,203,164,.7)" stroke="rgba(78,203,164,1)" stroke-width="1.5"/>
+    <!-- minaret 2 -->
+    <rect x="172" y="210" width="13" height="70" fill="rgba(255,255,255,.07)"/>
+    <polygon points="178,195 172,212 184,212" fill="rgba(139,92,246,.45)"/>
+    <!-- minaret 3 -->
+    <rect x="248" y="218" width="13" height="62" fill="rgba(255,255,255,.07)"/>
+    <polygon points="254,203 248,220 260,220" fill="rgba(139,92,246,.45)"/>
+    <!-- right dome -->
+    <ellipse cx="355" cy="280" rx="52" ry="65" fill="rgba(255,255,255,.05)"/>
+    <rect x="346" y="205" width="16" height="75" fill="rgba(255,255,255,.06)"/>
+    <ellipse cx="354" cy="203" rx="11" ry="5" fill="rgba(90,180,214,.35)"/>
+    <rect x="352" y="178" width="4" height="27" fill="rgba(255,255,255,.08)"/>
+    <circle cx="354" cy="175" r="5" fill="rgba(90,180,214,.7)" stroke="rgba(90,180,214,1)" stroke-width="1"/>
+    <!-- minaret 4 -->
+    <rect x="310" y="222" width="12" height="58" fill="rgba(255,255,255,.06)"/>
+    <polygon points="316,208 310,224 322,224" fill="rgba(139,92,246,.4)"/>
+    <!-- ground -->
+    <rect x="0" y="275" width="430" height="5" fill="rgba(255,255,255,.04)"/>
+    <!-- glow -->
+    <ellipse cx="215" cy="260" rx="160" ry="30" fill="url(#sg)"/>
+  </svg>
+  <div class="splash-content">
+    <div class="splash-logo"><span class="ww">W</span>AYLO</div>
+    <div class="splash-tagline">Your Seamless<br>Silk Road Journey</div>
+    <button class="splash-cta" onclick="enterApp()">✦ &nbsp;Begin Your Journey</button>
+    <p class="splash-sub">4.9 ★ · 12,000+ travelers · Uzbekistan & Beyond</p>
+  </div>
+</div>
+
+<!-- ═══════════ HOME ═══════════ -->
+<div id="home" class="screen hidden">
+  <div class="topbar">
+    <button class="icon-btn" style="font-size:15px;letter-spacing:-1px;">☰</button>
+    <div class="logo"><span class="wl">W</span>AYLO</div>
+    <button class="icon-btn" onclick="openNotif()">🔔<span class="notif-dot"></span></button>
+  </div>
+  <div class="scroll">
+    <div class="greeting">
+      <h1>Hello, Michael! <div class="av">M</div></h1>
+      <p>Your Seamless Silk Road Journey awaits ✦</p>
+    </div>
+    <div class="search-row">
+      <span>🔍</span>
+      <input type="text" placeholder="Where in Uzbekistan…">
+      <div class="filter-dot">⊞</div>
+    </div>
+    <!-- Hero -->
+    <div class="hero" onclick="navTo('detail')">
+      <div class="hero-bg"></div>
+      <div class="hero-overlay"></div>
+      <svg class="hero-deco" viewBox="0 0 390 215" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="80" cy="215" rx="46" ry="58" fill="rgba(255,255,255,.08)"/>
+        <rect x="72" y="152" width="14" height="63" fill="rgba(255,255,255,.07)"/>
+        <rect x="78" y="127" width="3" height="26" fill="rgba(255,255,255,.09)"/>
+        <circle cx="80" cy="124" r="4" fill="rgba(212,168,67,.8)"/>
+        <ellipse cx="195" cy="215" rx="55" ry="68" fill="rgba(255,255,255,.07)"/>
+        <rect x="186" y="140" width="16" height="75" fill="rgba(255,255,255,.08)"/>
+        <rect x="192" y="113" width="4" height="28" fill="rgba(255,255,255,.09)"/>
+        <circle cx="194" cy="110" r="5" fill="rgba(78,203,164,.85)"/>
+        <ellipse cx="320" cy="215" rx="40" ry="52" fill="rgba(255,255,255,.06)"/>
+        <rect x="313" y="158" width="13" height="57" fill="rgba(255,255,255,.07)"/>
+        <rect x="318" y="136" width="3" height="23" fill="rgba(255,255,255,.08)"/>
+        <circle cx="320" cy="133" r="4" fill="rgba(90,180,214,.8)"/>
+        <rect x="140" y="168" width="10" height="47" fill="rgba(255,255,255,.06)"/>
+        <polygon points="145,154 140,170 150,170" fill="rgba(139,92,246,.5)"/>
+        <rect x="256" y="172" width="10" height="43" fill="rgba(255,255,255,.06)"/>
+        <polygon points="261,158 256,174 266,174" fill="rgba(139,92,246,.5)"/>
+      </svg>
+      <div class="hero-body">
+        <div class="hero-top">
+          <div class="hero-title">Discover<br>Uzbekistan</div>
+          <div class="ai-chip">✨ AI Curated</div>
         </div>
-        <div class="greeting">
-            <h2>Hello, Michael!</h2>
-            <p>Your Seamless Silk Road Journey</p>
-            <input type="text" placeholder="Explore Samarkand..." style="width:100%; padding:10px; border-radius:20px; border:1px solid #ddd;">
+        <div>
+          <div class="hero-meta">
+            <div class="meta-av">W</div>
+            <div class="meta-txt">Curated by Waylo AI<b>April 26–30 · 4 Nights, 3 Guests</b></div>
+          </div>
+          <button class="cta-btn" onclick="event.stopPropagation();navTo('detail')">Start Journey &nbsp;›</button>
         </div>
-        <div class="card discover-card">
-            <h2>Discover Uzbekistan</h2>
-            <p>Curated by Waylo AI</p>
-            <p>April 26 - April 30</p>
-            <p>4 Nights, 3 Guests</p>
-            <div class="button" onclick="showTripScreen()">Start Journey</div>
-        </div>
-        <div class="recommended">
-            <h3>Recommended</h3>
-            <div class="card">Hotels</div>
-            <div class="card">Tours</div>
-            <div class="card">Food</div>
-        </div>
-        <div class="tailored">
-            <h3>Tailored for You</h3>
-            <div class="card">
-                <h4>Legends of Samarkand</h4>
-                <p>9.5 Superb</p>
-                <p>210 som · 3-Hour Historical Tour</p>
-            </div>
-        </div>
-        <div class="bottom-nav">
-            <div class="nav-item">Home</div>
-            <div class="nav-item">Explore</div>
-            <div class="nav-item">Trips</div>
-            <div class="nav-item">Profile</div>
-        </div>
+      </div>
     </div>
 
-    <div class="container" id="trip-screen" style="display:none;">
-        <div class="trip-header">
-            <h2>Trip to Samarkand</h2>
-            <p>April 26 - April 30</p>
-            <p>4 Nights, 3 Guests</p>
-        </div>
-        <div class="item">
-            <div style="background:#9370db; color:white; border-radius:50%; padding:10px; margin-right:10px;">VISA</div>
-            <div>Visa Approved</div>
-        </div>
-        <div class="item">
-            <div style="background:#add8e6; color:white; border-radius:50%; padding:10px; margin-right:10px;">✈️</div>
-            <div>Flight Confirmed: Tashkent - Samarkand<br>April 26, 10:30 - 11:45 AM<br>HY126 - UzAir · 960+</div>
-        </div>
-        <div class="item">
-            <div style="background:#90ee90; color:white; border-radius:50%; padding:10px; margin-right:10px;">🏨</div>
-            <div>Hotel Abdu-S<br>April 26-30 · 4.8 ★ 960 reviews</div>
-        </div>
-        <div class="item">
-            <div style="background:#ffa500; color:white; border-radius:50%; padding:10px; margin-right:10px;">🚗</div>
-            <div>Transfer arranged, 10:30 AM</div>
-        </div>
-        <div class="chat">
-            <img src="https://example.com/timur.jpg" width="40" style="border-radius:50%;"> Timur ★★★★★ 320 feedbacks
-            <p>Hello Michael! I'll meet you after breakfast for our personalized 2 PM city tour. We'll start with the Registan Sq...</p>
-            <div class="add-button">I'd like to add Bibi-Khanym Mosque</div>
-        </div>
-        <div class="bottom-nav">
-            <div class="nav-item">Chat</div>
-            <div class="nav-item">Activities</div>
-            <div class="nav-item">Details</div>
-            <div class="nav-item">Preferences</div>
-        </div>
+    <!-- Recommended -->
+    <div class="sec-head"><h3>Recommended</h3><span class="see-all">See all ›</span></div>
+    <div class="pills">
+      <div class="pill on" onclick="setPill(this)">🏨 Hotels</div>
+      <div class="pill" onclick="setPill(this)">🗺 Tours</div>
+      <div class="pill" onclick="setPill(this)">🍽 Food</div>
+      <div class="pill" onclick="setPill(this)">🕌 Culture</div>
+      <div class="pill" onclick="setPill(this)">🚌 Transport</div>
     </div>
 
-    <script>
-        Telegram.WebApp.ready();
-        Telegram.WebApp.MainButton.text = 'Book Now';
-        Telegram.WebApp.MainButton.show();
+    <!-- Destinations horizontal -->
+    <div class="sec-head"><h3>Top Destinations</h3><span class="see-all">›</span></div>
+    <div class="hscroll">
+      <div class="dest-card" onclick="navTo('detail')">
+        <div class="dest-bg bg-sam"></div>
+        <div class="dest-ov"></div>
+        <div class="dest-deco"></div>
+        <div class="dest-star">⭐ 9.8</div>
+        <div class="dest-info"><h4>Samarkand</h4><p>🕌 Registan Square</p></div>
+      </div>
+      <div class="dest-card">
+        <div class="dest-bg bg-buk"></div>
+        <div class="dest-ov"></div>
+        <div class="dest-deco"></div>
+        <div class="dest-star">⭐ 9.5</div>
+        <div class="dest-info"><h4>Bukhara</h4><p>🏯 Old City</p></div>
+      </div>
+      <div class="dest-card">
+        <div class="dest-bg bg-khi"></div>
+        <div class="dest-ov"></div>
+        <div class="dest-deco"></div>
+        <div class="dest-star">⭐ 9.3</div>
+        <div class="dest-info"><h4>Khiva</h4><p>🌙 Ichan-Kala</p></div>
+      </div>
+      <div class="dest-card">
+        <div class="dest-bg bg-tas"></div>
+        <div class="dest-ov"></div>
+        <div class="dest-deco"></div>
+        <div class="dest-star">⭐ 9.1</div>
+        <div class="dest-info"><h4>Tashkent</h4><p>🚇 Chorsu Bazar</p></div>
+      </div>
+    </div>
 
-        function showTripScreen() {
-            document.getElementById('home-screen').style.display = 'none';
-            document.getElementById('trip-screen').style.display = 'block';
-            // Интеграция с AI: Классификация интента и вызов DTPA для обновления пакета
-            // Пример: fetch('/api/assemble-package', { method: 'POST', body: JSON.stringify({ trip: 'Samarkand' }) });
-        }
+    <!-- Tailored -->
+    <div class="sec-head"><h3>Tailored for You</h3><span class="see-all">›</span></div>
+    <div class="tcard" onclick="navTo('detail')">
+      <div class="thumb tb1"><div class="thumb-dome"></div><div class="rb">⭐ 9.5</div></div>
+      <div class="ti">
+        <div>
+          <h4>Legends of Samarkand</h4>
+          <div class="tsub">🕌 3-Hour Historical Tour</div>
+          <div class="tags"><span class="tag">Superb</span><span class="tag">210 reviews</span></div>
+        </div>
+        <div class="pr"><div class="price">$48 <small>/ person</small></div><button class="bk-btn">Book</button></div>
+      </div>
+    </div>
+    <div class="tcard">
+      <div class="thumb tb2"><div class="thumb-dome"></div><div class="rb">⭐ 9.2</div></div>
+      <div class="ti">
+        <div>
+          <h4>Bukhara Day Escape</h4>
+          <div class="tsub">🚌 Full-Day Excursion</div>
+          <div class="tags"><span class="tag">Excellent</span><span class="tag">186 reviews</span></div>
+        </div>
+        <div class="pr"><div class="price">$65 <small>/ person</small></div><button class="bk-btn">Book</button></div>
+      </div>
+    </div>
+    <div class="tcard">
+      <div class="thumb tb3"><div class="thumb-dome"></div><div class="rb">⭐ 9.0</div></div>
+      <div class="ti">
+        <div>
+          <h4>Fergana Valley Bazaars</h4>
+          <div class="tsub">🛍 Shopping & Culture</div>
+          <div class="tags"><span class="tag">Amazing</span><span class="tag">142 reviews</span></div>
+        </div>
+        <div class="pr"><div class="price">$38 <small>/ person</small></div><button class="bk-btn">Book</button></div>
+      </div>
+    </div>
+    <div class="pad-bot"></div>
+  </div>
+  <nav class="bnav" id="nav-home">
+    <div class="nav-indicator" id="nav-ind"></div>
+    <div class="ni on" onclick="switchTab(0,'home')"><div class="nico">🏠</div><div class="nlbl">Home</div></div>
+    <div class="ni" onclick="switchTab(1,'explore')"><div class="nico">🔍</div><div class="nlbl">Explore</div></div>
+    <div class="ni" onclick="switchTab(2,'trips')"><div class="nico">🧳</div><div class="nlbl">Trips</div></div>
+    <div class="ni" onclick="switchTab(3,'profile')"><div class="nico">👤</div><div class="nlbl">Profile</div></div>
+  </nav>
+</div>
 
-        // Динамика: Обработка чата с гидом (Voice-Bozor для аналоговых партнеров)
-        document.querySelector('.add-button').addEventListener('click', () => {
-            alert('Adding Bibi-Khanym Mosque via Waylo AI... Calculating WAAP adjustment.');
-            // Симуляция WAAP: P_opt + R_sus * K_rel
-            const P_opt = 200; // Базовая цена
-            const R_sus = 0.1; // 10% буфер
-            const K_rel = 1.05; // Надежность
-            const waap = P_opt + (R_sus * K_rel * P_opt);
-            console.log('Updated Price:', waap);
-            // Отправка в DMC для исполнения
-        });
-    </script>
+<!-- ═══════════ DETAIL ═══════════ -->
+<div id="detail" class="screen hidden">
+  <div class="dh">
+    <div class="dh-bg"></div>
+    <svg class="dh-deco" viewBox="0 0 430 230" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="90" cy="230" rx="55" ry="70" fill="rgba(255,255,255,.07)"/>
+      <rect x="82" y="158" width="15" height="72" fill="rgba(255,255,255,.07)"/>
+      <rect x="88" y="133" width="3.5" height="26" fill="rgba(255,255,255,.09)"/>
+      <circle cx="90" cy="130" r="5" fill="rgba(212,168,67,.8)" stroke="rgba(212,168,67,1)" stroke-width="1.5"/>
+      <ellipse cx="215" cy="230" rx="65" ry="80" fill="rgba(255,255,255,.06)"/>
+      <rect x="206" y="145" width="17" height="85" fill="rgba(255,255,255,.07)"/>
+      <rect x="212" y="118" width="4" height="28" fill="rgba(255,255,255,.09)"/>
+      <circle cx="214" cy="115" r="6" fill="rgba(78,203,164,.8)" stroke="rgba(78,203,164,1)" stroke-width="1.5"/>
+      <ellipse cx="350" cy="230" rx="48" ry="62" fill="rgba(255,255,255,.06)"/>
+      <rect x="342" y="163" width="14" height="67" fill="rgba(255,255,255,.07)"/>
+      <rect x="347" y="140" width="3.5" height="24" fill="rgba(255,255,255,.08)"/>
+      <circle cx="349" cy="137" r="5" fill="rgba(90,180,214,.8)" stroke="rgba(90,180,214,1)" stroke-width="1.5"/>
+      <rect x="152" y="172" width="11" height="58" fill="rgba(255,255,255,.06)"/>
+      <polygon points="157,158 151,174 163,174" fill="rgba(139,92,246,.45)"/>
+      <rect x="264" y="178" width="11" height="52" fill="rgba(255,255,255,.06)"/>
+      <polygon points="269,164 263,180 275,180" fill="rgba(139,92,246,.45)"/>
+      <rect x="0" y="224" width="430" height="6" fill="rgba(255,255,255,.04)"/>
+    </svg>
+    <div class="dh-bar">
+      <div class="ibtn" onclick="goBack()">‹</div>
+      <h2>Trip to Samarkand</h2>
+      <div class="ibtn">⋯</div>
+    </div>
+  </div>
+  <div class="scroll">
+    <div class="progress-strip">
+      <div class="ps-top">
+        <div>
+          <h3>Trip to Samarkand</h3>
+          <p>📅 April 26 – 30 &nbsp;·&nbsp; 4 Nights, 3 Guests</p>
+        </div>
+        <div style="font-size:22px;cursor:pointer;">⌄</div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:65%"></div></div>
+      <div class="ps-labels"><span>Planning</span><b>65% ready</b><span>Departs in 47d</span></div>
+    </div>
+    <div class="cl">
+      <div class="ci">
+        <div class="ci-ico ic-pur">🛂</div>
+        <div class="ci-body"><div class="cit">VISA</div><div class="cis">E-Visa approved · Uzbekistan</div></div>
+        <div class="ci-right"><div class="sdot sg"></div><div class="stxt stg">Approved ✓</div></div>
+      </div>
+      <div class="ci">
+        <div class="ci-ico ic-blu">✈️</div>
+        <div class="ci-body"><div class="cit">Flight confirmed</div><div class="cis">Tashkent → Samarkand<br>Apr 26, 10:30–11:45 · HY126 · UzAir</div></div>
+        <div class="ci-right"><span class="stars">★★</span><span class="rn" style="margin-left:3px;">960</span></div>
+      </div>
+      <div class="ci">
+        <div class="ci-ico ic-grn">🏨</div>
+        <div class="ci-body">
+          <div class="cit">Hotel Abdu-S</div>
+          <div class="cis" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+            Apr 26–30 &nbsp;<span class="stars">★★★★★</span><span class="rn">4.8</span><span class="rc">960 reviews</span>
+          </div>
+        </div>
+        <div class="ci-right" style="font-size:16px;color:#d1d5db;">›</div>
+      </div>
+      <div class="ci">
+        <div class="ci-ico ic-amb">🚐</div>
+        <div class="ci-body"><div class="cit">Transfers</div><div class="cis">Pickup arranged · 10:30 AM</div></div>
+        <div class="ci-right"><div class="sdot sa"></div><div class="stxt sta">Pending</div></div>
+      </div>
+      <div class="ci">
+        <div class="ci-ico ic-sky">🍽</div>
+        <div class="ci-body"><div class="cit">Dinner Reservation</div><div class="cis">Platan Restaurant · Apr 26, 7:00 PM</div></div>
+        <div class="ci-right"><div class="sdot sg"></div><div class="stxt stg">Confirmed</div></div>
+      </div>
+      <div class="guide">
+        <div class="g-top">
+          <div class="g-av">T</div>
+          <div>
+            <div class="g-name">Timur <span class="flag">UZ</span><span class="g-fb">⭐ 320</span></div>
+            <div class="stars" style="margin-top:3px;">★★★★★</div>
+          </div>
+        </div>
+        <div class="g-msg">Hello Michael! I'll meet you after breakfast for our personalized <strong>2 PM city tour</strong>. We'll start with <strong>Registan Square</strong>, then Shah-i-Zinda necropolis and finish at the bazaar…</div>
+      </div>
+    </div>
+    <div class="chat-bar">
+      <span>💬</span>
+      <input type="text" value="I'd like to add Bibi-Khanym Mosque" readonly>
+      <button class="mic">🎙</button>
+    </div>
+    <div class="pad-bot"></div>
+  </div>
+  <nav class="bnav">
+    <div class="ni on"><div class="nico">💬</div><div class="nlbl">Chat</div></div>
+    <div class="ni"><div class="nico">🎯</div><div class="nlbl">Activities</div></div>
+    <div class="ni"><div class="nico">📋</div><div class="nlbl">Details</div></div>
+    <div class="ni"><div class="nico">⚙️</div><div class="nlbl">Preferences</div></div>
+  </nav>
+</div>
+
+<!-- ═══════════ EXPLORE ═══════════ -->
+<div id="explore" class="screen hidden">
+  <div class="explore-hero">
+    <svg style="position:absolute;inset:0;width:100%;height:100%;" viewBox="0 0 430 160" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="60" cy="160" rx="40" ry="52" fill="rgba(255,255,255,.06)"/>
+      <rect x="54" y="107" width="12" height="53" fill="rgba(255,255,255,.07)"/>
+      <rect x="59" y="85" width="3" height="23" fill="rgba(255,255,255,.08)"/>
+      <circle cx="61" cy="82" r="4" fill="rgba(212,168,67,.7)"/>
+      <ellipse cx="215" cy="160" rx="50" ry="62" fill="rgba(255,255,255,.05)"/>
+      <rect x="208" y="93" width="14" height="67" fill="rgba(255,255,255,.07)"/>
+      <rect x="213" y="70" width="3.5" height="24" fill="rgba(255,255,255,.08)"/>
+      <circle cx="215" cy="67" r="5" fill="rgba(78,203,164,.7)"/>
+      <ellipse cx="370" cy="160" rx="42" ry="54" fill="rgba(255,255,255,.05)"/>
+      <rect x="363" y="103" width="12" height="57" fill="rgba(255,255,255,.06)"/>
+      <rect x="368" y="82" width="3" height="22" fill="rgba(255,255,255,.07)"/>
+      <circle cx="370" cy="79" r="4" fill="rgba(90,180,214,.7)"/>
+    </svg>
+    <div class="exp-hero-content">
+      <h2>Explore the Silk Road</h2>
+      <p>Discover 400+ experiences across Uzbekistan</p>
+    </div>
+  </div>
+  <div class="scroll">
+    <div class="exp-search">
+      <span>🔍</span>
+      <input type="text" placeholder="Search cities, tours, hotels…">
+    </div>
+    <div class="filter-row" style="margin-top:20px;">
+      <div class="fchip on" onclick="setChip(this)">All</div>
+      <div class="fchip" onclick="setChip(this)">🕌 Historical</div>
+      <div class="fchip" onclick="setChip(this)">🏨 Hotels</div>
+      <div class="fchip" onclick="setChip(this)">🍽 Dining</div>
+      <div class="fchip" onclick="setChip(this)">🎨 Arts</div>
+      <div class="fchip" onclick="setChip(this)">🌿 Nature</div>
+    </div>
+    <div class="map-grid">
+      <div class="mg-card tall" onclick="navTo('detail')">
+        <div class="mg-bg" style="background:linear-gradient(160deg,#1a0845,#6b46c1 50%,#d97706)"></div>
+        <div class="mg-ov"></div>
+        <svg style="position:absolute;inset:0;width:100%;height:100%;" viewBox="0 0 155 272" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="78" cy="272" rx="55" ry="75" fill="rgba(255,255,255,.08)"/>
+          <rect x="71" y="190" width="13" height="82" fill="rgba(255,255,255,.08)"/>
+          <rect x="76" y="163" width="3" height="28" fill="rgba(255,255,255,.09)"/>
+          <circle cx="78" cy="160" r="5" fill="rgba(212,168,67,.9)" stroke="rgba(212,168,67,1)" stroke-width="1.5"/>
+          <ellipse cx="30" cy="272" rx="28" ry="38" fill="rgba(255,255,255,.06)"/>
+          <rect x="24" y="230" width="10" height="42" fill="rgba(255,255,255,.06)"/>
+          <polygon points="29,217 23,232 35,232" fill="rgba(139,92,246,.5)"/>
+          <ellipse cx="130" cy="272" rx="28" ry="38" fill="rgba(255,255,255,.06)"/>
+          <rect x="124" y="233" width="10" height="39" fill="rgba(255,255,255,.06)"/>
+          <polygon points="129,220 123,235 135,235" fill="rgba(139,92,246,.5)"/>
+        </svg>
+        <div class="mg-badge">⭐ 9.8</div>
+        <div class="mg-info"><h4>Samarkand</h4><p>🕌 12 experiences</p></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="mg-card" onclick="navTo('detail')">
+          <div class="mg-bg" style="background:linear-gradient(135deg,#065f46,#059669 55%,#d97706)"></div>
+          <div class="mg-ov"></div>
+          <div class="mg-badge">⭐ 9.5</div>
+          <div class="mg-info"><h4>Bukhara</h4><p>🏯 8 experiences</p></div>
+        </div>
+        <div class="mg-card">
+          <div class="mg-bg" style="background:linear-gradient(135deg,#1e3a5f,#0ea5e9 55%,#06b6d4)"></div>
+          <div class="mg-ov"></div>
+          <div class="mg-badge">⭐ 9.3</div>
+          <div class="mg-info"><h4>Khiva</h4><p>🌙 6 experiences</p></div>
+        </div>
+      </div>
+    </div>
+    <div style="height:12px;"></div>
+    <div class="map-grid" style="padding-top:0;">
+      <div class="mg-card">
+        <div class="mg-bg" style="background:linear-gradient(135deg,#7f1d1d,#dc2626 55%,#f59e0b)"></div>
+        <div class="mg-ov"></div>
+        <div class="mg-badge">⭐ 9.1</div>
+        <div class="mg-info"><h4>Tashkent</h4><p>🚇 10 experiences</p></div>
+      </div>
+      <div class="mg-card">
+        <div class="mg-bg" style="background:linear-gradient(135deg,#1c1917,#78350f 55%,#fbbf24)"></div>
+        <div class="mg-ov"></div>
+        <div class="mg-badge">⭐ 8.9</div>
+        <div class="mg-info"><h4>Fergana</h4><p>🛍 5 experiences</p></div>
+      </div>
+    </div>
+    <div class="pad-bot"></div>
+  </div>
+  <nav class="bnav" id="nav-explore">
+    <div class="ni" onclick="switchTab(0,'home')"><div class="nico">🏠</div><div class="nlbl">Home</div></div>
+    <div class="ni on" onclick="switchTab(1,'explore')"><div class="nico">🔍</div><div class="nlbl">Explore</div></div>
+    <div class="ni" onclick="switchTab(2,'trips')"><div class="nico">🧳</div><div class="nlbl">Trips</div></div>
+    <div class="ni" onclick="switchTab(3,'profile')"><div class="nico">👤</div><div class="nlbl">Profile</div></div>
+  </nav>
+</div>
+
+<!-- ═══════════ TRIPS ═══════════ -->
+<div id="trips" class="screen hidden">
+  <div class="trips-header">
+    <h2>My Journeys</h2>
+    <p>3 trips planned · 1 upcoming</p>
+  </div>
+  <div class="scroll">
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-dot active">✈️</div>
+          <div class="tl-line"></div>
+        </div>
+        <div class="tl-card" onclick="navTo('detail')">
+          <h4>Trip to Samarkand</h4>
+          <div class="tl-date">📅 April 26 – 30, 2025 &nbsp;·&nbsp; 4 Nights</div>
+          <div class="tl-status ts-upcoming">🔵 &nbsp;Upcoming · 65% ready</div>
+          <div class="tl-places">
+            <div class="tplace">🕌 Registan</div>
+            <div class="tplace">🏨 Hotel Abdu-S</div>
+            <div class="tplace">🍽 Platan</div>
+          </div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-dot" style="font-size:18px;">🏯</div>
+          <div class="tl-line"></div>
+        </div>
+        <div class="tl-card">
+          <h4>Bukhara Weekend</h4>
+          <div class="tl-date">📅 May 10 – 12, 2025 &nbsp;·&nbsp; 2 Nights</div>
+          <div class="tl-status ts-upcoming">🔵 &nbsp;Upcoming · 30% ready</div>
+          <div class="tl-places">
+            <div class="tplace">🏯 Ark Fortress</div>
+            <div class="tplace">🌙 Old City</div>
+          </div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-dot" style="font-size:18px;">🌙</div>
+        </div>
+        <div class="tl-card">
+          <h4>Khiva Getaway</h4>
+          <div class="tl-date">📅 March 1 – 3, 2025 &nbsp;·&nbsp; 2 Nights</div>
+          <div class="tl-status ts-done">✓ &nbsp;Completed</div>
+          <div class="tl-places">
+            <div class="tplace">🕍 Ichan-Kala</div>
+            <div class="tplace">📸 Kalta Minor</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:0 16px 0;margin-top:4px;">
+      <button style="width:100%;background:linear-gradient(135deg,var(--violet),var(--violet2));color:white;border:none;border-radius:16px;padding:15px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 4px 18px rgba(107,70,193,.35);">
+        ✦ &nbsp;Plan New Journey
+      </button>
+    </div>
+    <div class="pad-bot"></div>
+  </div>
+  <nav class="bnav" id="nav-trips">
+    <div class="ni" onclick="switchTab(0,'home')"><div class="nico">🏠</div><div class="nlbl">Home</div></div>
+    <div class="ni" onclick="switchTab(1,'explore')"><div class="nico">🔍</div><div class="nlbl">Explore</div></div>
+    <div class="ni on" onclick="switchTab(2,'trips')"><div class="nico">🧳</div><div class="nlbl">Trips</div></div>
+    <div class="ni" onclick="switchTab(3,'profile')"><div class="nico">👤</div><div class="nlbl">Profile</div></div>
+  </nav>
+</div>
+
+<!-- ═══════════ PROFILE ═══════════ -->
+<div id="profile" class="screen hidden">
+  <div class="scroll">
+    <div class="prof-hero">
+      <div class="prof-av">M</div>
+      <div class="prof-info">
+        <h2>Michael Chen</h2>
+        <p>📍 Tashkent, Uzbekistan</p>
+        <div class="prof-badges">
+          <span class="pbadge">✦ Silk Road Explorer</span>
+          <span class="pbadge">🌍 3 Countries</span>
+        </div>
+      </div>
+    </div>
+    <div class="stats-row">
+      <div class="stat"><div class="sn">3</div><div class="sl">Trips</div></div>
+      <div class="stat"><div class="sn">12</div><div class="sl">Cities</div></div>
+      <div class="stat"><div class="sn">48</div><div class="sl">Days</div></div>
+      <div class="stat"><div class="sn">320</div><div class="sl">Reviews</div></div>
+    </div>
+    <div class="slist">
+      <div class="slist-group">
+        <h4>Account</h4>
+        <div class="sitem"><div class="sico si-pur">👤</div><div class="slabel">Edit Profile</div><div class="schev">›</div></div>
+        <div class="sitem"><div class="sico si-grn">🔔</div><div class="slabel">Notifications</div><div class="schev">›</div></div>
+        <div class="sitem"><div class="sico si-sky">🔒</div><div class="slabel">Privacy & Security</div><div class="schev">›</div></div>
+      </div>
+      <div class="slist-group">
+        <h4>Travel Preferences</h4>
+        <div class="sitem"><div class="sico si-amb">🌍</div><div class="slabel">Travel Style</div><div class="schev">›</div></div>
+        <div class="sitem"><div class="sico si-grn">🌱</div><div class="slabel">Sustainability Settings</div><div class="schev">›</div></div>
+        <div class="sitem"><div class="sico si-pur">🗺</div><div class="slabel">Saved Places</div><div class="schev">›</div></div>
+      </div>
+      <div class="slist-group">
+        <h4>Support</h4>
+        <div class="sitem"><div class="sico si-sky">💬</div><div class="slabel">Help & Support</div><div class="schev">›</div></div>
+        <div class="sitem"><div class="sico si-ros">⭐</div><div class="slabel">Rate Waylo</div><div class="schev">›</div></div>
+        <div class="sitem"><div class="sico si-amb">📋</div><div class="slabel">Terms & Privacy</div><div class="schev">›</div></div>
+      </div>
+    </div>
+    <div class="pad-bot"></div>
+  </div>
+  <nav class="bnav" id="nav-profile">
+    <div class="ni" onclick="switchTab(0,'home')"><div class="nico">🏠</div><div class="nlbl">Home</div></div>
+    <div class="ni" onclick="switchTab(1,'explore')"><div class="nico">🔍</div><div class="nlbl">Explore</div></div>
+    <div class="ni" onclick="switchTab(2,'trips')"><div class="nico">🧳</div><div class="nlbl">Trips</div></div>
+    <div class="ni on" onclick="switchTab(3,'profile')"><div class="nico">👤</div><div class="nlbl">Profile</div></div>
+  </nav>
+</div>
+
+<!-- ═══════════ NOTIFICATIONS PANEL ═══════════ -->
+<div class="overlay" id="overlay" onclick="closeNotif()"></div>
+<div id="notif-panel">
+  <div class="np-head">
+    <h3>🔔 Notifications</h3>
+    <span class="close-np" onclick="closeNotif()">✕</span>
+  </div>
+  <div class="notif-list">
+    <div class="nitem unread">
+      <div class="nicon ic-grn">🏨</div>
+      <div class="nbody">
+        <div class="ntitle">Hotel confirmed!</div>
+        <div class="nsub">Hotel Abdu-S has confirmed your reservation for April 26–30.</div>
+        <div class="ntime">2 hours ago</div>
+      </div>
+    </div>
+    <div class="nitem unread">
+      <div class="nicon ic-pur">🛂</div>
+      <div class="nbody">
+        <div class="ntitle">E-Visa Approved ✓</div>
+        <div class="nsub">Your Uzbekistan e-visa has been approved. Download it now.</div>
+        <div class="ntime">Yesterday</div>
+      </div>
+    </div>
+    <div class="nitem">
+      <div class="nicon ic-blu">✈️</div>
+      <div class="nbody">
+        <div class="ntitle">Flight check-in opens</div>
+        <div class="nsub">HY126 Tashkent → Samarkand check-in opens in 3 days.</div>
+        <div class="ntime">2 days ago</div>
+      </div>
+    </div>
+    <div class="nitem">
+      <div class="nicon ic-amb">⭐</div>
+      <div class="nbody">
+        <div class="ntitle">Timur sent you a message</div>
+        <div class="nsub">Hello Michael! Looking forward to our tour on April 26…</div>
+        <div class="ntime">3 days ago</div>
+      </div>
+    </div>
+    <div class="nitem">
+      <div class="nicon" style="background:linear-gradient(135deg,#cffafe,#a5f3fc);">🎉</div>
+      <div class="nbody">
+        <div class="ntitle">Welcome to Waylo!</div>
+        <div class="nsub">Your AI-powered Silk Road journey companion is ready.</div>
+        <div class="ntime">1 week ago</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /app -->
+<script>
+// ── Stars ──
+const starsEl = document.getElementById('stars');
+for(let i=0;i<55;i++){
+  const s=document.createElement('div');
+  s.className='star';
+  const sz=Math.random()*2.5+1;
+  s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--dur:${2+Math.random()*3}s;--del:${Math.random()*4}s;`;
+  starsEl.appendChild(s);
+}
+
+// ── Screen state ──
+let currentMain='home';
+const mainScreens=['home','explore','trips','profile'];
+
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>{
+    s.classList.remove('pushed');
+    if(s.id!==id) s.classList.add('hidden');
+    else s.classList.remove('hidden');
+  });
+}
+
+function enterApp(){
+  const splash=document.getElementById('splash');
+  splash.style.transform='scale(1.04)';
+  splash.style.opacity='0';
+  splash.style.transition='transform .5s ease,opacity .45s ease';
+  setTimeout(()=>{
+    splash.classList.add('hidden');
+    show('home');
+  },460);
+}
+
+function navTo(id){
+  const from=document.getElementById(currentMain==='detail'?'home':currentMain);
+  from.classList.add('pushed');
+  const to=document.getElementById(id);
+  to.classList.remove('hidden');
+  to.style.transform='translateX(0)';
+  const prev=currentMain;
+  currentMain=id;
+  // store origin for back
+  to._from=prev;
+}
+
+function goBack(){
+  const detail=document.getElementById('detail');
+  detail.classList.add('hidden');
+  const origin=detail._from||'home';
+  const src=document.getElementById(origin);
+  src.classList.remove('pushed');
+  currentMain=origin;
+}
+
+function switchTab(idx,id){
+  mainScreens.forEach(s=>{
+    const el=document.getElementById(s);
+    if(s!==id){el.classList.add('hidden');el.classList.remove('pushed');}
+    else{el.classList.remove('hidden');}
+  });
+  currentMain=id;
+}
+
+function setPill(el){
+  el.closest('.pills').querySelectorAll('.pill').forEach(p=>p.classList.remove('on'));
+  el.classList.add('on');
+}
+
+function setChip(el){
+  el.closest('.filter-row').querySelectorAll('.fchip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+}
+
+function openNotif(){
+  document.getElementById('notif-panel').classList.add('open');
+  document.getElementById('overlay').classList.add('vis');
+}
+function closeNotif(){
+  document.getElementById('notif-panel').classList.remove('open');
+  document.getElementById('overlay').classList.remove('vis');
+}
+
+// Telegram WebApp
+if(window.Telegram?.WebApp){
+  const tg=window.Telegram.WebApp;
+  tg.expand();tg.ready();
+  tg.MainButton.setText('Book Now').show();
+  tg.MainButton.onClick(()=>navTo('detail'));
+}
+</script>
 </body>
 </html>
