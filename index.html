@@ -766,48 +766,8 @@ html,body{height:100%;background:#0a0a0a;overflow:hidden;}
 <div class="hscroll" id="topDestinations"></div>
       
     <div class="sec-head"><h3>TAILORED FOR YOU</h3><span class="see-all">&#8594;</span></div>
-    <div class="tcard" onclick="navTo('detail')">
-      <div class="thumb tb1"><div class="thumb-dome"></div><div class="rb">9.5</div></div>
-      <div class="ti">
-        <div>
-          <h4>DALI Hotel Samarkand</h4>
-          <div class="tsub">
-            <svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="7" cy="7" r="5.5"/><polyline points="7 4 7 7 9 9"/></svg>
-            3-Hour Historical Tour
-          </div>
-          <div class="tags"><span class="tag">SUPERB</span><span class="tag">210 REVIEWS</span></div>
-        </div>
-        <div class="pr"><div class="price">$48 <small>/ person</small></div><button class="bk-btn">BOOK</button></div>
-      </div>
-    </div>
-    <div class="tcard">
-      <div class="thumb tb2"><div class="thumb-dome"></div><div class="rb">9.2</div></div>
-      <div class="ti">
-        <div>
-          <h4>Kukaldosh Bukhara</h4>
-          <div class="tsub">
-            <svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="5" width="12" height="7" rx="1.5"/><path d="M4 5V4a3 3 0 0 1 6 0v1"/></svg>
-            Full-Day Excursion
-          </div>
-          <div class="tags"><span class="tag">EXCELLENT</span><span class="tag">186 REVIEWS</span></div>
-        </div>
-        <div class="pr"><div class="price">$65 <small>/ person</small></div><button class="bk-btn">BOOK</button></div>
-      </div>
-    </div>
-    <div class="tcard">
-      <div class="thumb tb3"><div class="thumb-dome"></div><div class="rb">9.0</div></div>
-      <div class="ti">
-        <div>
-          <h4>Deluxe Hotel Fergana</h4>
-          <div class="tsub">
-            <svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M7 1l1.5 4H13l-3.5 2.5 1.3 4L7 9l-3.8 2.5 1.3-4L1 5h4.5z"/></svg>
-            Shopping &amp; Culture
-          </div>
-          <div class="tags"><span class="tag">AMAZING</span><span class="tag">142 REVIEWS</span></div>
-        </div>
-        <div class="pr"><div class="price">$38 <small>/ person</small></div><button class="bk-btn">BOOK</button></div>
-      </div>
-    </div>
+<div id="tailoredForYou"></div>
+<div class="pad-bot"></div>
     <div class="pad-bot"></div>
   </div>
   <nav class="bnav">
@@ -1227,6 +1187,39 @@ const appState = {
         image: 'images/Samarkand003.jpg',
         openDetail: true
       },
+    tailoredForYou: [
+   {
+    title: 'DALI Hotel Samarkand',
+    subtitle: '3-Hour Historical Tour',
+    tag1: 'SUPERB',
+    tag2: '210 REVIEWS',
+    price: '$48',
+    priceNote: '/ person',
+    rating: '9.5',
+    imageClass: 'tb1',
+    openDetail: true
+  },
+  {
+    title: 'Kukaldosh Bukhara',
+    subtitle: 'Full-Day Excursion',
+    tag1: 'EXCELLENT',
+    tag2: '186 REVIEWS',
+    price: '$65',
+    priceNote: '/ person',
+    rating: '9.2',
+    imageClass: 'tb2'
+  },
+  {
+    title: 'Deluxe Hotel Fergana',
+    subtitle: 'Shopping & Culture',
+    tag1: 'AMAZING',
+    tag2: '142 REVIEWS',
+    price: '$38',
+    priceNote: '/ person',
+    rating: '9.0',
+    imageClass: 'tb3'
+  }
+]
       {
         title: 'BUKHARA',
         subtitle: 'Old City',
@@ -1391,10 +1384,41 @@ function renderTopDestinations() {
   `).join('');
 }
 
+function renderTailoredForYou() {
+  const el = document.getElementById('tailoredForYou');
+  const items = appState.home?.tailoredForYou;
+
+  if (!el || !items || !items.length) return;
+
+  el.innerHTML = items.map(item => `
+    <div class="tcard" ${item.openDetail ? 'onclick="navTo(\'detail\')"' : ''}>
+      <div class="thumb ${item.imageClass}">
+        <div class="thumb-dome"></div>
+        <div class="rb">${item.rating}</div>
+      </div>
+      <div class="ti">
+        <div>
+          <h4>${item.title}</h4>
+          <div class="tsub">${item.subtitle}</div>
+          <div class="tags">
+            <span class="tag">${item.tag1}</span>
+            <span class="tag">${item.tag2}</span>
+          </div>
+        </div>
+        <div class="pr">
+          <div class="price">${item.price} <small>${item.priceNote}</small></div>
+          <button class="bk-btn">BOOK</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
 function renderApp() {
   renderGreeting();
   renderHero();
   renderTopDestinations();
+  renderTailoredForYou();
 }
 
 async function loadAppState() {
