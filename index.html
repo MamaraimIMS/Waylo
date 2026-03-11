@@ -1424,23 +1424,32 @@ async function loadAppState() {
   if (APP_CONFIG.mode !== 'live') return;
 
   try {
-    const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user || null;
+    const tg = window.Telegram?.WebApp;
+    const tgUser = tg?.initDataUnsafe?.user || null;
 
     const response = await fetch(APP_CONFIG.endpoints.state, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         screen: currentMain,
-        telegramUser: tgUser
+        locale: 'ru',
+        appVersion: '1.0.0',
+        telegramUser: tgUser,
+        initData: tg?.initData || 'test'
       })
     });
 
-    if (!response.ok) throw new Error('State request failed');
+    if (!response.ok) {
+      throw new Error('State request failed');
+    }
 
     const data = await response.json();
 
     if (data.home) {
-      appState.home = data.home;
+      appState.home = {
+        ...appState.home,
+        ...data.home
+      };
     }
 
     renderApp();
