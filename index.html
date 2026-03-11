@@ -1160,7 +1160,8 @@ let currentMain = 'home';
 const APP_CONFIG = {
   mode: 'live',
   endpoints: {
-    state: 'https://alphagroupuz.app.n8n.cloud/webhook/app-bootstrap'
+    state: 'https://alphagroupuz.app.n8n.cloud/webhook/app-bootstrap',
+    action: 'https://alphagroupuz.app.n8n.cloud/webhook/app-action'
   }
 };
 
@@ -1424,8 +1425,13 @@ async function loadAppState() {
   if (APP_CONFIG.mode !== 'live') return;
 
   try {
+    console.log('WAYLO loadAppState started');
+
     const tg = window.Telegram?.WebApp;
-    const tgUser = tg?.initDataUnsafe?.user || null;
+    const tgUser = tg?.initDataUnsafe?.user || {
+      id: 123456789,
+      first_name: 'Mamaraim'
+    };
 
     const response = await fetch(APP_CONFIG.endpoints.state, {
       method: 'POST',
@@ -1444,6 +1450,7 @@ async function loadAppState() {
     }
 
     const data = await response.json();
+    console.log('WAYLO state response:', data);
 
     if (data.home) {
       appState.home = {
@@ -1458,10 +1465,70 @@ async function loadAppState() {
   }
 }
 
+async function sendAction(action, payload = {}) {
+  if (APP_CONFIG.mode !== 'live') return null;
+
+  try {
+    const tg = window.Telegram?.WebApp;
+    const tgUser = tg?.initDataUnsafe?.user || {
+      id: 123456789,
+      first_name: 'Mamaraim'
+    };
+
+    const response = await fetch(APP_CONFIG.endpoints.action, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action,
+        text: payload.text || '',
+        screen: currentMain,
+        locale: 'ru',
+        appVersion: '1.0.0',
+        telegramUser: tgUser,
+        initData: tg?.initData || 'test',
+        payload
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error('Action request failed');
+    }
+
+    const data = await response.json();
+    console.log('WAYLO action response:', data);
+    return data;
+  } catch (error) {
+    console.error('sendAction error:', error);
+    return null;
+  }
+}
+
+function setupHomeSearch() {
+  const input = document.querySelector('#home .search-row input');
+  if (!input) return;
+
+  input.addEventListener('keydown', async (event) => {
+    if (event.key !== 'Enter') return;
+
+    const text = input.value.trim();
+    if (!text) return;
+
+    const data = await sendAction('user_message', { text });
+
+    if (data?.message?.text) {
+      appState.home.greeting.subtitle = data.message.text;
+      renderApp();
+    }
+
+    input.value = '';
+  });
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   initTelegram();
   renderApp();
   await loadAppState();
+  setupHomeSearch();
 });
 </script>
 </body>
