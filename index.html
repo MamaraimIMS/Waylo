@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Waylo</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://telegram.org/js/telegram-web-app.js?61"></script>
 
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
@@ -721,10 +722,7 @@ html,body{height:100%;background:#0a0a0a;overflow:hidden;}
     </button>
   </div>
   <div class="scroll">
-    <div class="greeting">
-      <h1>Hello, MAMARAIM <div class="av">M</div></h1>
-      <p>Your Silk Road journey awaits</p>
-    </div>
+    <div class="greeting" id="homeGreeting"></div>
     <div class="search-row">
       <svg class="ico ico-sm" viewBox="0 0 18 18" fill="none" stroke="#9ca3af" stroke-width="1.8" stroke-linecap="round">
         <circle cx="8" cy="8" r="5.5"/><line x1="12.5" y1="12.5" x2="16.5" y2="16.5"/>
@@ -738,44 +736,7 @@ html,body{height:100%;background:#0a0a0a;overflow:hidden;}
     </div>
 
     <!-- Hero -->
-    <div class="hero" onclick="navTo('detail')">
-      <div class="hero-bg"></div>
-      <div class="hero-overlay"></div>
-      <svg class="hero-deco" viewBox="0 0 390 215" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg">
-        <ellipse cx="80" cy="215" rx="46" ry="58" fill="rgba(255,255,255,.08)"/>
-        <rect x="72" y="152" width="14" height="63" fill="rgba(255,255,255,.07)"/>
-        <rect x="78" y="127" width="3" height="26" fill="rgba(255,255,255,.09)"/>
-        <circle cx="80" cy="124" r="4" fill="rgba(212,168,67,.8)"/>
-        <ellipse cx="195" cy="215" rx="55" ry="68" fill="rgba(255,255,255,.07)"/>
-        <rect x="186" y="140" width="16" height="75" fill="rgba(255,255,255,.08)"/>
-        <rect x="192" y="113" width="4" height="28" fill="rgba(255,255,255,.09)"/>
-        <circle cx="194" cy="110" r="5" fill="rgba(78,203,164,.85)"/>
-        <ellipse cx="320" cy="215" rx="40" ry="52" fill="rgba(255,255,255,.06)"/>
-        <rect x="313" y="158" width="13" height="57" fill="rgba(255,255,255,.07)"/>
-        <rect x="318" y="136" width="3" height="23" fill="rgba(255,255,255,.08)"/>
-        <circle cx="320" cy="133" r="4" fill="rgba(90,180,214,.8)"/>
-        <rect x="140" y="168" width="10" height="47" fill="rgba(255,255,255,.06)"/>
-        <polygon points="145,154 140,170 150,170" fill="rgba(139,92,246,.5)"/>
-        <rect x="256" y="172" width="10" height="43" fill="rgba(255,255,255,.06)"/>
-        <polygon points="261,158 256,174 266,174" fill="rgba(139,92,246,.5)"/>
-      </svg>
-      <div class="hero-body">
-        <div class="hero-top">
-          <div class="hero-title">DISCOVER<br>UZBEKISTAN</div>
-          <div class="ai-chip">AI CURATED</div>
-        </div>
-        <div>
-          <div class="hero-meta">
-            <div class="meta-av">W</div>
-            <div class="meta-txt">Curated by Waylo AI<b>April 26–30 · 4 Nights, 3 Guests</b></div>
-          </div>
-          <button class="cta-btn" onclick="event.stopPropagation();navTo('detail')">
-            <span>START JOURNEY</span>
-            <span>&#8594;</span>
-          </button>
-        </div>
-      </div>
-    </div>
+<div class="hero" id="homeHero"></div>
 
     <div class="sec-head"><h3>RECOMMENDED</h3><span class="see-all">SEE ALL</span></div>
     <div class="pills">
@@ -1255,67 +1216,195 @@ html,body{height:100%;background:#0a0a0a;overflow:hidden;}
 
 </div>
 <script>
-// Tick marks
+const mainScreens = ['home', 'explore', 'trips', 'profile'];
+let currentMain = 'home';
 
-const mainScreens=['home','explore','trips','profile'];
-let currentMain='home';
+const APP_CONFIG = {
+  mode: 'mock', 
+  endpoints: {
+    state: 'https://YOUR-N8N-DOMAIN/webhook/get-app-state'
+  }
+};
 
-function show(id){
-  document.querySelectorAll('.screen').forEach(s=>{
+const appState = {
+  home: {
+    greeting: {
+      name: 'Mamaraim',
+      subtitle: 'Your Silk Road journey awaits'
+    },
+    hero: {
+      title: 'DISCOVER<br>UZBEKISTAN',
+      badge: 'AI CURATED',
+      curator: 'Curated by Waylo AI',
+      meta: 'April 26–30 · 4 Nights, 3 Guests',
+      cta: 'START JOURNEY',
+      image: 'images/Samarkand002.jpeg'
+    }
+  }
+};
+
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => {
     s.classList.remove('pushed');
-    s.id!==id ? s.classList.add('hidden') : s.classList.remove('hidden');
+    s.id !== id ? s.classList.add('hidden') : s.classList.remove('hidden');
   });
 }
 
-
-function navTo(id){
-  const from=document.getElementById(currentMain==='detail'?'home':currentMain);
-  from.classList.add('pushed');
-  const to=document.getElementById(id);
-  to.classList.remove('hidden');
-  to._from=currentMain;
-  currentMain=id;
+function navTo(id) {
+  const from = document.getElementById(currentMain === 'detail' ? 'home' : currentMain);
+  if (from) from.classList.add('pushed');
+  const to = document.getElementById(id);
+  if (to) {
+    to.classList.remove('hidden');
+    to._from = currentMain;
+  }
+  currentMain = id;
 }
 
-function goBack(){
-  const d=document.getElementById('detail');
+function goBack() {
+  const d = document.getElementById('detail');
+  if (!d) return;
   d.classList.add('hidden');
-  const src=document.getElementById(d._from||'home');
-  src.classList.remove('pushed');
-  currentMain=d._from||'home';
+  const src = document.getElementById(d._from || 'home');
+  if (src) src.classList.remove('pushed');
+  currentMain = d._from || 'home';
 }
 
-function switchTab(i,id){
-  mainScreens.forEach(s=>{
-    const el=document.getElementById(s);
-    s!==id?(el.classList.add('hidden'),el.classList.remove('pushed')):el.classList.remove('hidden');
+function switchTab(i, id) {
+  mainScreens.forEach(s => {
+    const el = document.getElementById(s);
+    if (!el) return;
+    s !== id ? (el.classList.add('hidden'), el.classList.remove('pushed')) : el.classList.remove('hidden');
   });
-  currentMain=id;
+  currentMain = id;
 }
 
-function setPill(el){
-  el.closest('.pills').querySelectorAll('.pill').forEach(p=>p.classList.remove('on'));
+function setPill(el) {
+  el.closest('.pills')?.querySelectorAll('.pill').forEach(p => p.classList.remove('on'));
   el.classList.add('on');
-}
-function setChip(el){
-  el.closest('.filter-row').querySelectorAll('.fchip').forEach(c=>c.classList.remove('on'));
-  el.classList.add('on');
-}
-function openNotif(){
-  document.getElementById('notif-panel').classList.add('open');
-  document.getElementById('overlay').classList.add('vis');
-}
-function closeNotif(){
-  document.getElementById('notif-panel').classList.remove('open');
-  document.getElementById('overlay').classList.remove('vis');
 }
 
-if(window.Telegram?.WebApp){
-  const tg=window.Telegram.WebApp;
-  tg.expand();tg.ready();
-  tg.MainButton.setText('BOOK NOW').show();
-  tg.MainButton.onClick(()=>navTo('detail'));
+function setChip(el) {
+  el.closest('.filter-row')?.querySelectorAll('.fchip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
 }
+
+function openNotif() {
+  document.getElementById('notif-panel')?.classList.add('open');
+  document.getElementById('overlay')?.classList.add('vis');
+}
+
+function closeNotif() {
+  document.getElementById('notif-panel')?.classList.remove('open');
+  document.getElementById('overlay')?.classList.remove('vis');
+}
+
+function initTelegram() {
+  if (window.Telegram?.WebApp) {
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+    tg.ready();
+    tg.MainButton.setText('BOOK NOW').show();
+    tg.MainButton.onClick(() => navTo('detail'));
+  }
+}
+
+function renderGreeting() {
+  const el = document.getElementById('homeGreeting');
+  const g = appState.home?.greeting;
+  if (!el || !g) return;
+
+  const firstLetter = (g.name || 'W').charAt(0).toUpperCase();
+
+  el.innerHTML = `
+    <h1>Hello, ${g.name} <div class="av">${firstLetter}</div></h1>
+    <p>${g.subtitle}</p>
+  `;
+}
+
+function renderHero() {
+  const el = document.getElementById('homeHero');
+  const hero = appState.home?.hero;
+  if (!el || !hero) return;
+
+  el.innerHTML = `
+    <div class="hero-bg" style="
+      background:
+      linear-gradient(180deg,rgba(0,0,0,.15),rgba(0,0,0,.65)),
+      url('${hero.image}') center/cover no-repeat;
+    "></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-body">
+      <div class="hero-top">
+        <div class="hero-title">${hero.title}</div>
+        <div class="ai-chip">${hero.badge}</div>
+      </div>
+      <div>
+        <div class="hero-meta">
+          <div class="meta-av">W</div>
+          <div class="meta-txt">
+            ${hero.curator}
+            <b>${hero.meta}</b>
+          </div>
+        </div>
+        <button class="cta-btn" id="heroStartBtn">
+          <span>${hero.cta}</span>
+          <span>&#8594;</span>
+        </button>
+      </div>
+    </div>
+  `;
+
+  const btn = document.getElementById('heroStartBtn');
+  if (btn) {
+    btn.addEventListener('click', (event) => {
+      event.stopPropagation();
+      navTo('detail');
+    });
+  }
+
+  el.onclick = () => navTo('detail');
+}
+
+function renderApp() {
+  renderGreeting();
+  renderHero();
+}
+
+async function loadAppState() {
+  if (APP_CONFIG.mode !== 'live') return;
+
+  try {
+    const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user || null;
+
+    const response = await fetch(APP_CONFIG.endpoints.state, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        screen: currentMain,
+        telegramUser: tgUser
+      })
+    });
+
+    if (!response.ok) throw new Error('State request failed');
+
+    const data = await response.json();
+
+    if (data.home) {
+      appState.home = data.home;
+    }
+
+    renderApp();
+  } catch (error) {
+    console.error('loadAppState error:', error);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  initTelegram();
+  renderApp();
+  await loadAppState();
+});
 </script>
 </body>
 </html>
