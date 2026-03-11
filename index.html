@@ -1466,7 +1466,10 @@ async function loadAppState() {
 }
 
 async function sendAction(action, payload = {}) {
-  if (APP_CONFIG.mode !== 'live') return null;
+  if (APP_CONFIG.mode !== 'live') {
+    console.log('APP_CONFIG.mode is not live');
+    return null;
+  }
 
   try {
     const tg = window.Telegram?.WebApp;
@@ -1475,27 +1478,34 @@ async function sendAction(action, payload = {}) {
       first_name: 'Mamaraim'
     };
 
+    const requestBody = {
+      action,
+      text: payload.text || '',
+      screen: currentMain || 'home',
+      locale: 'ru',
+      appVersion: '1.0.0',
+      telegramUser: tgUser,
+      initData: tg?.initData || 'test',
+      payload
+    };
+
+    console.log('WAYLO action request:', requestBody);
+
     const response = await fetch(APP_CONFIG.endpoints.action, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action,
-        text: payload.text || '',
-        screen: currentMain,
-        locale: 'ru',
-        appVersion: '1.0.0',
-        telegramUser: tgUser,
-        initData: tg?.initData || 'test',
-        payload
-      })
+      body: JSON.stringify(requestBody)
     });
 
+    console.log('WAYLO action HTTP status:', response.status);
+
     if (!response.ok) {
-      throw new Error('Action request failed');
+      throw new Error('Action request failed with status ' + response.status);
     }
 
     const data = await response.json();
     console.log('WAYLO action response:', data);
+
     return data;
   } catch (error) {
     console.error('sendAction error:', error);
