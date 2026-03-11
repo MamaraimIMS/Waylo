@@ -1515,23 +1515,54 @@ async function sendAction(action, payload = {}) {
 
 function setupHomeSearch() {
   const input = document.querySelector('#home .search-row input');
-  if (!input) return;
+  const actionButton = document.querySelector('#home .search-row button, #home .search-row .search-btn, #home .search-row .filter-btn');
 
-  input.addEventListener('keydown', async (event) => {
-    if (event.key !== 'Enter') return;
+  if (!input) {
+    console.error('WAYLO search input not found');
+    return;
+  }
 
+  const runSearch = async () => {
     const text = input.value.trim();
-    if (!text) return;
+
+    console.log('WAYLO runSearch text:', text);
+
+    if (!text) {
+      console.log('WAYLO empty search text');
+      return;
+    }
 
     const data = await sendAction('user_message', { text });
+
+    console.log('WAYLO UI received data:', data);
 
     if (data?.message?.text) {
       appState.home.greeting.subtitle = data.message.text;
       renderApp();
+      setupHomeSearch();
+    } else {
+      console.error('WAYLO no message.text in response');
+      alert('Ответ от Waylo не пришёл. Откройте Console.');
     }
 
     input.value = '';
+  };
+
+  input.addEventListener('keydown', async (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      await runSearch();
+    }
   });
+
+  if (actionButton) {
+    actionButton.addEventListener('click', async (event) => {
+      event.preventDefault();
+      await runSearch();
+    });
+  }
+
+  console.log('WAYLO search handlers attached');
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
