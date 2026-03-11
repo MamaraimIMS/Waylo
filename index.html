@@ -763,12 +763,7 @@ html,body{height:100%;background:#0a0a0a;overflow:hidden;}
     </div>
 
     <div class="sec-head"><h3>TOP DESTINATIONS</h3><span class="see-all">&#8594;</span></div>
-    <div class="hscroll">
-      <div class="dest-card" onclick="navTo('detail')">
-        <div class="dest-bg bg-sam"></div><div class="dest-ov"></div><div class="dest-deco"></div>
-        <div class="dest-star">9.8</div>
-        <div class="dest-info"><h4>SAMARKAND</h4><p>Registan Square</p></div>
-      </div>
+<div class="hscroll" id="topDestinations"></div>
       <div class="dest-card">
         <div class="dest-bg bg-buk"></div><div class="dest-ov"></div><div class="dest-deco"></div>
         <div class="dest-star">9.5</div>
@@ -1239,7 +1234,34 @@ const appState = {
       meta: 'April 26–30 · 4 Nights, 3 Guests',
       cta: 'START JOURNEY',
       image: 'images/Samarkand002.jpeg'
-    }
+    },
+    topDestinations: [
+      {
+        title: 'SAMARKAND',
+        subtitle: 'Registan Square',
+        rating: '9.8',
+        image: 'images/Samarkand003.jpg',
+        openDetail: true
+      },
+      {
+        title: 'BUKHARA',
+        subtitle: 'Old City',
+        rating: '9.5',
+        image: 'images/Bukhara001.webp'
+      },
+      {
+        title: 'KHIVA',
+        subtitle: 'Ichan-Kala',
+        rating: '9.3',
+        image: 'images/Khiva.jpg'
+      },
+      {
+        title: 'TASHKENT',
+        subtitle: 'Chorsu Bazar',
+        rating: '9.1',
+        image: 'images/Tashkent.jpg'
+      }
+    ]
   }
 };
 
@@ -1354,6 +1376,24 @@ function renderHero() {
       </div>
     </div>
   `;
+function renderTopDestinations() {
+  const el = document.getElementById('topDestinations');
+  const items = appState.home?.topDestinations;
+
+  if (!el || !items || !items.length) return;
+
+  el.innerHTML = items.map(item => `
+    <div class="dest-card" ${item.openDetail ? 'onclick="navTo(\'detail\')"' : ''}>
+      <div class="dest-bg" style="background:url('${item.image}') center/cover no-repeat;"></div>
+      <div class="dest-ov"></div>
+      <div class="dest-star">${item.rating}</div>
+      <div class="dest-info">
+        <h4>${item.title}</h4>
+        <p>${item.subtitle}</p>
+      </div>
+    </div>
+  `).join('');
+}
 
   const btn = document.getElementById('heroStartBtn');
   if (btn) {
@@ -1369,6 +1409,7 @@ function renderHero() {
 function renderApp() {
   renderGreeting();
   renderHero();
+  renderTopDestinations();
 }
 
 async function loadAppState() {
