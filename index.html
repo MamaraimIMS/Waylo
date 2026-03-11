@@ -1360,6 +1360,18 @@ function renderHero() {
       </div>
     </div>
   `;
+
+  const btn = document.getElementById('heroStartBtn');
+  if (btn) {
+    btn.addEventListener('click', (event) => {
+      event.stopPropagation();
+      navTo('detail');
+    });
+  }
+
+  el.onclick = () => navTo('detail');
+}
+
 function renderTopDestinations() {
   const el = document.getElementById('topDestinations');
   const items = appState.home?.topDestinations;
@@ -1377,17 +1389,6 @@ function renderTopDestinations() {
       </div>
     </div>
   `).join('');
-}
-
-  const btn = document.getElementById('heroStartBtn');
-  if (btn) {
-    btn.addEventListener('click', (event) => {
-      event.stopPropagation();
-      navTo('detail');
-    });
-  }
-
-  el.onclick = () => navTo('detail');
 }
 
 function renderApp() {
