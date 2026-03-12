@@ -6,7 +6,7 @@
 <title>Waylo</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <script src="https://telegram.org/js/telegram-web-app.js?61"></script>
-
+ 
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 :root{
@@ -43,7 +43,7 @@ html,body{height:100%;background:#0a0a0a;overflow:hidden;}
 .scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
 .scroll::-webkit-scrollbar{display:none;}
 .pad-bot{height:calc(var(--nav-h) + 16px);}
-
+ 
 /* ══════════════════════
    SPLASH — MONOCHROME
 ══════════════════════ */
@@ -52,14 +52,14 @@ html,body{height:100%;background:#0a0a0a;overflow:hidden;}
   justify-content:flex-end;
   z-index:100;
 }
-
+ 
 /* grainy texture overlay */
 #splash::before{
   content:'';position:absolute;inset:0;z-index:1;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
   pointer-events:none;opacity:.6;
 }
-
+ 
 .splash-grid{
   position:absolute;inset:0;z-index:0;overflow:hidden;
   background:
@@ -69,21 +69,21 @@ html,body{height:100%;background:#0a0a0a;overflow:hidden;}
   animation:gridFade 2s ease both;
 }
 @keyframes gridFade{from{opacity:0;}to{opacity:1;}}
-
+ 
 .splash-vline{
   position:absolute;top:0;bottom:0;left:50%;width:1px;
   background:linear-gradient(180deg,transparent,rgba(255,255,255,.08) 30%,rgba(255,255,255,.08) 70%,transparent);
   animation:vlineIn 1s .3s ease both;
 }
 @keyframes vlineIn{from{transform:scaleY(0);transform-origin:top;}to{transform:scaleY(1);}}
-
+ 
 /* large monochrome dome silhouette */
 .splash-skyline{
   position:absolute;bottom:0;left:0;right:0;
   animation:skylineRise .9s .2s cubic-bezier(.22,1,.36,1) both;
 }
 @keyframes skylineRise{from{transform:translateY(30px);opacity:0;}to{transform:translateY(0);opacity:1;}}
-
+ 
 /* scanning line */
 .splash-scan{
   position:absolute;left:0;right:0;height:1px;
@@ -97,7 +97,7 @@ html,body{height:100%;background:#0a0a0a;overflow:hidden;}
   95%{opacity:1;}
   100%{top:100%;opacity:0;}
 }
-
+ 
 /* counter digits */
 .splash-counter{
   position:absolute;top:32px;right:24px;z-index:5;
@@ -106,7 +106,7 @@ html,body{height:100%;background:#0a0a0a;overflow:hidden;}
   animation:fadeIn 1s .5s both;
 }
 @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
-
+ 
 .splash-tl{
   position:absolute;left:24px;top:0;bottom:0;width:1px;
   display:flex;flex-direction:column;gap:0;z-index:5;
@@ -117,32 +117,32 @@ html,body{height:100%;background:#0a0a0a;overflow:hidden;}
   margin-left:-1.5px;
 }
 .splash-tl-mark:nth-child(5n){width:8px;background:rgba(255,255,255,.3);}
-
+ 
 .splash-content{
   position:relative;z-index:5;
   padding:0 28px calc(44px + var(--safe-bottom));
   animation:fadeUp .7s .5s both;
 }
 @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
-
+ 
 .splash-logo{
   font-family:var(--bc);font-weight:900;font-size:52px;
   color:white;letter-spacing:-1px;line-height:1;
   margin-bottom:8px;
 }
 .splash-logo span{color:rgba(255,255,255,.25);}
-
+ 
 .splash-tagline{
   font-family:var(--bc);font-weight:300;font-size:18px;
   color:rgba(255,255,255,.45);letter-spacing:3px;text-transform:uppercase;
   margin-bottom:6px;line-height:1.4;
 }
-
+ 
 .splash-divider{
   width:40px;height:1px;background:rgba(255,255,255,.25);
   margin:16px 0;
 }
-
+ 
 .splash-cta{
   background:white;color:#0a0a0a;
   border:none;border-radius:0;
@@ -155,7 +155,7 @@ html,body{height:100%;background:#0a0a0a;overflow:hidden;}
 }
 .splash-cta:active{background:#e0e0e0;}
 .splash-cta .arr{font-size:20px;font-weight:300;}
-
+ 
 .splash-sub{
   margin-top:14px;
   font-family:var(--bc);font-size:12px;
@@ -163,7 +163,7 @@ html,body{height:100%;background:#0a0a0a;overflow:hidden;}
   display:flex;align-items:center;gap:12px;
 }
 .splash-sub::before{content:'';display:block;width:16px;height:1px;background:rgba(255,255,255,.2);}
-
+ 
 /* ══════════════════════
    SHARED TOPBAR
 ══════════════════════ */
@@ -190,13 +190,13 @@ html,body{height:100%;background:#0a0a0a;overflow:hidden;}
   width:7px;height:7px;background:var(--coral);
   border-radius:50%;border:1.5px solid var(--silk);
 }
-
+ 
 /* SVG icon sizing */
 .ico{display:block;flex-shrink:0;}
 .ico-sm{width:18px;height:18px;}
 .ico-md{width:22px;height:22px;}
 .ico-lg{width:26px;height:26px;}
-
+ 
 /* ══════════════════════
    HOME
 ══════════════════════ */
@@ -212,7 +212,7 @@ html,body{height:100%;background:#0a0a0a;overflow:hidden;}
   color:white;font-family:var(--bc);font-size:17px;font-weight:700;flex-shrink:0;
 }
 .greeting p{font-family:var(--b);font-size:13px;color:var(--muted);margin-top:3px;}
-
+ 
 .search-row{
   margin:0 20px 20px;background:white;border-radius:12px;
   display:flex;align-items:center;gap:10px;padding:11px 14px;
@@ -228,7 +228,7 @@ html,body{height:100%;background:#0a0a0a;overflow:hidden;}
   background:var(--deep);
   border-radius:7px;display:flex;align-items:center;justify-content:center;cursor:pointer;
 }
-
+ 
 .hero{
   margin:0 20px 24px;border-radius:18px;overflow:hidden;
   position:relative;height:215px;cursor:pointer;
@@ -284,11 +284,11 @@ html,body{height:100%;background:#0a0a0a;overflow:hidden;}
   transition:background .15s;
 }
 .cta-btn:active{background:rgba(255,255,255,.22);}
-
+ 
 .sec-head{padding:0 20px 12px;display:flex;justify-content:space-between;align-items:center;}
 .sec-head h3{font-family:var(--bc);font-size:18px;font-weight:700;color:var(--deep);letter-spacing:.2px;}
 .see-all{font-family:var(--bc);font-size:13px;color:var(--violet);font-weight:600;cursor:pointer;letter-spacing:.5px;}
-
+ 
 .pills{padding:0 20px 20px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;}
 .pills::-webkit-scrollbar{display:none;}
 .pill{
@@ -300,7 +300,7 @@ html,body{height:100%;background:#0a0a0a;overflow:hidden;}
 }
 .pill.on{background:var(--deep);color:white;border-color:var(--deep);}
 .pill:active{transform:scale(.95);}
-
+ 
 .hscroll{padding:0 20px 22px;display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;}
 .hscroll::-webkit-scrollbar{display:none;}
 .dest-card{
@@ -313,15 +313,15 @@ html,body{height:100%;background:#0a0a0a;overflow:hidden;}
 .bg-sam{
   background:url("images/Samarkand003.jpg") center/cover no-repeat;
 }
-
+ 
 .bg-buk{
   background:url("images/Bukhara001.webp") center/cover no-repeat;
 }
-
+ 
 .bg-khi{
   background:url("images/Khiva.jpg") center/cover no-repeat;
 }
-
+ 
 .bg-tas{
   background:url("images/Tashkent.jpg") center/cover no-repeat;
 }
@@ -339,7 +339,7 @@ html,body{height:100%;background:#0a0a0a;overflow:hidden;}
   border-radius:5px;padding:3px 7px;
   font-family:var(--bc);font-size:12px;font-weight:700;color:white;letter-spacing:.3px;
 }
-
+ 
 .tcard{
   margin:0 20px 10px;background:white;border-radius:14px;overflow:hidden;
   box-shadow:0 2px 10px rgba(0,0,0,.06);cursor:pointer;display:flex;
@@ -350,11 +350,11 @@ html,body{height:100%;background:#0a0a0a;overflow:hidden;}
 .tb1{
   background:url("images/HotelDaliSamarkand.jpg") center/cover no-repeat;
 }
-
+ 
 .tb2{
   background:url("images/KukaldoshBukhara.webp") center/cover no-repeat;
 }
-
+ 
 .tb3{
   background:url("images/DeluxeFergana.jpg") center/cover no-repeat;
 }
@@ -381,7 +381,7 @@ html,body{height:100%;background:#0a0a0a;overflow:hidden;}
   padding:5px 12px;
   font-family:var(--bc);font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.5px;text-transform:uppercase;
 }
-
+ 
 /* ══════════════════════
    TRIP DETAIL
 ══════════════════════ */
@@ -485,7 +485,7 @@ html,body{height:100%;background:#0a0a0a;overflow:hidden;}
   cursor:pointer;transition:transform .15s;
 }
 .mic:active{transform:scale(.9);}
-
+ 
 /* ══════════════════════
    EXPLORE
 ══════════════════════ */
@@ -545,7 +545,7 @@ html,body{height:100%;background:#0a0a0a;overflow:hidden;}
   border-radius:5px;padding:2px 7px;
   font-family:var(--bc);font-size:11.5px;font-weight:700;color:white;letter-spacing:.3px;
 }
-
+ 
 /* ══════════════════════
    TRIPS TIMELINE
 ══════════════════════ */
@@ -591,7 +591,7 @@ html,body{height:100%;background:#0a0a0a;overflow:hidden;}
   font-family:var(--bc);font-size:12px;font-weight:600;color:var(--deep);
   display:flex;align-items:center;gap:4px;
 }
-
+ 
 /* ══════════════════════
    PROFILE
 ══════════════════════ */
@@ -645,7 +645,7 @@ html,body{height:100%;background:#0a0a0a;overflow:hidden;}
 .sitem .schev{font-size:15px;color:#d1d5db;}
 .si-pur{background:#ede9fb;}.si-amb{background:#fef3c7;}.si-grn{background:#d1fae5;}
 .si-sky{background:#e0f2fe;}.si-ros{background:#fee2e2;}
-
+ 
 /* ══════════════════════
    BOTTOM NAV
 ══════════════════════ */
@@ -659,7 +659,7 @@ html,body{height:100%;background:#0a0a0a;overflow:hidden;}
 .ni.on .nico{transform:scale(1.12);}
 .ni .nlbl{font-family:var(--bc);font-size:10.5px;font-weight:600;color:var(--muted);letter-spacing:.4px;text-transform:uppercase;}
 .ni.on .nlbl{color:var(--violet);}
-
+ 
 /* ══════════════════════
    NOTIF PANEL
 ══════════════════════ */
@@ -703,7 +703,7 @@ html,body{height:100%;background:#0a0a0a;overflow:hidden;}
 </head>
 <body>
 <div id="app">
-
+ 
 <!-- ═══════════ HOME ═══════════ -->
 <div id="home" class="screen">
   <div class="topbar">
@@ -734,10 +734,10 @@ html,body{height:100%;background:#0a0a0a;overflow:hidden;}
         </svg>
       </div>
     </div>
-
+ 
     <!-- Hero -->
 <div class="hero" id="homeHero"></div>
-
+ 
     <div class="sec-head"><h3>RECOMMENDED</h3><span class="see-all">SEE ALL</span></div>
     <div class="pills">
       <div class="pill on" onclick="setPill(this)">
@@ -761,7 +761,7 @@ html,body{height:100%;background:#0a0a0a;overflow:hidden;}
         Transport
       </div>
     </div>
-
+ 
     <div class="sec-head"><h3>TOP DESTINATIONS</h3><span class="see-all">&#8594;</span></div>
 <div class="hscroll" id="topDestinations"></div>
       
@@ -788,7 +788,7 @@ html,body{height:100%;background:#0a0a0a;overflow:hidden;}
     </div>
   </nav>
 </div>
-
+ 
 <!-- ═══════════ DETAIL ═══════════ -->
 <div id="detail" class="screen hidden">
   <div class="dh">
@@ -828,7 +828,7 @@ html,body{height:100%;background:#0a0a0a;overflow:hidden;}
       <div class="ps-labels"><span>PLANNING</span><b>65% READY</b><span>47 DAYS</span></div>
     </div>
     <div class="cl">
-
+ 
       <div class="ci">
         <div class="ci-ico ic-blu">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#0284c7" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M17 9l-7-7-7 7"/><path d="M5 9l5-5 5 5v8a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1z"/></svg>
@@ -907,7 +907,7 @@ html,body{height:100%;background:#0a0a0a;overflow:hidden;}
     <div class="ni"><div class="nico"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#9ca3af" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="2.5"/><path d="M10 1v3M10 16v3M1 10h3M16 10h3M3.5 3.5l2.1 2.1M14.4 14.4l2.1 2.1M3.5 16.5l2.1-2.1M14.4 5.6l2.1-2.1"/></svg></div><div class="nlbl">Preferences</div></div>
   </nav>
 </div>
-
+ 
 <!-- ═══════════ EXPLORE ═══════════ -->
 <div id="explore" class="screen hidden">
   <div class="explore-hero">
@@ -1001,7 +1001,7 @@ html,body{height:100%;background:#0a0a0a;overflow:hidden;}
     <div class="ni" onclick="switchTab(3,'profile')"><div class="nico"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#9ca3af" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="7" r="3.5"/><path d="M3 18c0-3.9 3.1-7 7-7s7 3.1 7 7"/></svg></div><div class="nlbl">Profile</div></div>
   </nav>
 </div>
-
+ 
 <!-- ═══════════ TRIPS ═══════════ -->
 <div id="trips" class="screen hidden">
   <div class="trips-header">
@@ -1070,7 +1070,7 @@ html,body{height:100%;background:#0a0a0a;overflow:hidden;}
     <div class="ni" onclick="switchTab(3,'profile')"><div class="nico"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#9ca3af" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="7" r="3.5"/><path d="M3 18c0-3.9 3.1-7 7-7s7 3.1 7 7"/></svg></div><div class="nlbl">Profile</div></div>
   </nav>
 </div>
-
+ 
 <!-- ═══════════ PROFILE ═══════════ -->
 <div id="profile" class="screen hidden">
   <div class="scroll">
@@ -1120,7 +1120,7 @@ html,body{height:100%;background:#0a0a0a;overflow:hidden;}
     <div class="ni on" onclick="switchTab(3,'profile')"><div class="nico"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#6b46c1" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="7" r="3.5"/><path d="M3 18c0-3.9 3.1-7 7-7s7 3.1 7 7"/></svg></div><div class="nlbl">Profile</div></div>
   </nav>
 </div>
-
+ 
 <!-- ═══════════ NOTIFICATIONS ═══════════ -->
 <div class="overlay" id="overlay" onclick="closeNotif()"></div>
 <div id="notif-panel">
@@ -1151,20 +1151,20 @@ html,body{height:100%;background:#0a0a0a;overflow:hidden;}
     </div>
   </div>
 </div>
-
+ 
 </div>
 <script>
 const mainScreens = ['home', 'explore', 'trips', 'profile'];
 let currentMain = 'home';
-
+ 
 const APP_CONFIG = {
   mode: 'live',
   endpoints: {
-    state: 'https://alphagroupuz.app.n8n.cloud/webhook/app-bootstrap',
+    state: 'https://alphagroupuz.app.n8n.cloud/webhook/waylo/state',
     action: 'https://alphagroupuz.app.n8n.cloud/webhook/app-action'
   }
 };
-
+ 
 const appState = {
   home: {
     greeting: {
@@ -1241,14 +1241,14 @@ const appState = {
     ]
   }
 };
-
+ 
 function show(id) {
   document.querySelectorAll('.screen').forEach(s => {
     s.classList.remove('pushed');
     s.id !== id ? s.classList.add('hidden') : s.classList.remove('hidden');
   });
 }
-
+ 
 function navTo(id) {
   const from = document.getElementById(currentMain === 'detail' ? 'home' : currentMain);
   if (from) from.classList.add('pushed');
@@ -1259,7 +1259,7 @@ function navTo(id) {
   }
   currentMain = id;
 }
-
+ 
 function goBack() {
   const d = document.getElementById('detail');
   if (!d) return;
@@ -1268,7 +1268,7 @@ function goBack() {
   if (src) src.classList.remove('pushed');
   currentMain = d._from || 'home';
 }
-
+ 
 function switchTab(i, id) {
   mainScreens.forEach(s => {
     const el = document.getElementById(s);
@@ -1277,27 +1277,27 @@ function switchTab(i, id) {
   });
   currentMain = id;
 }
-
+ 
 function setPill(el) {
   el.closest('.pills')?.querySelectorAll('.pill').forEach(p => p.classList.remove('on'));
   el.classList.add('on');
 }
-
+ 
 function setChip(el) {
   el.closest('.filter-row')?.querySelectorAll('.fchip').forEach(c => c.classList.remove('on'));
   el.classList.add('on');
 }
-
+ 
 function openNotif() {
   document.getElementById('notif-panel')?.classList.add('open');
   document.getElementById('overlay')?.classList.add('vis');
 }
-
+ 
 function closeNotif() {
   document.getElementById('notif-panel')?.classList.remove('open');
   document.getElementById('overlay')?.classList.remove('vis');
 }
-
+ 
 function initTelegram() {
   if (window.Telegram?.WebApp) {
     const tg = window.Telegram.WebApp;
@@ -1307,25 +1307,25 @@ function initTelegram() {
     tg.MainButton.onClick(() => navTo('detail'));
   }
 }
-
+ 
 function renderGreeting() {
   const el = document.getElementById('homeGreeting');
   const g = appState.home?.greeting;
   if (!el || !g) return;
-
+ 
   const firstLetter = (g.name || 'W').charAt(0).toUpperCase();
-
+ 
   el.innerHTML = `
     <h1>Hello, ${g.name} <div class="av">${firstLetter}</div></h1>
     <p>${g.subtitle}</p>
   `;
 }
-
+ 
 function renderHero() {
   const el = document.getElementById('homeHero');
   const hero = appState.home?.hero;
   if (!el || !hero) return;
-
+ 
   el.innerHTML = `
     <div class="hero-bg" style="
       background:
@@ -1353,7 +1353,7 @@ function renderHero() {
       </div>
     </div>
   `;
-
+ 
   const btn = document.getElementById('heroStartBtn');
   if (btn) {
     btn.addEventListener('click', (event) => {
@@ -1361,16 +1361,16 @@ function renderHero() {
       navTo('detail');
     });
   }
-
+ 
   el.onclick = () => navTo('detail');
 }
-
+ 
 function renderTopDestinations() {
   const el = document.getElementById('topDestinations');
   const items = appState.home?.topDestinations;
-
+ 
   if (!el || !items || !items.length) return;
-
+ 
   el.innerHTML = items.map(item => `
     <div class="dest-card" ${item.openDetail ? 'onclick="navTo(\'detail\')"' : ''}>
       <div class="dest-bg" style="background:url('${item.image}') center/cover no-repeat;"></div>
@@ -1383,13 +1383,13 @@ function renderTopDestinations() {
     </div>
   `).join('');
 }
-
+ 
 function renderTailoredForYou() {
   const el = document.getElementById('tailoredForYou');
   const items = appState.home?.tailoredForYou;
-
+ 
   if (!el || !items || !items.length) return;
-
+ 
   el.innerHTML = items.map(item => `
     <div class="tcard" ${item.openDetail ? 'onclick="navTo(\'detail\')"' : ''}>
       <div class="thumb ${item.imageClass}">
@@ -1413,26 +1413,26 @@ function renderTailoredForYou() {
     </div>
   `).join('');
 }
-
+ 
 function renderApp() {
   renderGreeting();
   renderHero();
   renderTopDestinations();
   renderTailoredForYou();
 }
-
+ 
 async function loadAppState() {
   if (APP_CONFIG.mode !== 'live') return;
-
+ 
   try {
     console.log('WAYLO loadAppState started');
-
+ 
     const tg = window.Telegram?.WebApp;
     const tgUser = tg?.initDataUnsafe?.user || {
       id: 123456789,
       first_name: 'Mamaraim'
     };
-
+ 
     const response = await fetch(APP_CONFIG.endpoints.state, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1444,11 +1444,11 @@ async function loadAppState() {
         initData: tg?.initData || 'test'
       })
     });
-
+ 
     if (!response.ok) {
       throw new Error('State request failed');
     }
-
+ 
     const text = await response.text();
     console.log('WAYLO raw response:', text);
     if (!text || text.trim() === '') {
@@ -1457,33 +1457,33 @@ async function loadAppState() {
     }
     const data = JSON.parse(text);
     console.log('WAYLO state response:', data);
-
+ 
     if (data.home) {
       appState.home = {
         ...appState.home,
         ...data.home
       };
     }
-
+ 
     renderApp();
   } catch (error) {
     console.error('loadAppState error:', error);
   }
 }
-
+ 
 async function sendAction(action, payload = {}) {
   if (APP_CONFIG.mode !== 'live') {
     console.log('APP_CONFIG.mode is not live');
     return null;
   }
-
+ 
   try {
     const tg = window.Telegram?.WebApp;
     const tgUser = tg?.initDataUnsafe?.user || {
       id: 123456789,
       first_name: 'Mamaraim'
     };
-
+ 
     const requestBody = {
       action,
       text: payload.text || '',
@@ -1494,54 +1494,54 @@ async function sendAction(action, payload = {}) {
       initData: tg?.initData || 'test',
       payload
     };
-
+ 
     console.log('WAYLO action request:', requestBody);
-
+ 
     const response = await fetch(APP_CONFIG.endpoints.action, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(requestBody)
     });
-
+ 
     console.log('WAYLO action HTTP status:', response.status);
-
+ 
     if (!response.ok) {
       throw new Error('Action request failed with status ' + response.status);
     }
-
+ 
     const data = await response.json();
     console.log('WAYLO action response:', data);
-
+ 
     return data;
   } catch (error) {
     console.error('sendAction error:', error);
     return null;
   }
 }
-
+ 
 function setupHomeSearch() {
   const input = document.querySelector('#home .search-row input');
   const actionButton = document.querySelector('#home .search-row button, #home .search-row .search-btn, #home .search-row .filter-btn');
-
+ 
   if (!input) {
     console.error('WAYLO search input not found');
     return;
   }
-
+ 
   const runSearch = async () => {
     const text = input.value.trim();
-
+ 
     console.log('WAYLO runSearch text:', text);
-
+ 
     if (!text) {
       console.log('WAYLO empty search text');
       return;
     }
-
+ 
     const data = await sendAction('user_message', { text });
-
+ 
     console.log('WAYLO UI received data:', data);
-
+ 
     if (data?.message?.text) {
       appState.home.greeting.subtitle = data.message.text;
       renderApp();
@@ -1550,27 +1550,27 @@ function setupHomeSearch() {
       console.error('WAYLO no message.text in response');
       alert('Ответ от Waylo не пришёл. Откройте Console.');
     }
-
+ 
     input.value = '';
   };
-
+ 
   input.addEventListener('keydown', async (event) => {
     if (event.key === 'Enter') {
       event.preventDefault();
       await runSearch();
     }
   });
-
+ 
   if (actionButton) {
     actionButton.addEventListener('click', async (event) => {
       event.preventDefault();
       await runSearch();
     });
   }
-
+ 
   console.log('WAYLO search handlers attached');
 }
-
+ 
 document.addEventListener('DOMContentLoaded', async () => {
   initTelegram();
   renderApp();
@@ -1580,3 +1580,4 @@ document.addEventListener('DOMContentLoaded', async () => {
 </script>
 </body>
 </html>
+ 
