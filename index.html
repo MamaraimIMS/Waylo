@@ -1160,8 +1160,8 @@ let currentMain = 'home';
 const APP_CONFIG = {
   mode: 'live',
   endpoints: {
-    state: 'https://alphagroupuz.app.n8n.cloud/webhook/waylo/state',
-    action: 'https://alphagroupuz.app.n8n.cloud/webhook/waylo/action'
+    state: 'https://alphagroupuz.app.n8n.cloud/webhook/app-bootstrap',
+    action: 'https://alphagroupuz.app.n8n.cloud/webhook/app-action'
   }
 };
 
@@ -1449,7 +1449,13 @@ async function loadAppState() {
       throw new Error('State request failed');
     }
 
-    const data = await response.json();
+    const text = await response.text();
+    console.log('WAYLO raw response:', text);
+    if (!text || text.trim() === '') {
+      console.warn('WAYLO: empty response from n8n, using demo data');
+      return;
+    }
+    const data = JSON.parse(text);
     console.log('WAYLO state response:', data);
 
     if (data.home) {
