@@ -1509,7 +1509,9 @@ async function sendAction(action, payload = {}) {
       throw new Error('Action request failed with status ' + response.status);
     }
  
-    const data = await response.json();
+    const text = await response.text();
+    if (!text || text.trim() === '') { return null; }
+    const data = JSON.parse(text);
     console.log('WAYLO action response:', data);
  
     return data;
