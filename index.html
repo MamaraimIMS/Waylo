@@ -1545,13 +1545,24 @@ function setupHomeSearch() {
     console.log('WAYLO UI received data:', data);
  
     if (data?.message?.text) {
-      appState.home.greeting.subtitle = data.message.text;
-      renderApp();
-      setupHomeSearch();
-    } else {
-      console.error('WAYLO no message.text in response');
-      alert('Ответ от Waylo не пришёл. Откройте Console.');
-    }
+  appState.home.greeting.subtitle = data.message.text;
+  
+  if (data.packages && data.packages.length > 0) {
+    appState.home.tailoredForYou = data.packages.map(p => ({
+      title: p.title,
+      subtitle: p.city,
+      price: '$' + p.total_price,
+      priceNote: '/person',
+      tag1: p.tag1 || '',
+      tag2: p.tag2 || '',
+      rating: String(p.rating || ''),
+      openDetail: true
+    }));
+  }
+  
+  renderApp();
+  setupHomeSearch();
+}
  
     input.value = '';
   };
