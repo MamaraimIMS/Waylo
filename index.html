@@ -1974,9 +1974,24 @@ async function submitBooking(e) {
     source: 'Telegram Mini App'
   };
   
+  // 1. Сохранить в Supabase
   const res = await post('requests', request);
+  
+  // 2. Отправить уведомление через n8n → Telegram
+  if (res) {
+    try {
+      await fetch('https://alphagroupuz.app.n8n.cloud/webhook/waylo-booking', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(request)
+      });
+    } catch (err) {
+      console.log('Notification webhook error:', err);
+    }
+  }
+  
   closeBooking();
-  toast(res ? 'Booking confirmed!' : 'Error occurred', !res);
+  toast(res ? '✅ Заявка отправлена!' : 'Ошибка отправки', !res);
 }
 
 // ══════════════════════════════════════════════════════════════
