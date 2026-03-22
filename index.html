@@ -106,9 +106,11 @@ html, body {
    HEADER
    ══════════════════════════════════════════════════════════════ */
 .header {
-  background: var(--teal);
-  padding: 20px;
-  padding-top: calc(20px + var(--safe-top));
+  background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.3)), url('./header-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  padding: 24px 20px 28px;
+  padding-top: calc(24px + var(--safe-top));
   border-radius: 0 0 30px 30px;
 }
 
@@ -125,6 +127,7 @@ html, body {
   font-size: 22px;
   font-weight: 700;
   color: #fff;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
 .header-title {
@@ -141,6 +144,7 @@ html, body {
   font-size: 22px;
   font-weight: 700;
   color: #fff;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
 .search-row {
