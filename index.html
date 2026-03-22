@@ -1522,7 +1522,7 @@ html, body {
 <!-- ONBOARDING -->
 <div class="onboarding" id="onboarding">
   <div class="onboarding-image">
-    <img src="https://images.unsplash.com/photo-1596402184320-417e7178b2cd?w=800" alt="Uzbekistan">
+    <img src="./hero.jpg" alt="Uzbekistan">
   </div>
   <div class="onboarding-content">
     <h1 class="onboarding-title">Explore<br>Uzbekistan<br>with Waylo</h1>
@@ -1956,7 +1956,7 @@ function renderTours() {
   
   el.innerHTML = data.top_tours.map(t => `
     <div class="card-h" onclick="openDetail('${t.id}', 'tour')">
-      <img src="${t.image_url || 'https://images.unsplash.com/photo-1596402184320-417e7178b2cd?w=400'}" alt="">
+      <img src="${t.image_url || './hero.jpg'}" alt="">
       ${t.badge_text ? `<div class="card-h-badge">${t.badge_text}</div>` : ''}
       <div class="card-h-info">
         <div class="card-h-title">${t.display_title}</div>
@@ -1972,7 +1972,7 @@ function renderDestinations() {
   
   el.innerHTML = data.top_destinations.map(d => `
     <div class="card-h" onclick="openDetail('${d.id}', 'destination')">
-      <img src="${d.image_url || 'https://images.unsplash.com/photo-1596402184320-417e7178b2cd?w=400'}" alt="">
+      <img src="${d.image_url || './hero.jpg'}" alt="">
       ${d.badge_text ? `<div class="card-h-badge">${d.badge_text}</div>` : ''}
       <div class="card-h-rating">
         <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
@@ -1992,7 +1992,7 @@ function renderHotels() {
   
   el.innerHTML = data.hotels.slice(0, 5).map(h => `
     <div class="card-v" onclick="openDetail('${h.id}', 'hotel')">
-      <img class="card-v-img" src="${h.image_url || h.gallery?.[0] || 'https://images.unsplash.com/photo-1596402184320-417e7178b2cd?w=300'}" alt="">
+      <img class="card-v-img" src="${h.image_url || h.gallery?.[0] || './hero.jpg'}" alt="">
       <div class="card-v-body">
         <div class="card-v-title">${h.name}</div>
         <div class="card-v-sub">${h.city} • ${h.stars}★</div>
@@ -2014,7 +2014,7 @@ function renderSights() {
   
   el.innerHTML = data.sights.map(s => `
     <div class="card-v" onclick="openDetail('${s.id}', 'sight')">
-      <img class="card-v-img" src="${s.gallery?.[0] || 'https://images.unsplash.com/photo-1596402184320-417e7178b2cd?w=300'}" alt="">
+      <img class="card-v-img" src="${s.gallery?.[0] || './hero.jpg'}" alt="">
       <div class="card-v-body">
         <div class="card-v-title">${s.name}</div>
         <div class="card-v-sub">${s.city} • ${s.type}</div>
@@ -2120,7 +2120,7 @@ function openDetail(id, type) {
   const badge = item.badge_text || '';
   const gallery = item.gallery || [item.image_url];
   
-  document.getElementById('detailImg').src = item.image_url || gallery[0] || 'https://images.unsplash.com/photo-1596402184320-417e7178b2cd?w=800';
+  document.getElementById('detailImg').src = item.image_url || gallery[0] || './hero.jpg';
   document.getElementById('detailTitle').textContent = title;
   document.getElementById('detailAddress').querySelector('span').textContent = city + (item.address ? ', ' + item.address : '');
   document.getElementById('detailBadge').textContent = badge;
@@ -2169,7 +2169,7 @@ function openDetail(id, type) {
   
   // Gallery
   document.getElementById('detailGallery').innerHTML = gallery.slice(0, 3).map(img => 
-    `<div class="detail-thumb"><img src="${img || 'https://images.unsplash.com/photo-1596402184320-417e7178b2cd?w=200'}" alt=""></div>`
+    `<div class="detail-thumb"><img src="${img || './hero.jpg'}" alt=""></div>`
   ).join('');
   
   // Price
@@ -2313,7 +2313,7 @@ function openModuleSelector(idx) {
   list.innerHTML = alternatives.map(alt => `
     <div class="selector-item ${alt.id === mod.id ? 'selected' : ''}" onclick="selectModule('${alt.id}', '${alt.name.replace(/'/g, "\\'")}', ${alt.price})">
       <div class="selector-item-img">
-        <img src="${alt.image || 'https://images.unsplash.com/photo-1596402184320-417e7178b2cd?w=200'}" alt="">
+        <img src="${alt.image || './hero.jpg'}" alt="">
       </div>
       <div class="selector-item-info">
         <div class="selector-item-name">${alt.name}</div>
