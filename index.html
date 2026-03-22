@@ -696,6 +696,235 @@ html, body {
 }
 
 /* ══════════════════════════════════════════════════════════════
+   TOUR MODULES (Конструктор тура)
+   ══════════════════════════════════════════════════════════════ */
+.tour-modules {
+  padding: 20px;
+  padding-top: 0;
+}
+
+.modules-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.module-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  background: var(--bg-gray);
+  border-radius: 14px;
+  position: relative;
+}
+
+.module-icon {
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, var(--teal) 0%, #0891b2 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.module-icon.hotel { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); }
+.module-icon.transfer { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
+.module-icon.restaurant { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+.module-icon.sight { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+.module-icon.guide { background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); }
+
+.module-icon svg {
+  width: 22px;
+  height: 22px;
+  stroke: #fff;
+  stroke-width: 2;
+  fill: none;
+}
+
+.module-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.module-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.module-details {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.module-price {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--teal);
+  margin-right: 8px;
+}
+
+.module-change {
+  width: 36px;
+  height: 36px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.module-change svg {
+  width: 18px;
+  height: 18px;
+  stroke: var(--teal);
+  stroke-width: 2;
+  fill: none;
+}
+
+.modules-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+  padding: 16px;
+  background: linear-gradient(135deg, var(--teal) 0%, #0891b2 100%);
+  border-radius: 14px;
+  color: #fff;
+}
+
+.modules-total span {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.modules-total strong {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+/* MODULE SELECTOR MODAL */
+.module-selector {
+  position: fixed;
+  inset: 0;
+  z-index: 250;
+  background: var(--bg);
+  transform: translateY(100%);
+  transition: transform 0.3s;
+}
+
+.module-selector.open {
+  transform: translateY(0);
+}
+
+.selector-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  padding-top: calc(16px + var(--safe-top));
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.selector-title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.selector-close {
+  width: 40px;
+  height: 40px;
+  background: var(--bg-gray);
+  border: none;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.selector-close svg {
+  width: 20px;
+  height: 20px;
+  stroke: var(--text);
+  stroke-width: 2;
+  fill: none;
+}
+
+.selector-list {
+  padding: 20px;
+  padding-bottom: calc(20px + var(--safe-bottom));
+  overflow-y: auto;
+  max-height: calc(100vh - 80px);
+}
+
+.selector-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  background: var(--bg-gray);
+  border: 2px solid transparent;
+  border-radius: 16px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.selector-item:hover,
+.selector-item.selected {
+  border-color: var(--teal);
+  background: rgba(13, 148, 136, 0.05);
+}
+
+.selector-item-img {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.selector-item-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.selector-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.selector-item-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.selector-item-details {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.selector-item-price {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--teal);
+}
+
+/* ══════════════════════════════════════════════════════════════
    PROFILE
    ══════════════════════════════════════════════════════════════ */
 .profile-head {
@@ -913,6 +1142,18 @@ html, body {
 .booking-preview-loc {
   font-size: 14px;
   color: var(--text-secondary);
+}
+
+.booking-modules {
+  margin-top: 8px;
+  max-height: 80px;
+  overflow-y: auto;
+}
+
+.booking-module-item {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
 }
 
 .form-group { margin-bottom: 18px; }
@@ -1430,6 +1671,16 @@ html, body {
       <p class="detail-desc" id="detailDesc"></p>
       
       <div class="detail-info-grid" id="detailInfo"></div>
+      
+      <!-- TOUR MODULES (конструктор тура) -->
+      <div class="tour-modules" id="tourModules" style="display:none;">
+        <h3 class="detail-section-title">Что включено в тур</h3>
+        <div class="modules-list" id="modulesList"></div>
+        <div class="modules-total">
+          <span>Итого:</span>
+          <strong id="modulesTotal">$0</strong>
+        </div>
+      </div>
     </div>
     
     <div class="detail-footer">
@@ -1582,6 +1833,17 @@ html, body {
       <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
     </button>
   </div>
+</div>
+
+<!-- MODULE SELECTOR MODAL -->
+<div class="module-selector" id="moduleSelector">
+  <div class="selector-header">
+    <span class="selector-title" id="selectorTitle">Выберите отель</span>
+    <button class="selector-close" onclick="closeModuleSelector()">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="selector-list" id="selectorList"></div>
 </div>
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
@@ -1914,8 +2176,170 @@ function openDetail(id, type) {
   const priceLabel = type === 'hotel' ? '/night' : type === 'guide' ? '/day' : '';
   document.getElementById('detailPrice').innerHTML = `$${price}<small>${priceLabel}</small>`;
   
+  // Show/hide tour modules
+  if (type === 'tour' && item.modules && item.modules.length > 0) {
+    document.getElementById('tourModules').style.display = 'block';
+    currentModules = JSON.parse(JSON.stringify(item.modules)); // Deep copy
+    renderModules();
+  } else {
+    document.getElementById('tourModules').style.display = 'none';
+  }
+  
   switchView('detail');
   document.getElementById('navbar').style.display = 'none';
+}
+
+// ══════════════════════════════════════════════════════════════
+// TOUR MODULES — Конструктор тура
+// ══════════════════════════════════════════════════════════════
+let currentModules = [];
+let editingModuleIndex = null;
+
+const moduleIcons = {
+  hotel: '<svg viewBox="0 0 24 24"><path d="M3 21V8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v13"/><path d="M3 11h18"/><rect x="7" y="11" width="4" height="5"/><rect x="13" y="11" width="4" height="5"/></svg>',
+  transfer: '<svg viewBox="0 0 24 24"><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M5 17H3V6l9-4 9 4v11h-2"/><path d="M9 17h6"/></svg>',
+  restaurant: '<svg viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>',
+  sight: '<svg viewBox="0 0 24 24"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/><circle cx="12" cy="10" r="3"/></svg>',
+  guide: '<svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+  entertainment: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>',
+  museum: '<svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg>'
+};
+
+function renderModules() {
+  const list = document.getElementById('modulesList');
+  let total = 0;
+  
+  list.innerHTML = currentModules.map((mod, idx) => {
+    const moduleType = mod.type || 'sight';
+    const icon = moduleIcons[moduleType] || moduleIcons.sight;
+    total += mod.price || 0;
+    
+    return `
+      <div class="module-item">
+        <div class="module-icon ${moduleType}">${icon}</div>
+        <div class="module-info">
+          <div class="module-name">${mod.name}</div>
+          <div class="module-details">${mod.details || mod.type || ''}</div>
+        </div>
+        <div class="module-price">$${mod.price || 0}</div>
+        <button class="module-change" onclick="openModuleSelector(${idx})">
+          <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        </button>
+      </div>
+    `;
+  }).join('');
+  
+  document.getElementById('modulesTotal').textContent = '$' + total;
+  document.getElementById('detailPrice').innerHTML = `$${total}<small></small>`;
+  
+  // Update currentItem total_price
+  if (currentItem) {
+    currentItem.total_price = total;
+  }
+}
+
+function openModuleSelector(idx) {
+  editingModuleIndex = idx;
+  const mod = currentModules[idx];
+  const moduleType = mod.type || 'hotel';
+  
+  // Set title based on type
+  const titles = {
+    hotel: 'Выберите отель',
+    transfer: 'Выберите трансфер',
+    restaurant: 'Выберите ресторан',
+    sight: 'Выберите достопримечательность',
+    guide: 'Выберите гида',
+    entertainment: 'Выберите развлечение',
+    museum: 'Выберите музей'
+  };
+  document.getElementById('selectorTitle').textContent = titles[moduleType] || 'Выберите вариант';
+  
+  // Get alternatives from data
+  let alternatives = [];
+  
+  if (moduleType === 'hotel') {
+    alternatives = data.hotels.map(h => ({
+      id: h.id,
+      name: h.name,
+      details: `${h.city} • ${h.stars}★`,
+      price: h.price_from,
+      image: h.image_url
+    }));
+  } else if (moduleType === 'transfer') {
+    alternatives = data.transfers.map(t => ({
+      id: t.id,
+      name: t.name,
+      details: `${t.from_city} → ${t.to_city} • ${t.vehicle}`,
+      price: t.price,
+      image: t.gallery?.[0] || ''
+    }));
+  } else if (moduleType === 'restaurant') {
+    alternatives = data.restaurants.map(r => ({
+      id: r.id,
+      name: r.name,
+      details: `${r.city} • ${r.cuisine}`,
+      price: r.avg_check,
+      image: r.gallery?.[0] || ''
+    }));
+  } else if (moduleType === 'sight') {
+    alternatives = data.sights.map(s => ({
+      id: s.id,
+      name: s.name,
+      details: `${s.city} • ${s.type}`,
+      price: s.entry_price || 0,
+      image: s.gallery?.[0] || ''
+    }));
+  } else if (moduleType === 'guide') {
+    alternatives = data.guides.map(g => ({
+      id: g.id,
+      name: g.name,
+      details: `${g.city} • ${g.languages}`,
+      price: g.price_day,
+      image: g.gallery?.[0] || ''
+    }));
+  } else if (moduleType === 'museum') {
+    alternatives = data.museums.map(m => ({
+      id: m.id,
+      name: m.name,
+      details: `${m.city} • ${m.type}`,
+      price: m.entry_price || 0,
+      image: m.gallery?.[0] || ''
+    }));
+  }
+  
+  // Render alternatives
+  const list = document.getElementById('selectorList');
+  list.innerHTML = alternatives.map(alt => `
+    <div class="selector-item ${alt.id === mod.id ? 'selected' : ''}" onclick="selectModule('${alt.id}', '${alt.name.replace(/'/g, "\\'")}', ${alt.price})">
+      <div class="selector-item-img">
+        <img src="${alt.image || 'https://images.unsplash.com/photo-1596484552834-6a58f850e0a1?w=200'}" alt="">
+      </div>
+      <div class="selector-item-info">
+        <div class="selector-item-name">${alt.name}</div>
+        <div class="selector-item-details">${alt.details}</div>
+      </div>
+      <div class="selector-item-price">$${alt.price}</div>
+    </div>
+  `).join('');
+  
+  document.getElementById('moduleSelector').classList.add('open');
+}
+
+function closeModuleSelector() {
+  document.getElementById('moduleSelector').classList.remove('open');
+  editingModuleIndex = null;
+}
+
+function selectModule(id, name, price) {
+  if (editingModuleIndex !== null && currentModules[editingModuleIndex]) {
+    currentModules[editingModuleIndex].id = id;
+    currentModules[editingModuleIndex].name = name;
+    currentModules[editingModuleIndex].price = price;
+    renderModules();
+  }
+  closeModuleSelector();
+  toast('✅ Модуль заменён!');
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -1927,11 +2351,19 @@ function openBooking() {
     const city = currentItem.city || currentItem.from_city || '';
     const img = currentItem.image_url || currentItem.gallery?.[0] || '';
     
+    let modulesHtml = '';
+    if (currentType === 'tour' && currentModules.length > 0) {
+      modulesHtml = `<div class="booking-modules">${currentModules.map(m => 
+        `<div class="booking-module-item">• ${m.name} — $${m.price}</div>`
+      ).join('')}</div>`;
+    }
+    
     document.getElementById('bookingPreview').innerHTML = `
       <img src="${img}" alt="">
       <div>
         <div class="booking-preview-name">${title}</div>
         <div class="booking-preview-loc">${city}</div>
+        ${modulesHtml}
       </div>
     `;
   }
