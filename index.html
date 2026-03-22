@@ -2304,4 +2304,14 @@ function buildContext() {
     ).join('\n') + '\n\n';
   }
   
-  if (data.restaurants.length
+  if (data.restaurants.length) {
+    ctx += 'РЕСТОРАНЫ:\n' + data.restaurants.map(r => 
+      `- ${r.name}: ${r.city}, ${r.cuisine}, средний чек $${r.avg_check}`
+    ).join('\n') + '\n\n';
+  }
+  
+  return ctx;
+}
+</script>
+</body>
+</html>
