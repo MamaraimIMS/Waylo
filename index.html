@@ -749,6 +749,8 @@ html, body {
 .module-icon.museum { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); }
 .module-icon.museums { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); }
 .module-icon.entertainment { background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%); }
+.module-icon.food { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
+.module-icon.recreation { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); }
 
 .module-icon svg {
   width: 22px;
@@ -774,8 +776,9 @@ html, body {
 }
 
 .module-details {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-secondary);
+  line-height: 1.3;
 }
 
 .module-price {
@@ -802,6 +805,64 @@ html, body {
   width: 18px;
   height: 18px;
   stroke: var(--teal);
+  stroke-width: 2;
+  fill: none;
+}
+
+.module-delete {
+  width: 36px;
+  height: 36px;
+  background: #fff;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-left: 6px;
+}
+
+.module-delete svg {
+  width: 18px;
+  height: 18px;
+  stroke: #ef4444;
+  stroke-width: 2;
+  fill: none;
+}
+
+.module-delete:active {
+  background: #fef2f2;
+}
+
+.module-add-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px;
+  margin-top: 12px;
+  background: var(--bg);
+  border: 2px dashed #d1d5db;
+  border-radius: 14px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.module-add-btn:active {
+  background: var(--bg-gray);
+  border-color: var(--teal);
+  color: var(--teal);
+}
+
+.module-add-btn svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
   stroke-width: 2;
   fill: none;
 }
@@ -1434,6 +1495,119 @@ html, body {
   stroke: transparent;
   stroke-width: 3;
   fill: none;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   ADD MODULE MENU
+   ══════════════════════════════════════════════════════════════ */
+.add-module-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 310;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s;
+}
+
+.add-module-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.add-module-menu {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--bg);
+  border-radius: 24px 24px 0 0;
+  z-index: 311;
+  max-height: 80vh;
+  transform: translateY(100%);
+  transition: transform 0.3s;
+  overflow: hidden;
+  touch-action: pan-y;
+  overscroll-behavior: contain;
+}
+
+.add-module-menu.open {
+  transform: translateY(0);
+}
+
+.add-module-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.add-module-title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.add-module-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  padding: 20px;
+  padding-bottom: calc(20px + var(--safe-bottom));
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.add-module-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 12px;
+  background: var(--bg-gray);
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.add-module-item:active {
+  transform: scale(0.95);
+  background: #e2e8f0;
+}
+
+.add-module-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.add-module-icon svg {
+  width: 26px;
+  height: 26px;
+  stroke: #fff;
+  stroke-width: 2;
+  fill: none;
+}
+
+.add-module-icon.flights { background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); }
+.add-module-icon.hotels { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); }
+.add-module-icon.transfers { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
+.add-module-icon.sights { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+.add-module-icon.restaurants { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+.add-module-icon.food { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
+.add-module-icon.recreation { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); }
+.add-module-icon.entertainment { background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%); }
+.add-module-icon.museums { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); }
+.add-module-icon.guides { background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); }
+
+.add-module-item span {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  text-align: center;
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -2514,6 +2688,80 @@ html, body {
   </div>
 </div>
 
+<!-- ADD MODULE MENU -->
+<div class="add-module-overlay" id="addModuleOverlay" onclick="closeAddModuleMenu()"></div>
+<div class="add-module-menu" id="addModuleMenu">
+  <div class="modal-handle"></div>
+  <div class="add-module-header">
+    <h3 class="add-module-title">Добавить из каталога</h3>
+    <button class="modal-close" onclick="closeAddModuleMenu()">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="add-module-grid">
+    <div class="add-module-item" onclick="addNewModule('flights')">
+      <div class="add-module-icon flights">
+        <svg viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+      </div>
+      <span>Авиабилеты</span>
+    </div>
+    <div class="add-module-item" onclick="addNewModule('hotels')">
+      <div class="add-module-icon hotels">
+        <svg viewBox="0 0 24 24"><path d="M3 21V8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v13"/><path d="M3 11h18"/><rect x="7" y="11" width="4" height="5"/><rect x="13" y="11" width="4" height="5"/></svg>
+      </div>
+      <span>Отели</span>
+    </div>
+    <div class="add-module-item" onclick="addNewModule('transfers')">
+      <div class="add-module-icon transfers">
+        <svg viewBox="0 0 24 24"><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M5 17H3V6l9-4 9 4v11h-2"/><path d="M9 17h6"/></svg>
+      </div>
+      <span>Трансферы</span>
+    </div>
+    <div class="add-module-item" onclick="addNewModule('sights')">
+      <div class="add-module-icon sights">
+        <svg viewBox="0 0 24 24"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/><circle cx="12" cy="10" r="3"/></svg>
+      </div>
+      <span>Достопримечательности</span>
+    </div>
+    <div class="add-module-item" onclick="addNewModule('restaurants')">
+      <div class="add-module-icon restaurants">
+        <svg viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
+      </div>
+      <span>Рестораны</span>
+    </div>
+    <div class="add-module-item" onclick="addNewModule('food')">
+      <div class="add-module-icon food">
+        <svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+      </div>
+      <span>Еда</span>
+    </div>
+    <div class="add-module-item" onclick="addNewModule('recreation')">
+      <div class="add-module-icon recreation">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+      </div>
+      <span>Отдых</span>
+    </div>
+    <div class="add-module-item" onclick="addNewModule('entertainment')">
+      <div class="add-module-icon entertainment">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+      </div>
+      <span>Развлечения</span>
+    </div>
+    <div class="add-module-item" onclick="addNewModule('museums')">
+      <div class="add-module-icon museums">
+        <svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg>
+      </div>
+      <span>Музеи</span>
+    </div>
+    <div class="add-module-item" onclick="addNewModule('guides')">
+      <div class="add-module-icon guides">
+        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <span>Гиды</span>
+    </div>
+  </div>
+</div>
+
 <!-- AI CHAT MODAL -->
 <div class="ai-modal" id="aiModal">
   <div class="ai-header">
@@ -3006,7 +3254,9 @@ const moduleIcons = {
   museum: '<svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg>',
   museums: '<svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg>',
   flights: '<svg viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>',
-  flight: '<svg viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>'
+  flight: '<svg viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>',
+  food: '<svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>',
+  recreation: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>'
 };
 
 // Русские названия категорий модулей
@@ -3025,7 +3275,9 @@ const moduleNames = {
   museum: 'Музей',
   museums: 'Музей',
   flights: 'Авиабилеты',
-  flight: 'Авиабилеты'
+  flight: 'Авиабилеты',
+  food: 'Еда',
+  recreation: 'Отдых'
 };
 
 function renderModules() {
@@ -3038,20 +3290,86 @@ function renderModules() {
     const categoryName = moduleNames[moduleType] || moduleType;
     total += mod.price || 0;
     
+    // Формируем строку с датами в зависимости от типа
+    let dateInfo = '';
+    if (moduleType === 'flights' || moduleType === 'flight') {
+      if (mod.date_out) {
+        dateInfo = `📅 ${formatDateShort(mod.date_out)}`;
+        if (mod.date_back) dateInfo += ` — ${formatDateShort(mod.date_back)}`;
+      }
+    } else if (moduleType === 'hotel' || moduleType === 'hotels') {
+      if (mod.check_in && mod.check_out) {
+        dateInfo = `📅 ${formatDateShort(mod.check_in)} — ${formatDateShort(mod.check_out)}`;
+        if (mod.nights) dateInfo += ` (${mod.nights} ноч.)`;
+      }
+    } else if (moduleType === 'transfer' || moduleType === 'transfers') {
+      if (mod.date) {
+        dateInfo = `📅 ${formatDateShort(mod.date)}`;
+        if (mod.time) dateInfo += ` в ${mod.time}`;
+      }
+    } else if (moduleType === 'restaurant' || moduleType === 'restaurants') {
+      if (mod.date) {
+        dateInfo = `📅 ${formatDateShort(mod.date)}`;
+        if (mod.time) dateInfo += ` в ${mod.time}`;
+      }
+    } else if (moduleType === 'sight' || moduleType === 'sights') {
+      if (mod.date) {
+        dateInfo = `📅 ${formatDateShort(mod.date)}`;
+        if (mod.time) dateInfo += ` в ${mod.time}`;
+      }
+    } else if (moduleType === 'guide' || moduleType === 'guides') {
+      if (mod.start_date) {
+        dateInfo = `📅 ${formatDateShort(mod.start_date)}`;
+        if (mod.end_date) dateInfo += ` — ${formatDateShort(mod.end_date)}`;
+        if (mod.days) dateInfo += ` (${mod.days} дн.)`;
+      }
+    } else if (moduleType === 'museum' || moduleType === 'museums') {
+      if (mod.date) {
+        dateInfo = `📅 ${formatDateShort(mod.date)}`;
+        if (mod.time) dateInfo += ` в ${mod.time}`;
+      }
+    } else if (moduleType === 'food') {
+      if (mod.date) {
+        dateInfo = `📅 ${formatDateShort(mod.date)}`;
+        if (mod.time) dateInfo += ` в ${mod.time}`;
+      }
+    } else if (moduleType === 'recreation') {
+      if (mod.date) {
+        dateInfo = `📅 ${formatDateShort(mod.date)}`;
+        if (mod.time) dateInfo += ` в ${mod.time}`;
+      }
+    } else if (moduleType === 'entertainment') {
+      if (mod.date) {
+        dateInfo = `📅 ${formatDateShort(mod.date)}`;
+        if (mod.time) dateInfo += ` в ${mod.time}`;
+      }
+    }
+    
     return `
       <div class="module-item">
         <div class="module-icon ${moduleType}">${icon}</div>
         <div class="module-info">
           <div class="module-name">${mod.name}</div>
-          <div class="module-details">${categoryName}</div>
+          <div class="module-details">${categoryName}${dateInfo ? ' • ' + dateInfo : ''}</div>
         </div>
         <div class="module-price">$${mod.price || 0}</div>
         <button class="module-change" onclick="openModuleEdit(${idx})">
           <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
         </button>
+        <button class="module-delete" onclick="deleteModule(${idx})">
+          <svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        </button>
       </div>
     `;
   }).join('');
+  
+  // Кнопка добавления модуля
+  list.innerHTML += `
+    <button class="module-add-btn" onclick="openAddModuleMenu()">
+      <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Добавить из каталога
+    </button>
+  `;
   
   document.getElementById('modulesTotal').textContent = '$' + total;
   document.getElementById('detailPrice').innerHTML = `$${total}<small></small>`;
@@ -3060,6 +3378,59 @@ function renderModules() {
   if (currentItem) {
     currentItem.total_price = total;
   }
+}
+
+// Форматирование даты коротко (15 мар)
+function formatDateShort(dateStr) {
+  if (!dateStr) return '';
+  const months = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
+  const d = new Date(dateStr);
+  return `${d.getDate()} ${months[d.getMonth()]}`;
+}
+
+// Удаление модуля
+function deleteModule(idx) {
+  if (confirm('Удалить этот модуль из тура?')) {
+    currentModules.splice(idx, 1);
+    renderModules();
+    toast('🗑️ Модуль удалён');
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// ADD MODULE MENU — Добавление модуля из каталога
+// ══════════════════════════════════════════════════════════════
+function openAddModuleMenu() {
+  document.getElementById('addModuleOverlay').classList.add('open');
+  document.getElementById('addModuleMenu').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeAddModuleMenu() {
+  document.getElementById('addModuleOverlay').classList.remove('open');
+  document.getElementById('addModuleMenu').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// Добавление нового модуля выбранного типа
+function addNewModule(type) {
+  closeAddModuleMenu();
+  
+  // Создаём пустой модуль нужного типа
+  const newModule = {
+    type: type,
+    name: 'Новый модуль',
+    price: 0
+  };
+  
+  // Добавляем в массив
+  currentModules.push(newModule);
+  const newIndex = currentModules.length - 1;
+  
+  // Открываем форму редактирования для нового модуля
+  setTimeout(() => {
+    openModuleEdit(newIndex);
+  }, 300);
 }
 
 function openModuleSelector(idx) {
@@ -3269,7 +3640,9 @@ function openModuleEdit(idx) {
     guides: 'Гид',
     museum: 'Музей',
     museums: 'Музей',
-    entertainment: 'Развлечение'
+    entertainment: 'Развлечение',
+    food: 'Еда',
+    recreation: 'Отдых'
   };
   
   document.getElementById('moduleEditTitle').textContent = titles[moduleType] || 'Редактировать модуль';
@@ -3291,6 +3664,12 @@ function openModuleEdit(idx) {
     formHtml = renderGuideForm();
   } else if (moduleType === 'museum' || moduleType === 'museums') {
     formHtml = renderMuseumForm();
+  } else if (moduleType === 'food') {
+    formHtml = renderFoodForm();
+  } else if (moduleType === 'recreation') {
+    formHtml = renderRecreationForm();
+  } else if (moduleType === 'entertainment') {
+    formHtml = renderEntertainmentForm();
   } else {
     formHtml = renderGenericForm();
   }
@@ -4195,6 +4574,345 @@ function saveMuseumModule() {
   }
   closeModuleEdit();
   toast('✅ Музей обновлён!');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ФОРМА: ЕДА
+// ═══════════════════════════════════════════════════════════════
+function renderFoodForm() {
+  const mod = editingModule;
+  const today = new Date().toISOString().split('T')[0];
+  
+  const foodOptions = (data.food || []).map(f => `
+    <div class="edit-option-card ${mod.food_id === f.id ? 'selected' : ''}" onclick="selectFoodOption('${f.id}', '${f.name.replace(/'/g, "\\'")}', ${f.price || 0})">
+      <img src="${f.gallery?.[0] || './hero.jpg'}" alt="">
+      <div class="edit-option-info">
+        <div class="edit-option-name">${f.name}</div>
+        <div class="edit-option-details">${f.city} • ${f.type || ''}</div>
+      </div>
+      <div class="edit-option-price">$${f.price || 0}</div>
+      <div class="edit-option-check">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+    </div>
+  `).join('') || '<p style="text-align:center;color:var(--text-muted);padding:20px;">Нет доступных вариантов</p>';
+  
+  return `
+    <div class="edit-section">
+      <div class="edit-section-title">Выберите заведение</div>
+      <div id="foodOptions">${foodOptions}</div>
+    </div>
+    
+    <div class="edit-section">
+      <div class="edit-section-title">Дата и время</div>
+      <div class="edit-row">
+        <div class="edit-field">
+          <label class="edit-label">Дата</label>
+          <input type="date" class="edit-input" id="foodDate" value="${mod.date || today}">
+        </div>
+        <div class="edit-field">
+          <label class="edit-label">Время</label>
+          <input type="time" class="edit-input" id="foodTime" value="${mod.time || '12:00'}">
+        </div>
+      </div>
+      <div class="edit-field">
+        <label class="edit-label">Количество человек</label>
+        <input type="number" class="edit-input" id="foodPeople" value="${mod.people || 2}" min="1" onchange="calcFoodTotal()">
+      </div>
+    </div>
+    
+    <div class="edit-calc">
+      <div class="edit-calc-row">
+        <span>Цена на человека</span>
+        <span>$<span id="foodPriceOne">${mod.price_per_person || 0}</span></span>
+      </div>
+      <div class="edit-calc-row">
+        <span>Человек</span>
+        <span id="foodPeopleCount">${mod.people || 2}</span>
+      </div>
+      <div class="edit-calc-row total">
+        <span>Итого</span>
+        <span>$<span id="foodTotal">${mod.price || 0}</span></span>
+      </div>
+    </div>
+    
+    <div class="edit-actions">
+      <button class="edit-btn edit-btn-secondary" onclick="closeModuleEdit()">Отмена</button>
+      <button class="edit-btn edit-btn-primary" onclick="saveFoodModule()">Сохранить</button>
+    </div>
+  `;
+}
+
+let selectedFoodId = null;
+let selectedFoodName = '';
+let selectedFoodPrice = 0;
+
+function selectFoodOption(id, name, price) {
+  selectedFoodId = id;
+  selectedFoodName = name;
+  selectedFoodPrice = price;
+  
+  document.querySelectorAll('#foodOptions .edit-option-card').forEach(c => c.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+  
+  document.getElementById('foodPriceOne').textContent = price;
+  calcFoodTotal();
+}
+
+function calcFoodTotal() {
+  const price = parseFloat(document.getElementById('foodPriceOne').textContent) || 0;
+  const people = parseInt(document.getElementById('foodPeople').value) || 1;
+  document.getElementById('foodPeopleCount').textContent = people;
+  document.getElementById('foodTotal').textContent = price * people;
+}
+
+function saveFoodModule() {
+  if (!selectedFoodId) {
+    toast('Выберите заведение', true);
+    return;
+  }
+  
+  const people = parseInt(document.getElementById('foodPeople').value) || 1;
+  const totalPrice = selectedFoodPrice * people;
+  
+  if (editingModuleIndex !== null && currentModules[editingModuleIndex]) {
+    currentModules[editingModuleIndex].name = selectedFoodName;
+    currentModules[editingModuleIndex].price = totalPrice;
+    currentModules[editingModuleIndex].food_id = selectedFoodId;
+    currentModules[editingModuleIndex].price_per_person = selectedFoodPrice;
+    currentModules[editingModuleIndex].date = document.getElementById('foodDate').value;
+    currentModules[editingModuleIndex].time = document.getElementById('foodTime').value;
+    currentModules[editingModuleIndex].people = people;
+    renderModules();
+  }
+  closeModuleEdit();
+  toast('✅ Еда добавлена!');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ФОРМА: ОТДЫХ
+// ═══════════════════════════════════════════════════════════════
+function renderRecreationForm() {
+  const mod = editingModule;
+  const today = new Date().toISOString().split('T')[0];
+  
+  const recreationOptions = (data.recreation || []).map(r => `
+    <div class="edit-option-card ${mod.recreation_id === r.id ? 'selected' : ''}" onclick="selectRecreationOption('${r.id}', '${r.name.replace(/'/g, "\\'")}', ${r.price || 0})">
+      <img src="${r.gallery?.[0] || './hero.jpg'}" alt="">
+      <div class="edit-option-info">
+        <div class="edit-option-name">${r.name}</div>
+        <div class="edit-option-details">${r.city} • ${r.type || ''} • ${r.duration_hours || 1}ч</div>
+      </div>
+      <div class="edit-option-price">$${r.price || 0}</div>
+      <div class="edit-option-check">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+    </div>
+  `).join('') || '<p style="text-align:center;color:var(--text-muted);padding:20px;">Нет доступных вариантов</p>';
+  
+  return `
+    <div class="edit-section">
+      <div class="edit-section-title">Выберите активность</div>
+      <div id="recreationOptions">${recreationOptions}</div>
+    </div>
+    
+    <div class="edit-section">
+      <div class="edit-section-title">Дата и время</div>
+      <div class="edit-row">
+        <div class="edit-field">
+          <label class="edit-label">Дата</label>
+          <input type="date" class="edit-input" id="recreationDate" value="${mod.date || today}">
+        </div>
+        <div class="edit-field">
+          <label class="edit-label">Время</label>
+          <input type="time" class="edit-input" id="recreationTime" value="${mod.time || '10:00'}">
+        </div>
+      </div>
+      <div class="edit-field">
+        <label class="edit-label">Количество человек</label>
+        <input type="number" class="edit-input" id="recreationPeople" value="${mod.people || 2}" min="1" onchange="calcRecreationTotal()">
+      </div>
+    </div>
+    
+    <div class="edit-calc">
+      <div class="edit-calc-row">
+        <span>Цена на человека</span>
+        <span>$<span id="recreationPriceOne">${mod.price_per_person || 0}</span></span>
+      </div>
+      <div class="edit-calc-row">
+        <span>Человек</span>
+        <span id="recreationPeopleCount">${mod.people || 2}</span>
+      </div>
+      <div class="edit-calc-row total">
+        <span>Итого</span>
+        <span>$<span id="recreationTotal">${mod.price || 0}</span></span>
+      </div>
+    </div>
+    
+    <div class="edit-actions">
+      <button class="edit-btn edit-btn-secondary" onclick="closeModuleEdit()">Отмена</button>
+      <button class="edit-btn edit-btn-primary" onclick="saveRecreationModule()">Сохранить</button>
+    </div>
+  `;
+}
+
+let selectedRecreationId = null;
+let selectedRecreationName = '';
+let selectedRecreationPrice = 0;
+
+function selectRecreationOption(id, name, price) {
+  selectedRecreationId = id;
+  selectedRecreationName = name;
+  selectedRecreationPrice = price;
+  
+  document.querySelectorAll('#recreationOptions .edit-option-card').forEach(c => c.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+  
+  document.getElementById('recreationPriceOne').textContent = price;
+  calcRecreationTotal();
+}
+
+function calcRecreationTotal() {
+  const price = parseFloat(document.getElementById('recreationPriceOne').textContent) || 0;
+  const people = parseInt(document.getElementById('recreationPeople').value) || 1;
+  document.getElementById('recreationPeopleCount').textContent = people;
+  document.getElementById('recreationTotal').textContent = price * people;
+}
+
+function saveRecreationModule() {
+  if (!selectedRecreationId) {
+    toast('Выберите активность', true);
+    return;
+  }
+  
+  const people = parseInt(document.getElementById('recreationPeople').value) || 1;
+  const totalPrice = selectedRecreationPrice * people;
+  
+  if (editingModuleIndex !== null && currentModules[editingModuleIndex]) {
+    currentModules[editingModuleIndex].name = selectedRecreationName;
+    currentModules[editingModuleIndex].price = totalPrice;
+    currentModules[editingModuleIndex].recreation_id = selectedRecreationId;
+    currentModules[editingModuleIndex].price_per_person = selectedRecreationPrice;
+    currentModules[editingModuleIndex].date = document.getElementById('recreationDate').value;
+    currentModules[editingModuleIndex].time = document.getElementById('recreationTime').value;
+    currentModules[editingModuleIndex].people = people;
+    renderModules();
+  }
+  closeModuleEdit();
+  toast('✅ Отдых добавлен!');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ФОРМА: РАЗВЛЕЧЕНИЯ
+// ═══════════════════════════════════════════════════════════════
+function renderEntertainmentForm() {
+  const mod = editingModule;
+  const today = new Date().toISOString().split('T')[0];
+  
+  const entertainmentOptions = (data.entertainment || []).map(e => `
+    <div class="edit-option-card ${mod.entertainment_id === e.id ? 'selected' : ''}" onclick="selectEntertainmentOption('${e.id}', '${e.name.replace(/'/g, "\\'")}', ${e.price || 0})">
+      <img src="${e.gallery?.[0] || './hero.jpg'}" alt="">
+      <div class="edit-option-info">
+        <div class="edit-option-name">${e.name}</div>
+        <div class="edit-option-details">${e.city} • ${e.type || ''}</div>
+      </div>
+      <div class="edit-option-price">$${e.price || 0}</div>
+      <div class="edit-option-check">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+    </div>
+  `).join('') || '<p style="text-align:center;color:var(--text-muted);padding:20px;">Нет доступных вариантов</p>';
+  
+  return `
+    <div class="edit-section">
+      <div class="edit-section-title">Выберите развлечение</div>
+      <div id="entertainmentOptions">${entertainmentOptions}</div>
+    </div>
+    
+    <div class="edit-section">
+      <div class="edit-section-title">Дата и время</div>
+      <div class="edit-row">
+        <div class="edit-field">
+          <label class="edit-label">Дата</label>
+          <input type="date" class="edit-input" id="entertainmentDate" value="${mod.date || today}">
+        </div>
+        <div class="edit-field">
+          <label class="edit-label">Время</label>
+          <input type="time" class="edit-input" id="entertainmentTime" value="${mod.time || '19:00'}">
+        </div>
+      </div>
+      <div class="edit-field">
+        <label class="edit-label">Количество билетов</label>
+        <input type="number" class="edit-input" id="entertainmentTickets" value="${mod.tickets || 2}" min="1" onchange="calcEntertainmentTotal()">
+      </div>
+    </div>
+    
+    <div class="edit-calc">
+      <div class="edit-calc-row">
+        <span>Цена билета</span>
+        <span>$<span id="entertainmentPriceOne">${mod.ticket_price || 0}</span></span>
+      </div>
+      <div class="edit-calc-row">
+        <span>Билетов</span>
+        <span id="entertainmentTicketCount">${mod.tickets || 2}</span>
+      </div>
+      <div class="edit-calc-row total">
+        <span>Итого</span>
+        <span>$<span id="entertainmentTotal">${mod.price || 0}</span></span>
+      </div>
+    </div>
+    
+    <div class="edit-actions">
+      <button class="edit-btn edit-btn-secondary" onclick="closeModuleEdit()">Отмена</button>
+      <button class="edit-btn edit-btn-primary" onclick="saveEntertainmentModule()">Сохранить</button>
+    </div>
+  `;
+}
+
+let selectedEntertainmentId = null;
+let selectedEntertainmentName = '';
+let selectedEntertainmentPrice = 0;
+
+function selectEntertainmentOption(id, name, price) {
+  selectedEntertainmentId = id;
+  selectedEntertainmentName = name;
+  selectedEntertainmentPrice = price;
+  
+  document.querySelectorAll('#entertainmentOptions .edit-option-card').forEach(c => c.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+  
+  document.getElementById('entertainmentPriceOne').textContent = price;
+  calcEntertainmentTotal();
+}
+
+function calcEntertainmentTotal() {
+  const price = parseFloat(document.getElementById('entertainmentPriceOne').textContent) || 0;
+  const tickets = parseInt(document.getElementById('entertainmentTickets').value) || 1;
+  document.getElementById('entertainmentTicketCount').textContent = tickets;
+  document.getElementById('entertainmentTotal').textContent = price * tickets;
+}
+
+function saveEntertainmentModule() {
+  if (!selectedEntertainmentId) {
+    toast('Выберите развлечение', true);
+    return;
+  }
+  
+  const tickets = parseInt(document.getElementById('entertainmentTickets').value) || 1;
+  const totalPrice = selectedEntertainmentPrice * tickets;
+  
+  if (editingModuleIndex !== null && currentModules[editingModuleIndex]) {
+    currentModules[editingModuleIndex].name = selectedEntertainmentName;
+    currentModules[editingModuleIndex].price = totalPrice;
+    currentModules[editingModuleIndex].entertainment_id = selectedEntertainmentId;
+    currentModules[editingModuleIndex].ticket_price = selectedEntertainmentPrice;
+    currentModules[editingModuleIndex].date = document.getElementById('entertainmentDate').value;
+    currentModules[editingModuleIndex].time = document.getElementById('entertainmentTime').value;
+    currentModules[editingModuleIndex].tickets = tickets;
+    renderModules();
+  }
+  closeModuleEdit();
+  toast('✅ Развлечение добавлено!');
 }
 
 // Общая форма для неизвестных типов
