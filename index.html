@@ -2945,10 +2945,10 @@ function renderAIResponse(result) {
   // Render cards if present
   if (cards.length > 0) {
     html += `<div class="ai-cards">`;
-    cards.forEach(card => {
+    cards.forEach((card, idx) => {
       const priceLabel = card.price_label || '';
       html += `
-        <div class="ai-card" onclick="openCardFromAI('${card.type}', '${card.id}')">
+        <div class="ai-card" data-type="${card.type}" data-idx="${idx}">
           <img src="${card.image || './hero.jpg'}" alt="">
           <div class="ai-card-info">
             <div class="ai-card-name">${card.name}</div>
@@ -2962,6 +2962,9 @@ function renderAIResponse(result) {
       `;
     });
     html += `</div>`;
+    
+    // Сохраняем карточки для клика
+    window.lastAICards = cards;
   }
   
   html += `</div></div>`;
@@ -2988,6 +2991,20 @@ function openCardFromAI(type, id) {
     showDetail(item, type);
   }
 }
+
+// Обработчик кликов на AI карточки
+document.addEventListener('click', function(e) {
+  const card = e.target.closest('.ai-card');
+  if (card && window.lastAICards) {
+    const idx = parseInt(card.dataset.idx);
+    const type = card.dataset.type;
+    
+    if (!isNaN(idx) && window.lastAICards[idx]) {
+      const cardData = window.lastAICards[idx];
+      openCardFromAI(type, cardData.id);
+    }
+  }
+});
 
 // Локальные ответы если webhook недоступен — возвращают карточки!
 function getLocalReply(text) {
