@@ -735,10 +735,20 @@ html, body {
 }
 
 .module-icon.hotel { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); }
+.module-icon.hotels { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); }
 .module-icon.transfer { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
+.module-icon.transfers { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
 .module-icon.restaurant { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+.module-icon.restaurants { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
 .module-icon.sight { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+.module-icon.sights { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
 .module-icon.guide { background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); }
+.module-icon.guides { background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); }
+.module-icon.flights { background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); }
+.module-icon.flight { background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); }
+.module-icon.museum { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); }
+.module-icon.museums { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); }
+.module-icon.entertainment { background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%); }
 
 .module-icon svg {
   width: 22px;
@@ -2614,12 +2624,39 @@ let editingModuleIndex = null;
 
 const moduleIcons = {
   hotel: '<svg viewBox="0 0 24 24"><path d="M3 21V8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v13"/><path d="M3 11h18"/><rect x="7" y="11" width="4" height="5"/><rect x="13" y="11" width="4" height="5"/></svg>',
+  hotels: '<svg viewBox="0 0 24 24"><path d="M3 21V8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v13"/><path d="M3 11h18"/><rect x="7" y="11" width="4" height="5"/><rect x="13" y="11" width="4" height="5"/></svg>',
   transfer: '<svg viewBox="0 0 24 24"><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M5 17H3V6l9-4 9 4v11h-2"/><path d="M9 17h6"/></svg>',
+  transfers: '<svg viewBox="0 0 24 24"><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M5 17H3V6l9-4 9 4v11h-2"/><path d="M9 17h6"/></svg>',
   restaurant: '<svg viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>',
+  restaurants: '<svg viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>',
   sight: '<svg viewBox="0 0 24 24"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/><circle cx="12" cy="10" r="3"/></svg>',
+  sights: '<svg viewBox="0 0 24 24"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/><circle cx="12" cy="10" r="3"/></svg>',
   guide: '<svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+  guides: '<svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
   entertainment: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>',
-  museum: '<svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg>'
+  museum: '<svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg>',
+  museums: '<svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-6h6v6"/></svg>',
+  flights: '<svg viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>',
+  flight: '<svg viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>'
+};
+
+// Русские названия категорий модулей
+const moduleNames = {
+  hotel: 'Отель',
+  hotels: 'Отель',
+  transfer: 'Трансфер',
+  transfers: 'Трансфер',
+  restaurant: 'Ресторан',
+  restaurants: 'Ресторан',
+  sight: 'Достопримечательность',
+  sights: 'Достопримечательность',
+  guide: 'Гид',
+  guides: 'Гид',
+  entertainment: 'Развлечение',
+  museum: 'Музей',
+  museums: 'Музей',
+  flights: 'Авиабилеты',
+  flight: 'Авиабилеты'
 };
 
 function renderModules() {
@@ -2629,6 +2666,7 @@ function renderModules() {
   list.innerHTML = currentModules.map((mod, idx) => {
     const moduleType = mod.type || 'sight';
     const icon = moduleIcons[moduleType] || moduleIcons.sight;
+    const categoryName = moduleNames[moduleType] || moduleType;
     total += mod.price || 0;
     
     return `
@@ -2636,7 +2674,7 @@ function renderModules() {
         <div class="module-icon ${moduleType}">${icon}</div>
         <div class="module-info">
           <div class="module-name">${mod.name}</div>
-          <div class="module-details">${mod.details || mod.type || ''}</div>
+          <div class="module-details">${categoryName}</div>
         </div>
         <div class="module-price">$${mod.price || 0}</div>
         <button class="module-change" onclick="openModuleSelector(${idx})">
@@ -2663,19 +2701,33 @@ function openModuleSelector(idx) {
   // Set title based on type
   const titles = {
     hotel: 'Выберите отель',
+    hotels: 'Выберите отель',
     transfer: 'Выберите трансфер',
+    transfers: 'Выберите трансфер',
     restaurant: 'Выберите ресторан',
+    restaurants: 'Выберите ресторан',
     sight: 'Выберите достопримечательность',
+    sights: 'Выберите достопримечательность',
     guide: 'Выберите гида',
+    guides: 'Выберите гида',
     entertainment: 'Выберите развлечение',
-    museum: 'Выберите музей'
+    museum: 'Выберите музей',
+    museums: 'Выберите музей',
+    flights: 'Авиабилеты',
+    flight: 'Авиабилеты'
   };
   document.getElementById('selectorTitle').textContent = titles[moduleType] || 'Выберите вариант';
+  
+  // Для авиабилетов — нет альтернатив, закрываем
+  if (moduleType === 'flights' || moduleType === 'flight') {
+    toast('Авиабилеты редактируются отдельно');
+    return;
+  }
   
   // Get alternatives from data
   let alternatives = [];
   
-  if (moduleType === 'hotel') {
+  if (moduleType === 'hotel' || moduleType === 'hotels') {
     alternatives = data.hotels.map(h => ({
       id: h.id,
       name: h.name,
@@ -2683,7 +2735,7 @@ function openModuleSelector(idx) {
       price: h.price_from,
       image: h.image_url
     }));
-  } else if (moduleType === 'transfer') {
+  } else if (moduleType === 'transfer' || moduleType === 'transfers') {
     alternatives = data.transfers.map(t => ({
       id: t.id,
       name: t.name,
@@ -2691,7 +2743,7 @@ function openModuleSelector(idx) {
       price: t.price,
       image: t.gallery?.[0] || ''
     }));
-  } else if (moduleType === 'restaurant') {
+  } else if (moduleType === 'restaurant' || moduleType === 'restaurants') {
     alternatives = data.restaurants.map(r => ({
       id: r.id,
       name: r.name,
@@ -2699,7 +2751,7 @@ function openModuleSelector(idx) {
       price: r.avg_check,
       image: r.gallery?.[0] || ''
     }));
-  } else if (moduleType === 'sight') {
+  } else if (moduleType === 'sight' || moduleType === 'sights') {
     alternatives = data.sights.map(s => ({
       id: s.id,
       name: s.name,
@@ -2707,7 +2759,7 @@ function openModuleSelector(idx) {
       price: s.entry_price || 0,
       image: s.gallery?.[0] || ''
     }));
-  } else if (moduleType === 'guide') {
+  } else if (moduleType === 'guide' || moduleType === 'guides') {
     alternatives = data.guides.map(g => ({
       id: g.id,
       name: g.name,
@@ -2715,7 +2767,7 @@ function openModuleSelector(idx) {
       price: g.price_day,
       image: g.gallery?.[0] || ''
     }));
-  } else if (moduleType === 'museum') {
+  } else if (moduleType === 'museum' || moduleType === 'museums') {
     alternatives = data.museums.map(m => ({
       id: m.id,
       name: m.name,
