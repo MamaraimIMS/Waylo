@@ -1090,6 +1090,343 @@ html, body {
   color: var(--teal);
 }
 
+/* Группа отеля с номерами */
+.selector-hotel-group {
+  margin-bottom: 16px;
+  background: var(--bg);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+}
+
+.selector-hotel-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  background: var(--bg-gray);
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.selector-hotel-header img {
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.selector-hotel-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.selector-hotel-city {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.selector-rooms {
+  display: flex;
+  flex-direction: column;
+}
+
+.selector-room {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.selector-room:last-child {
+  border-bottom: none;
+}
+
+.selector-room:active {
+  background: var(--bg-gray);
+}
+
+.selector-room-info {
+  flex: 1;
+}
+
+.selector-room-type {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.selector-room-price {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--teal);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MODULE EDIT MODAL
+   ══════════════════════════════════════════════════════════════ */
+.module-edit-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 300;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s;
+}
+
+.module-edit-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.module-edit-modal {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--bg);
+  border-radius: 24px 24px 0 0;
+  z-index: 301;
+  max-height: 90vh;
+  overflow-y: auto;
+  transform: translateY(100%);
+  transition: transform 0.3s;
+}
+
+.module-edit-modal.open {
+  transform: translateY(0);
+}
+
+.module-edit-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  border-bottom: 1px solid #f1f5f9;
+  position: sticky;
+  top: 0;
+  background: var(--bg);
+  z-index: 10;
+}
+
+.module-edit-title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.module-edit-body {
+  padding: 20px;
+  padding-bottom: calc(20px + var(--safe-bottom));
+}
+
+/* Форма редактирования */
+.edit-section {
+  margin-bottom: 20px;
+}
+
+.edit-section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+
+.edit-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.edit-row-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.edit-field {
+  margin-bottom: 12px;
+}
+
+.edit-label {
+  display: block;
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.edit-input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 14px;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.edit-input:focus {
+  outline: none;
+  border-color: var(--teal);
+}
+
+.edit-select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 14px;
+  background: var(--bg);
+  color: var(--text);
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 20px;
+}
+
+/* Калькуляция стоимости */
+.edit-calc {
+  background: var(--bg-gray);
+  border-radius: 14px;
+  padding: 16px;
+  margin-top: 16px;
+}
+
+.edit-calc-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.edit-calc-row:not(:last-child) {
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.edit-calc-row.total {
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--text);
+  border-bottom: none;
+  padding-top: 12px;
+}
+
+.edit-calc-row.total span:last-child {
+  color: var(--teal);
+  font-size: 20px;
+}
+
+/* Кнопки */
+.edit-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.edit-btn {
+  flex: 1;
+  padding: 14px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+}
+
+.edit-btn-primary {
+  background: var(--teal);
+  color: #fff;
+}
+
+.edit-btn-secondary {
+  background: var(--bg-gray);
+  color: var(--text);
+}
+
+/* Выбор отеля/номера в форме */
+.edit-option-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--bg);
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  cursor: pointer;
+  margin-bottom: 8px;
+  transition: all 0.2s;
+}
+
+.edit-option-card.selected {
+  border-color: var(--teal);
+  background: rgba(20, 184, 166, 0.05);
+}
+
+.edit-option-card img {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.edit-option-info {
+  flex: 1;
+}
+
+.edit-option-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.edit-option-details {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.edit-option-price {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--teal);
+}
+
+.edit-option-check {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.edit-option-card.selected .edit-option-check {
+  background: var(--teal);
+  border-color: var(--teal);
+}
+
+.edit-option-card.selected .edit-option-check svg {
+  stroke: #fff;
+}
+
+.edit-option-check svg {
+  width: 14px;
+  height: 14px;
+  stroke: transparent;
+  stroke-width: 3;
+  fill: none;
+}
+
 /* ══════════════════════════════════════════════════════════════
    PROFILE
    ══════════════════════════════════════════════════════════════ */
@@ -2145,6 +2482,21 @@ html, body {
 
 <div class="toast" id="toast"></div>
 
+<!-- MODULE EDIT MODAL -->
+<div class="module-edit-overlay" id="moduleEditOverlay" onclick="closeModuleEdit()"></div>
+<div class="module-edit-modal" id="moduleEditModal">
+  <div class="modal-handle"></div>
+  <div class="module-edit-header">
+    <h3 class="module-edit-title" id="moduleEditTitle">Редактировать модуль</h3>
+    <button class="modal-close" onclick="closeModuleEdit()">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="module-edit-body" id="moduleEditBody">
+    <!-- Динамический контент формы -->
+  </div>
+</div>
+
 <!-- AI CHAT MODAL -->
 <div class="ai-modal" id="aiModal">
   <div class="ai-header">
@@ -2677,7 +3029,7 @@ function renderModules() {
           <div class="module-details">${categoryName}</div>
         </div>
         <div class="module-price">$${mod.price || 0}</div>
-        <button class="module-change" onclick="openModuleSelector(${idx})">
+        <button class="module-change" onclick="openModuleEdit(${idx})">
           <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
         </button>
       </div>
@@ -2779,18 +3131,67 @@ function openModuleSelector(idx) {
   
   // Render alternatives
   const list = document.getElementById('selectorList');
-  list.innerHTML = alternatives.map(alt => `
-    <div class="selector-item ${alt.id === mod.id ? 'selected' : ''}" onclick="selectModule('${alt.id}', '${alt.name.replace(/'/g, "\\'")}', ${alt.price})">
-      <div class="selector-item-img">
-        <img src="${alt.image || './hero.jpg'}" alt="">
+  
+  // Для отелей — особая логика с номерами
+  if (moduleType === 'hotel' || moduleType === 'hotels') {
+    list.innerHTML = alternatives.map(alt => {
+      const hotel = data.hotels.find(h => h.id === alt.id);
+      const rooms = hotel?.rooms || [];
+      
+      if (rooms.length === 0) {
+        // Отель без номеров — показываем как обычно
+        return `
+          <div class="selector-item ${alt.id === mod.id ? 'selected' : ''}" onclick="selectModule('${alt.id}', '${alt.name.replace(/'/g, "\\'")}', ${alt.price})">
+            <div class="selector-item-img">
+              <img src="${alt.image || './hero.jpg'}" alt="">
+            </div>
+            <div class="selector-item-info">
+              <div class="selector-item-name">${alt.name}</div>
+              <div class="selector-item-details">${alt.details}</div>
+            </div>
+            <div class="selector-item-price">$${alt.price}</div>
+          </div>
+        `;
+      }
+      
+      // Отель с номерами — показываем номера
+      return `
+        <div class="selector-hotel-group">
+          <div class="selector-hotel-header">
+            <img src="${alt.image || './hero.jpg'}" alt="">
+            <div>
+              <div class="selector-hotel-name">${alt.name}</div>
+              <div class="selector-hotel-city">${hotel.city} • ${hotel.stars || ''}★</div>
+            </div>
+          </div>
+          <div class="selector-rooms">
+            ${rooms.map(room => `
+              <div class="selector-room" onclick="selectHotelRoom('${alt.id}', '${alt.name.replace(/'/g, "\\'")}', '${(room.type || 'Standard').replace(/'/g, "\\'")}', ${room.price || alt.price})">
+                <div class="selector-room-info">
+                  <div class="selector-room-type">${room.type || 'Standard'}</div>
+                </div>
+                <div class="selector-room-price">$${room.price || alt.price}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }).join('');
+  } else {
+    // Для остальных типов — обычный список
+    list.innerHTML = alternatives.map(alt => `
+      <div class="selector-item ${alt.id === mod.id ? 'selected' : ''}" onclick="selectModule('${alt.id}', '${alt.name.replace(/'/g, "\\'")}', ${alt.price})">
+        <div class="selector-item-img">
+          <img src="${alt.image || './hero.jpg'}" alt="">
+        </div>
+        <div class="selector-item-info">
+          <div class="selector-item-name">${alt.name}</div>
+          <div class="selector-item-details">${alt.details}</div>
+        </div>
+        <div class="selector-item-price">$${alt.price}</div>
       </div>
-      <div class="selector-item-info">
-        <div class="selector-item-name">${alt.name}</div>
-        <div class="selector-item-details">${alt.details}</div>
-      </div>
-      <div class="selector-item-price">$${alt.price}</div>
-    </div>
-  `).join('');
+    `).join('');
+  }
   
   document.getElementById('moduleSelector').classList.add('open');
 }
@@ -2798,6 +3199,18 @@ function openModuleSelector(idx) {
 function closeModuleSelector() {
   document.getElementById('moduleSelector').classList.remove('open');
   editingModuleIndex = null;
+}
+
+// Выбор номера отеля для модуля тура
+function selectHotelRoom(hotelId, hotelName, roomType, roomPrice) {
+  if (editingModuleIndex !== null && currentModules[editingModuleIndex]) {
+    currentModules[editingModuleIndex].id = hotelId;
+    currentModules[editingModuleIndex].name = `${hotelName} — ${roomType}`;
+    currentModules[editingModuleIndex].price = roomPrice;
+    renderModules();
+  }
+  closeModuleSelector();
+  toast('✅ Номер выбран!');
 }
 
 function selectModule(id, name, price) {
@@ -2809,6 +3222,988 @@ function selectModule(id, name, price) {
   }
   closeModuleSelector();
   toast('✅ Модуль заменён!');
+}
+
+// ══════════════════════════════════════════════════════════════
+// MODULE EDIT — Формы редактирования модулей
+// ══════════════════════════════════════════════════════════════
+let editingModule = null;
+
+function openModuleEdit(idx) {
+  editingModuleIndex = idx;
+  editingModule = currentModules[idx];
+  const moduleType = editingModule.type || 'sight';
+  
+  // Заголовки форм
+  const titles = {
+    flights: 'Авиабилеты',
+    flight: 'Авиабилеты',
+    hotel: 'Отель',
+    hotels: 'Отель',
+    transfer: 'Трансфер',
+    transfers: 'Трансфер',
+    restaurant: 'Ресторан',
+    restaurants: 'Ресторан',
+    sight: 'Достопримечательность',
+    sights: 'Достопримечательность',
+    guide: 'Гид',
+    guides: 'Гид',
+    museum: 'Музей',
+    museums: 'Музей',
+    entertainment: 'Развлечение'
+  };
+  
+  document.getElementById('moduleEditTitle').textContent = titles[moduleType] || 'Редактировать модуль';
+  
+  // Генерируем форму в зависимости от типа
+  let formHtml = '';
+  
+  if (moduleType === 'flights' || moduleType === 'flight') {
+    formHtml = renderFlightForm();
+  } else if (moduleType === 'hotel' || moduleType === 'hotels') {
+    formHtml = renderHotelForm();
+  } else if (moduleType === 'transfer' || moduleType === 'transfers') {
+    formHtml = renderTransferForm();
+  } else if (moduleType === 'sight' || moduleType === 'sights') {
+    formHtml = renderSightForm();
+  } else if (moduleType === 'restaurant' || moduleType === 'restaurants') {
+    formHtml = renderRestaurantForm();
+  } else if (moduleType === 'guide' || moduleType === 'guides') {
+    formHtml = renderGuideForm();
+  } else if (moduleType === 'museum' || moduleType === 'museums') {
+    formHtml = renderMuseumForm();
+  } else {
+    formHtml = renderGenericForm();
+  }
+  
+  document.getElementById('moduleEditBody').innerHTML = formHtml;
+  document.getElementById('moduleEditOverlay').classList.add('open');
+  document.getElementById('moduleEditModal').classList.add('open');
+}
+
+function closeModuleEdit() {
+  document.getElementById('moduleEditOverlay').classList.remove('open');
+  document.getElementById('moduleEditModal').classList.remove('open');
+  editingModuleIndex = null;
+  editingModule = null;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ФОРМА: АВИАБИЛЕТЫ
+// ═══════════════════════════════════════════════════════════════
+function renderFlightForm() {
+  const mod = editingModule;
+  const today = new Date().toISOString().split('T')[0];
+  
+  return `
+    <div class="edit-section">
+      <div class="edit-section-title">Маршрут</div>
+      <div class="edit-row">
+        <div class="edit-field">
+          <label class="edit-label">Откуда</label>
+          <input type="text" class="edit-input" id="flightFrom" value="${mod.from || ''}" placeholder="Ташкент">
+        </div>
+        <div class="edit-field">
+          <label class="edit-label">Куда</label>
+          <input type="text" class="edit-input" id="flightTo" value="${mod.to || ''}" placeholder="Самарканд">
+        </div>
+      </div>
+    </div>
+    
+    <div class="edit-section">
+      <div class="edit-section-title">Даты</div>
+      <div class="edit-row">
+        <div class="edit-field">
+          <label class="edit-label">Дата вылета</label>
+          <input type="date" class="edit-input" id="flightDateOut" value="${mod.date_out || today}">
+        </div>
+        <div class="edit-field">
+          <label class="edit-label">Дата возврата</label>
+          <input type="date" class="edit-input" id="flightDateBack" value="${mod.date_back || ''}">
+        </div>
+      </div>
+    </div>
+    
+    <div class="edit-section">
+      <div class="edit-section-title">Пассажиры и авиакомпания</div>
+      <div class="edit-row">
+        <div class="edit-field">
+          <label class="edit-label">Пассажиров</label>
+          <input type="number" class="edit-input" id="flightPassengers" value="${mod.passengers || 1}" min="1" max="9">
+        </div>
+        <div class="edit-field">
+          <label class="edit-label">Класс</label>
+          <select class="edit-select" id="flightClass">
+            <option value="economy" ${mod.flight_class === 'economy' ? 'selected' : ''}>Эконом</option>
+            <option value="business" ${mod.flight_class === 'business' ? 'selected' : ''}>Бизнес</option>
+          </select>
+        </div>
+      </div>
+      <div class="edit-field">
+        <label class="edit-label">Авиакомпания</label>
+        <select class="edit-select" id="flightAirline">
+          <option value="">Любая</option>
+          <option value="Uzbekistan Airways" ${mod.airline === 'Uzbekistan Airways' ? 'selected' : ''}>Uzbekistan Airways</option>
+          <option value="Qanot Sharq" ${mod.airline === 'Qanot Sharq' ? 'selected' : ''}>Qanot Sharq</option>
+        </select>
+      </div>
+    </div>
+    
+    <div class="edit-field">
+      <label class="edit-label">Цена за билет ($)</label>
+      <input type="number" class="edit-input" id="flightPrice" value="${mod.price || 0}" min="0" onchange="calcFlightTotal()">
+    </div>
+    
+    <div class="edit-calc" id="flightCalc">
+      <div class="edit-calc-row">
+        <span>Цена за билет</span>
+        <span>$<span id="flightPriceOne">${mod.price || 0}</span></span>
+      </div>
+      <div class="edit-calc-row">
+        <span>Пассажиров</span>
+        <span><span id="flightPassCount">${mod.passengers || 1}</span></span>
+      </div>
+      <div class="edit-calc-row total">
+        <span>Итого</span>
+        <span>$<span id="flightTotal">${(mod.price || 0) * (mod.passengers || 1)}</span></span>
+      </div>
+    </div>
+    
+    <div class="edit-actions">
+      <button class="edit-btn edit-btn-secondary" onclick="closeModuleEdit()">Отмена</button>
+      <button class="edit-btn edit-btn-primary" onclick="saveFlightModule()">Сохранить</button>
+    </div>
+  `;
+}
+
+function calcFlightTotal() {
+  const price = parseFloat(document.getElementById('flightPrice').value) || 0;
+  const passengers = parseInt(document.getElementById('flightPassengers').value) || 1;
+  document.getElementById('flightPriceOne').textContent = price;
+  document.getElementById('flightPassCount').textContent = passengers;
+  document.getElementById('flightTotal').textContent = price * passengers;
+}
+
+function saveFlightModule() {
+  const from = document.getElementById('flightFrom').value;
+  const to = document.getElementById('flightTo').value;
+  const price = parseFloat(document.getElementById('flightPrice').value) || 0;
+  const passengers = parseInt(document.getElementById('flightPassengers').value) || 1;
+  
+  if (editingModuleIndex !== null && currentModules[editingModuleIndex]) {
+    currentModules[editingModuleIndex].name = `${from} → ${to}`;
+    currentModules[editingModuleIndex].price = price * passengers;
+    currentModules[editingModuleIndex].from = from;
+    currentModules[editingModuleIndex].to = to;
+    currentModules[editingModuleIndex].date_out = document.getElementById('flightDateOut').value;
+    currentModules[editingModuleIndex].date_back = document.getElementById('flightDateBack').value;
+    currentModules[editingModuleIndex].passengers = passengers;
+    currentModules[editingModuleIndex].flight_class = document.getElementById('flightClass').value;
+    currentModules[editingModuleIndex].airline = document.getElementById('flightAirline').value;
+    renderModules();
+  }
+  closeModuleEdit();
+  toast('✅ Авиабилеты обновлены!');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ФОРМА: ОТЕЛЬ
+// ═══════════════════════════════════════════════════════════════
+function renderHotelForm() {
+  const mod = editingModule;
+  const today = new Date().toISOString().split('T')[0];
+  const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+  
+  // Список отелей
+  const hotelsOptions = data.hotels.map(h => `
+    <div class="edit-option-card ${mod.hotel_id === h.id ? 'selected' : ''}" onclick="selectHotelOption('${h.id}')">
+      <img src="${h.image_url || './hero.jpg'}" alt="">
+      <div class="edit-option-info">
+        <div class="edit-option-name">${h.name}</div>
+        <div class="edit-option-details">${h.city} • ${h.stars || ''}★</div>
+      </div>
+      <div class="edit-option-check">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+    </div>
+  `).join('');
+  
+  return `
+    <div class="edit-section">
+      <div class="edit-section-title">Выберите отель</div>
+      <div id="hotelOptions">${hotelsOptions}</div>
+    </div>
+    
+    <div class="edit-section" id="roomsSection" style="display:${mod.hotel_id ? 'block' : 'none'}">
+      <div class="edit-section-title">Выберите номер</div>
+      <div id="roomOptions"></div>
+    </div>
+    
+    <div class="edit-section">
+      <div class="edit-section-title">Даты проживания</div>
+      <div class="edit-row">
+        <div class="edit-field">
+          <label class="edit-label">Заезд</label>
+          <input type="date" class="edit-input" id="hotelCheckIn" value="${mod.check_in || today}" onchange="calcHotelTotal()">
+        </div>
+        <div class="edit-field">
+          <label class="edit-label">Выезд</label>
+          <input type="date" class="edit-input" id="hotelCheckOut" value="${mod.check_out || tomorrow}" onchange="calcHotelTotal()">
+        </div>
+      </div>
+    </div>
+    
+    <div class="edit-section">
+      <div class="edit-section-title">Гости</div>
+      <div class="edit-row">
+        <div class="edit-field">
+          <label class="edit-label">Взрослых</label>
+          <input type="number" class="edit-input" id="hotelAdults" value="${mod.adults || 2}" min="1" max="10">
+        </div>
+        <div class="edit-field">
+          <label class="edit-label">Детей</label>
+          <input type="number" class="edit-input" id="hotelChildren" value="${mod.children || 0}" min="0" max="5">
+        </div>
+      </div>
+    </div>
+    
+    <div class="edit-calc" id="hotelCalc">
+      <div class="edit-calc-row">
+        <span>Цена за ночь</span>
+        <span>$<span id="hotelPriceNight">${mod.price_per_night || 0}</span></span>
+      </div>
+      <div class="edit-calc-row">
+        <span>Ночей</span>
+        <span><span id="hotelNights">1</span></span>
+      </div>
+      <div class="edit-calc-row total">
+        <span>Итого</span>
+        <span>$<span id="hotelTotal">${mod.price || 0}</span></span>
+      </div>
+    </div>
+    
+    <div class="edit-actions">
+      <button class="edit-btn edit-btn-secondary" onclick="closeModuleEdit()">Отмена</button>
+      <button class="edit-btn edit-btn-primary" onclick="saveHotelModule()">Сохранить</button>
+    </div>
+  `;
+}
+
+let selectedHotelId = null;
+let selectedRoomData = null;
+
+function selectHotelOption(hotelId) {
+  selectedHotelId = hotelId;
+  
+  // Обновляем выделение
+  document.querySelectorAll('#hotelOptions .edit-option-card').forEach(c => c.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+  
+  // Показываем номера этого отеля
+  const hotel = data.hotels.find(h => h.id === hotelId);
+  const rooms = hotel?.rooms || [];
+  
+  document.getElementById('roomsSection').style.display = 'block';
+  
+  if (rooms.length === 0) {
+    document.getElementById('roomOptions').innerHTML = `
+      <div class="edit-option-card selected" onclick="">
+        <div class="edit-option-info">
+          <div class="edit-option-name">Стандартный номер</div>
+        </div>
+        <div class="edit-option-price">$${hotel.price_from}</div>
+      </div>
+    `;
+    selectedRoomData = { type: 'Стандартный номер', price: hotel.price_from };
+    document.getElementById('hotelPriceNight').textContent = hotel.price_from;
+    calcHotelTotal();
+    return;
+  }
+  
+  document.getElementById('roomOptions').innerHTML = rooms.map((room, idx) => `
+    <div class="edit-option-card ${idx === 0 ? 'selected' : ''}" onclick="selectRoomOption(${idx}, '${(room.type || 'Standard').replace(/'/g, "\\'")}', ${room.price})">
+      <div class="edit-option-info">
+        <div class="edit-option-name">${room.type || 'Standard'}</div>
+      </div>
+      <div class="edit-option-price">$${room.price}/ночь</div>
+      <div class="edit-option-check">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+    </div>
+  `).join('');
+  
+  // Выбираем первый номер по умолчанию
+  if (rooms.length > 0) {
+    selectedRoomData = { type: rooms[0].type, price: rooms[0].price };
+    document.getElementById('hotelPriceNight').textContent = rooms[0].price;
+    calcHotelTotal();
+  }
+}
+
+function selectRoomOption(idx, type, price) {
+  document.querySelectorAll('#roomOptions .edit-option-card').forEach(c => c.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+  
+  selectedRoomData = { type, price };
+  document.getElementById('hotelPriceNight').textContent = price;
+  calcHotelTotal();
+}
+
+function calcHotelTotal() {
+  const checkIn = new Date(document.getElementById('hotelCheckIn').value);
+  const checkOut = new Date(document.getElementById('hotelCheckOut').value);
+  const nights = Math.max(1, Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24)));
+  const priceNight = parseFloat(document.getElementById('hotelPriceNight').textContent) || 0;
+  
+  document.getElementById('hotelNights').textContent = nights;
+  document.getElementById('hotelTotal').textContent = priceNight * nights;
+}
+
+function saveHotelModule() {
+  if (!selectedHotelId || !selectedRoomData) {
+    toast('Выберите отель и номер', true);
+    return;
+  }
+  
+  const hotel = data.hotels.find(h => h.id === selectedHotelId);
+  const checkIn = document.getElementById('hotelCheckIn').value;
+  const checkOut = document.getElementById('hotelCheckOut').value;
+  const nights = Math.max(1, Math.ceil((new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60 * 24)));
+  const totalPrice = selectedRoomData.price * nights;
+  
+  if (editingModuleIndex !== null && currentModules[editingModuleIndex]) {
+    currentModules[editingModuleIndex].name = `${hotel.name} — ${selectedRoomData.type}`;
+    currentModules[editingModuleIndex].price = totalPrice;
+    currentModules[editingModuleIndex].hotel_id = selectedHotelId;
+    currentModules[editingModuleIndex].room_type = selectedRoomData.type;
+    currentModules[editingModuleIndex].price_per_night = selectedRoomData.price;
+    currentModules[editingModuleIndex].check_in = checkIn;
+    currentModules[editingModuleIndex].check_out = checkOut;
+    currentModules[editingModuleIndex].nights = nights;
+    currentModules[editingModuleIndex].adults = parseInt(document.getElementById('hotelAdults').value) || 2;
+    currentModules[editingModuleIndex].children = parseInt(document.getElementById('hotelChildren').value) || 0;
+    renderModules();
+  }
+  closeModuleEdit();
+  toast('✅ Отель обновлён!');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ФОРМА: ТРАНСФЕР
+// ═══════════════════════════════════════════════════════════════
+function renderTransferForm() {
+  const mod = editingModule;
+  const today = new Date().toISOString().split('T')[0];
+  
+  const transferOptions = data.transfers.map(t => `
+    <div class="edit-option-card ${mod.transfer_id === t.id ? 'selected' : ''}" onclick="selectTransferOption('${t.id}', '${t.name.replace(/'/g, "\\'")}', ${t.price})">
+      <img src="${t.gallery?.[0] || './hero.jpg'}" alt="">
+      <div class="edit-option-info">
+        <div class="edit-option-name">${t.name}</div>
+        <div class="edit-option-details">${t.from_city} → ${t.to_city} • ${t.vehicle}</div>
+      </div>
+      <div class="edit-option-price">$${t.price}</div>
+      <div class="edit-option-check">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+    </div>
+  `).join('');
+  
+  return `
+    <div class="edit-section">
+      <div class="edit-section-title">Выберите трансфер</div>
+      <div id="transferOptions">${transferOptions}</div>
+    </div>
+    
+    <div class="edit-section">
+      <div class="edit-section-title">Дата и время</div>
+      <div class="edit-row">
+        <div class="edit-field">
+          <label class="edit-label">Дата</label>
+          <input type="date" class="edit-input" id="transferDate" value="${mod.date || today}">
+        </div>
+        <div class="edit-field">
+          <label class="edit-label">Время</label>
+          <input type="time" class="edit-input" id="transferTime" value="${mod.time || '09:00'}">
+        </div>
+      </div>
+    </div>
+    
+    <div class="edit-section">
+      <div class="edit-section-title">Класс автомобиля</div>
+      <select class="edit-select" id="transferClass">
+        <option value="standard" ${mod.vehicle_class === 'standard' ? 'selected' : ''}>Стандарт</option>
+        <option value="comfort" ${mod.vehicle_class === 'comfort' ? 'selected' : ''}>Комфорт</option>
+        <option value="business" ${mod.vehicle_class === 'business' ? 'selected' : ''}>Бизнес</option>
+        <option value="minivan" ${mod.vehicle_class === 'minivan' ? 'selected' : ''}>Минивэн (до 7 чел.)</option>
+      </select>
+    </div>
+    
+    <div class="edit-field">
+      <label class="edit-label">Пассажиров</label>
+      <input type="number" class="edit-input" id="transferPassengers" value="${mod.passengers || 2}" min="1" max="20">
+    </div>
+    
+    <div class="edit-field">
+      <label class="edit-label">Адрес подачи</label>
+      <input type="text" class="edit-input" id="transferPickup" value="${mod.pickup || ''}" placeholder="Отель / Адрес">
+    </div>
+    
+    <div class="edit-calc">
+      <div class="edit-calc-row total">
+        <span>Стоимость</span>
+        <span>$<span id="transferPrice">${mod.price || 0}</span></span>
+      </div>
+    </div>
+    
+    <div class="edit-actions">
+      <button class="edit-btn edit-btn-secondary" onclick="closeModuleEdit()">Отмена</button>
+      <button class="edit-btn edit-btn-primary" onclick="saveTransferModule()">Сохранить</button>
+    </div>
+  `;
+}
+
+let selectedTransferId = null;
+let selectedTransferPrice = 0;
+
+function selectTransferOption(id, name, price) {
+  selectedTransferId = id;
+  selectedTransferPrice = price;
+  
+  document.querySelectorAll('#transferOptions .edit-option-card').forEach(c => c.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+  
+  document.getElementById('transferPrice').textContent = price;
+}
+
+function saveTransferModule() {
+  if (!selectedTransferId) {
+    toast('Выберите трансфер', true);
+    return;
+  }
+  
+  const transfer = data.transfers.find(t => t.id === selectedTransferId);
+  
+  if (editingModuleIndex !== null && currentModules[editingModuleIndex]) {
+    currentModules[editingModuleIndex].name = transfer.name;
+    currentModules[editingModuleIndex].price = selectedTransferPrice;
+    currentModules[editingModuleIndex].transfer_id = selectedTransferId;
+    currentModules[editingModuleIndex].date = document.getElementById('transferDate').value;
+    currentModules[editingModuleIndex].time = document.getElementById('transferTime').value;
+    currentModules[editingModuleIndex].vehicle_class = document.getElementById('transferClass').value;
+    currentModules[editingModuleIndex].passengers = parseInt(document.getElementById('transferPassengers').value) || 2;
+    currentModules[editingModuleIndex].pickup = document.getElementById('transferPickup').value;
+    renderModules();
+  }
+  closeModuleEdit();
+  toast('✅ Трансфер обновлён!');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ФОРМА: ДОСТОПРИМЕЧАТЕЛЬНОСТЬ
+// ═══════════════════════════════════════════════════════════════
+function renderSightForm() {
+  const mod = editingModule;
+  const today = new Date().toISOString().split('T')[0];
+  
+  const sightsOptions = data.sights.map(s => `
+    <div class="edit-option-card ${mod.sight_id === s.id ? 'selected' : ''}" onclick="selectSightOption('${s.id}', '${s.name.replace(/'/g, "\\'")}', ${s.entry_price || 0})">
+      <img src="${s.gallery?.[0] || './hero.jpg'}" alt="">
+      <div class="edit-option-info">
+        <div class="edit-option-name">${s.name}</div>
+        <div class="edit-option-details">${s.city} • ${s.type}</div>
+      </div>
+      <div class="edit-option-price">$${s.entry_price || 0}</div>
+      <div class="edit-option-check">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+    </div>
+  `).join('');
+  
+  return `
+    <div class="edit-section">
+      <div class="edit-section-title">Выберите место</div>
+      <div id="sightOptions">${sightsOptions}</div>
+    </div>
+    
+    <div class="edit-section">
+      <div class="edit-section-title">Дата и время посещения</div>
+      <div class="edit-row">
+        <div class="edit-field">
+          <label class="edit-label">Дата</label>
+          <input type="date" class="edit-input" id="sightDate" value="${mod.date || today}">
+        </div>
+        <div class="edit-field">
+          <label class="edit-label">Время</label>
+          <input type="time" class="edit-input" id="sightTime" value="${mod.time || '10:00'}">
+        </div>
+      </div>
+    </div>
+    
+    <div class="edit-field">
+      <label class="edit-label">Количество человек</label>
+      <input type="number" class="edit-input" id="sightPeople" value="${mod.people || 2}" min="1" onchange="calcSightTotal()">
+    </div>
+    
+    <div class="edit-calc">
+      <div class="edit-calc-row">
+        <span>Входной билет</span>
+        <span>$<span id="sightTicketPrice">${mod.ticket_price || 0}</span></span>
+      </div>
+      <div class="edit-calc-row">
+        <span>Человек</span>
+        <span id="sightPeopleCount">${mod.people || 2}</span>
+      </div>
+      <div class="edit-calc-row total">
+        <span>Итого</span>
+        <span>$<span id="sightTotal">${mod.price || 0}</span></span>
+      </div>
+    </div>
+    
+    <div class="edit-actions">
+      <button class="edit-btn edit-btn-secondary" onclick="closeModuleEdit()">Отмена</button>
+      <button class="edit-btn edit-btn-primary" onclick="saveSightModule()">Сохранить</button>
+    </div>
+  `;
+}
+
+let selectedSightId = null;
+let selectedSightName = '';
+let selectedSightPrice = 0;
+
+function selectSightOption(id, name, price) {
+  selectedSightId = id;
+  selectedSightName = name;
+  selectedSightPrice = price;
+  
+  document.querySelectorAll('#sightOptions .edit-option-card').forEach(c => c.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+  
+  document.getElementById('sightTicketPrice').textContent = price;
+  calcSightTotal();
+}
+
+function calcSightTotal() {
+  const price = parseFloat(document.getElementById('sightTicketPrice').textContent) || 0;
+  const people = parseInt(document.getElementById('sightPeople').value) || 1;
+  document.getElementById('sightPeopleCount').textContent = people;
+  document.getElementById('sightTotal').textContent = price * people;
+}
+
+function saveSightModule() {
+  if (!selectedSightId) {
+    toast('Выберите место', true);
+    return;
+  }
+  
+  const people = parseInt(document.getElementById('sightPeople').value) || 1;
+  const totalPrice = selectedSightPrice * people;
+  
+  if (editingModuleIndex !== null && currentModules[editingModuleIndex]) {
+    currentModules[editingModuleIndex].name = selectedSightName;
+    currentModules[editingModuleIndex].price = totalPrice;
+    currentModules[editingModuleIndex].sight_id = selectedSightId;
+    currentModules[editingModuleIndex].ticket_price = selectedSightPrice;
+    currentModules[editingModuleIndex].date = document.getElementById('sightDate').value;
+    currentModules[editingModuleIndex].time = document.getElementById('sightTime').value;
+    currentModules[editingModuleIndex].people = people;
+    renderModules();
+  }
+  closeModuleEdit();
+  toast('✅ Достопримечательность обновлена!');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ФОРМА: РЕСТОРАН
+// ═══════════════════════════════════════════════════════════════
+function renderRestaurantForm() {
+  const mod = editingModule;
+  const today = new Date().toISOString().split('T')[0];
+  
+  const restaurantOptions = data.restaurants.map(r => `
+    <div class="edit-option-card ${mod.restaurant_id === r.id ? 'selected' : ''}" onclick="selectRestaurantOption('${r.id}', '${r.name.replace(/'/g, "\\'")}', ${r.avg_check || 0})">
+      <img src="${r.gallery?.[0] || './hero.jpg'}" alt="">
+      <div class="edit-option-info">
+        <div class="edit-option-name">${r.name}</div>
+        <div class="edit-option-details">${r.city} • ${r.cuisine}</div>
+      </div>
+      <div class="edit-option-price">$${r.avg_check || 0}</div>
+      <div class="edit-option-check">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+    </div>
+  `).join('');
+  
+  return `
+    <div class="edit-section">
+      <div class="edit-section-title">Выберите ресторан</div>
+      <div id="restaurantOptions">${restaurantOptions}</div>
+    </div>
+    
+    <div class="edit-section">
+      <div class="edit-section-title">Бронирование</div>
+      <div class="edit-row">
+        <div class="edit-field">
+          <label class="edit-label">Дата</label>
+          <input type="date" class="edit-input" id="restaurantDate" value="${mod.date || today}">
+        </div>
+        <div class="edit-field">
+          <label class="edit-label">Время</label>
+          <input type="time" class="edit-input" id="restaurantTime" value="${mod.time || '19:00'}">
+        </div>
+      </div>
+      <div class="edit-field">
+        <label class="edit-label">Количество гостей</label>
+        <input type="number" class="edit-input" id="restaurantGuests" value="${mod.guests || 2}" min="1" onchange="calcRestaurantTotal()">
+      </div>
+    </div>
+    
+    <div class="edit-section">
+      <div class="edit-section-title">Трансфер</div>
+      <div class="edit-row">
+        <div class="edit-field">
+          <label class="edit-label">Трансфер из отеля</label>
+          <select class="edit-select" id="restaurantTransfer" onchange="calcRestaurantTotal()">
+            <option value="0" ${!mod.transfer_price ? 'selected' : ''}>Не нужен</option>
+            <option value="10" ${mod.transfer_price == 10 ? 'selected' : ''}>Туда ($10)</option>
+            <option value="20" ${mod.transfer_price == 20 ? 'selected' : ''}>Туда и обратно ($20)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    
+    <div class="edit-calc">
+      <div class="edit-calc-row">
+        <span>Средний чек (на чел.)</span>
+        <span>$<span id="restaurantAvgCheck">${mod.avg_check || 0}</span></span>
+      </div>
+      <div class="edit-calc-row">
+        <span>Гостей</span>
+        <span id="restaurantGuestCount">${mod.guests || 2}</span>
+      </div>
+      <div class="edit-calc-row">
+        <span>Трансфер</span>
+        <span>$<span id="restaurantTransferPrice">${mod.transfer_price || 0}</span></span>
+      </div>
+      <div class="edit-calc-row total">
+        <span>Итого</span>
+        <span>$<span id="restaurantTotal">${mod.price || 0}</span></span>
+      </div>
+    </div>
+    
+    <div class="edit-actions">
+      <button class="edit-btn edit-btn-secondary" onclick="closeModuleEdit()">Отмена</button>
+      <button class="edit-btn edit-btn-primary" onclick="saveRestaurantModule()">Сохранить</button>
+    </div>
+  `;
+}
+
+let selectedRestaurantId = null;
+let selectedRestaurantName = '';
+let selectedRestaurantAvgCheck = 0;
+
+function selectRestaurantOption(id, name, avgCheck) {
+  selectedRestaurantId = id;
+  selectedRestaurantName = name;
+  selectedRestaurantAvgCheck = avgCheck;
+  
+  document.querySelectorAll('#restaurantOptions .edit-option-card').forEach(c => c.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+  
+  document.getElementById('restaurantAvgCheck').textContent = avgCheck;
+  calcRestaurantTotal();
+}
+
+function calcRestaurantTotal() {
+  const avgCheck = parseFloat(document.getElementById('restaurantAvgCheck').textContent) || 0;
+  const guests = parseInt(document.getElementById('restaurantGuests').value) || 1;
+  const transferPrice = parseFloat(document.getElementById('restaurantTransfer').value) || 0;
+  
+  document.getElementById('restaurantGuestCount').textContent = guests;
+  document.getElementById('restaurantTransferPrice').textContent = transferPrice;
+  document.getElementById('restaurantTotal').textContent = (avgCheck * guests) + transferPrice;
+}
+
+function saveRestaurantModule() {
+  if (!selectedRestaurantId) {
+    toast('Выберите ресторан', true);
+    return;
+  }
+  
+  const guests = parseInt(document.getElementById('restaurantGuests').value) || 1;
+  const transferPrice = parseFloat(document.getElementById('restaurantTransfer').value) || 0;
+  const totalPrice = (selectedRestaurantAvgCheck * guests) + transferPrice;
+  
+  if (editingModuleIndex !== null && currentModules[editingModuleIndex]) {
+    currentModules[editingModuleIndex].name = selectedRestaurantName;
+    currentModules[editingModuleIndex].price = totalPrice;
+    currentModules[editingModuleIndex].restaurant_id = selectedRestaurantId;
+    currentModules[editingModuleIndex].avg_check = selectedRestaurantAvgCheck;
+    currentModules[editingModuleIndex].date = document.getElementById('restaurantDate').value;
+    currentModules[editingModuleIndex].time = document.getElementById('restaurantTime').value;
+    currentModules[editingModuleIndex].guests = guests;
+    currentModules[editingModuleIndex].transfer_price = transferPrice;
+    renderModules();
+  }
+  closeModuleEdit();
+  toast('✅ Ресторан обновлён!');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ФОРМА: ГИД
+// ═══════════════════════════════════════════════════════════════
+function renderGuideForm() {
+  const mod = editingModule;
+  const today = new Date().toISOString().split('T')[0];
+  
+  const guideOptions = data.guides.map(g => `
+    <div class="edit-option-card ${mod.guide_id === g.id ? 'selected' : ''}" onclick="selectGuideOption('${g.id}', '${g.name.replace(/'/g, "\\'")}', ${g.price_day || 0})">
+      <img src="${g.gallery?.[0] || 'https://i.pravatar.cc/150?u=' + g.id}" alt="">
+      <div class="edit-option-info">
+        <div class="edit-option-name">${g.name}</div>
+        <div class="edit-option-details">${g.city} • ${g.languages}</div>
+      </div>
+      <div class="edit-option-price">$${g.price_day}/день</div>
+      <div class="edit-option-check">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+    </div>
+  `).join('');
+  
+  return `
+    <div class="edit-section">
+      <div class="edit-section-title">Выберите гида</div>
+      <div id="guideOptions">${guideOptions}</div>
+    </div>
+    
+    <div class="edit-section">
+      <div class="edit-section-title">Даты</div>
+      <div class="edit-row">
+        <div class="edit-field">
+          <label class="edit-label">С</label>
+          <input type="date" class="edit-input" id="guideStartDate" value="${mod.start_date || today}" onchange="calcGuideTotal()">
+        </div>
+        <div class="edit-field">
+          <label class="edit-label">По</label>
+          <input type="date" class="edit-input" id="guideEndDate" value="${mod.end_date || today}" onchange="calcGuideTotal()">
+        </div>
+      </div>
+    </div>
+    
+    <div class="edit-calc">
+      <div class="edit-calc-row">
+        <span>Цена за день</span>
+        <span>$<span id="guidePriceDay">${mod.price_day || 0}</span></span>
+      </div>
+      <div class="edit-calc-row">
+        <span>Дней</span>
+        <span id="guideDays">${mod.days || 1}</span>
+      </div>
+      <div class="edit-calc-row total">
+        <span>Итого</span>
+        <span>$<span id="guideTotal">${mod.price || 0}</span></span>
+      </div>
+    </div>
+    
+    <div class="edit-actions">
+      <button class="edit-btn edit-btn-secondary" onclick="closeModuleEdit()">Отмена</button>
+      <button class="edit-btn edit-btn-primary" onclick="saveGuideModule()">Сохранить</button>
+    </div>
+  `;
+}
+
+let selectedGuideId = null;
+let selectedGuideName = '';
+let selectedGuidePriceDay = 0;
+
+function selectGuideOption(id, name, priceDay) {
+  selectedGuideId = id;
+  selectedGuideName = name;
+  selectedGuidePriceDay = priceDay;
+  
+  document.querySelectorAll('#guideOptions .edit-option-card').forEach(c => c.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+  
+  document.getElementById('guidePriceDay').textContent = priceDay;
+  calcGuideTotal();
+}
+
+function calcGuideTotal() {
+  const startDate = new Date(document.getElementById('guideStartDate').value);
+  const endDate = new Date(document.getElementById('guideEndDate').value);
+  const days = Math.max(1, Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1);
+  const priceDay = parseFloat(document.getElementById('guidePriceDay').textContent) || 0;
+  
+  document.getElementById('guideDays').textContent = days;
+  document.getElementById('guideTotal').textContent = priceDay * days;
+}
+
+function saveGuideModule() {
+  if (!selectedGuideId) {
+    toast('Выберите гида', true);
+    return;
+  }
+  
+  const startDate = new Date(document.getElementById('guideStartDate').value);
+  const endDate = new Date(document.getElementById('guideEndDate').value);
+  const days = Math.max(1, Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1);
+  const totalPrice = selectedGuidePriceDay * days;
+  
+  if (editingModuleIndex !== null && currentModules[editingModuleIndex]) {
+    currentModules[editingModuleIndex].name = selectedGuideName;
+    currentModules[editingModuleIndex].price = totalPrice;
+    currentModules[editingModuleIndex].guide_id = selectedGuideId;
+    currentModules[editingModuleIndex].price_day = selectedGuidePriceDay;
+    currentModules[editingModuleIndex].start_date = document.getElementById('guideStartDate').value;
+    currentModules[editingModuleIndex].end_date = document.getElementById('guideEndDate').value;
+    currentModules[editingModuleIndex].days = days;
+    renderModules();
+  }
+  closeModuleEdit();
+  toast('✅ Гид обновлён!');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ФОРМА: МУЗЕЙ
+// ═══════════════════════════════════════════════════════════════
+function renderMuseumForm() {
+  const mod = editingModule;
+  const today = new Date().toISOString().split('T')[0];
+  
+  const museumOptions = data.museums.map(m => `
+    <div class="edit-option-card ${mod.museum_id === m.id ? 'selected' : ''}" onclick="selectMuseumOption('${m.id}', '${m.name.replace(/'/g, "\\'")}', ${m.entry_price || 0})">
+      <img src="${m.gallery?.[0] || './hero.jpg'}" alt="">
+      <div class="edit-option-info">
+        <div class="edit-option-name">${m.name}</div>
+        <div class="edit-option-details">${m.city} • ${m.type}</div>
+      </div>
+      <div class="edit-option-price">$${m.entry_price || 0}</div>
+      <div class="edit-option-check">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+    </div>
+  `).join('');
+  
+  return `
+    <div class="edit-section">
+      <div class="edit-section-title">Выберите музей</div>
+      <div id="museumOptions">${museumOptions}</div>
+    </div>
+    
+    <div class="edit-section">
+      <div class="edit-section-title">Дата посещения</div>
+      <div class="edit-row">
+        <div class="edit-field">
+          <label class="edit-label">Дата</label>
+          <input type="date" class="edit-input" id="museumDate" value="${mod.date || today}">
+        </div>
+        <div class="edit-field">
+          <label class="edit-label">Время</label>
+          <input type="time" class="edit-input" id="museumTime" value="${mod.time || '10:00'}">
+        </div>
+      </div>
+      <div class="edit-field">
+        <label class="edit-label">Количество человек</label>
+        <input type="number" class="edit-input" id="museumPeople" value="${mod.people || 2}" min="1" onchange="calcMuseumTotal()">
+      </div>
+    </div>
+    
+    <div class="edit-calc">
+      <div class="edit-calc-row">
+        <span>Входной билет</span>
+        <span>$<span id="museumTicketPrice">${mod.ticket_price || 0}</span></span>
+      </div>
+      <div class="edit-calc-row">
+        <span>Человек</span>
+        <span id="museumPeopleCount">${mod.people || 2}</span>
+      </div>
+      <div class="edit-calc-row total">
+        <span>Итого</span>
+        <span>$<span id="museumTotal">${mod.price || 0}</span></span>
+      </div>
+    </div>
+    
+    <div class="edit-actions">
+      <button class="edit-btn edit-btn-secondary" onclick="closeModuleEdit()">Отмена</button>
+      <button class="edit-btn edit-btn-primary" onclick="saveMuseumModule()">Сохранить</button>
+    </div>
+  `;
+}
+
+let selectedMuseumId = null;
+let selectedMuseumName = '';
+let selectedMuseumPrice = 0;
+
+function selectMuseumOption(id, name, price) {
+  selectedMuseumId = id;
+  selectedMuseumName = name;
+  selectedMuseumPrice = price;
+  
+  document.querySelectorAll('#museumOptions .edit-option-card').forEach(c => c.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+  
+  document.getElementById('museumTicketPrice').textContent = price;
+  calcMuseumTotal();
+}
+
+function calcMuseumTotal() {
+  const price = parseFloat(document.getElementById('museumTicketPrice').textContent) || 0;
+  const people = parseInt(document.getElementById('museumPeople').value) || 1;
+  document.getElementById('museumPeopleCount').textContent = people;
+  document.getElementById('museumTotal').textContent = price * people;
+}
+
+function saveMuseumModule() {
+  if (!selectedMuseumId) {
+    toast('Выберите музей', true);
+    return;
+  }
+  
+  const people = parseInt(document.getElementById('museumPeople').value) || 1;
+  const totalPrice = selectedMuseumPrice * people;
+  
+  if (editingModuleIndex !== null && currentModules[editingModuleIndex]) {
+    currentModules[editingModuleIndex].name = selectedMuseumName;
+    currentModules[editingModuleIndex].price = totalPrice;
+    currentModules[editingModuleIndex].museum_id = selectedMuseumId;
+    currentModules[editingModuleIndex].ticket_price = selectedMuseumPrice;
+    currentModules[editingModuleIndex].date = document.getElementById('museumDate').value;
+    currentModules[editingModuleIndex].time = document.getElementById('museumTime').value;
+    currentModules[editingModuleIndex].people = people;
+    renderModules();
+  }
+  closeModuleEdit();
+  toast('✅ Музей обновлён!');
+}
+
+// Общая форма для неизвестных типов
+function renderGenericForm() {
+  const mod = editingModule;
+  
+  return `
+    <div class="edit-field">
+      <label class="edit-label">Название</label>
+      <input type="text" class="edit-input" id="genericName" value="${mod.name || ''}">
+    </div>
+    <div class="edit-field">
+      <label class="edit-label">Цена ($)</label>
+      <input type="number" class="edit-input" id="genericPrice" value="${mod.price || 0}" min="0">
+    </div>
+    <div class="edit-actions">
+      <button class="edit-btn edit-btn-secondary" onclick="closeModuleEdit()">Отмена</button>
+      <button class="edit-btn edit-btn-primary" onclick="saveGenericModule()">Сохранить</button>
+    </div>
+  `;
+}
+
+function saveGenericModule() {
+  if (editingModuleIndex !== null && currentModules[editingModuleIndex]) {
+    currentModules[editingModuleIndex].name = document.getElementById('genericName').value;
+    currentModules[editingModuleIndex].price = parseFloat(document.getElementById('genericPrice').value) || 0;
+    renderModules();
+  }
+  closeModuleEdit();
+  toast('✅ Модуль обновлён!');
 }
 
 // ══════════════════════════════════════════════════════════════
