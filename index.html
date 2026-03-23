@@ -1047,6 +1047,124 @@ html, body {
 }
 
 /* ══════════════════════════════════════════════════════════════
+   BOOKINGS HISTORY (История заявок)
+   ══════════════════════════════════════════════════════════════ */
+.bookings-section {
+  padding: 0 20px 20px;
+}
+
+.bookings-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 14px;
+}
+
+.bookings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.bookings-empty {
+  text-align: center;
+  padding: 30px 20px;
+  background: var(--bg-gray);
+  border-radius: 16px;
+}
+
+.bookings-empty svg {
+  width: 48px;
+  height: 48px;
+  stroke: var(--text-muted);
+  stroke-width: 1.5;
+  fill: none;
+  margin-bottom: 12px;
+}
+
+.bookings-empty p {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.bookings-empty span {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.booking-card {
+  background: var(--bg);
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 14px;
+  display: flex;
+  gap: 14px;
+}
+
+.booking-card-img {
+  width: 70px;
+  height: 70px;
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.booking-card-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.booking-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.booking-card-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.booking-card-details {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.booking-card-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.booking-card-price {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--teal);
+}
+
+.booking-card-status {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.booking-card-status.confirmed {
+  background: #d1fae5;
+  color: #059669;
+}
+
+/* ══════════════════════════════════════════════════════════════
    MODAL
    ══════════════════════════════════════════════════════════════ */
 .overlay {
@@ -1399,6 +1517,73 @@ html, body {
   margin-bottom: 4px;
 }
 
+/* AI CARDS — карточки в ответах AI */
+.ai-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.ai-card {
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.ai-card:active {
+  transform: scale(0.97);
+}
+
+.ai-card img {
+  width: 100%;
+  height: 80px;
+  object-fit: cover;
+}
+
+.ai-card-info {
+  padding: 10px;
+}
+
+.ai-card-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ai-card-sub {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ai-card-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ai-card-rating {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.ai-card-price {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--teal);
+}
+
 .ai-suggestions {
   display: flex;
   gap: 8px;
@@ -1711,7 +1896,19 @@ html, body {
         <img id="profileImg" src="https://i.pravatar.cc/200?u=waylo" alt="">
       </div>
       <div class="profile-name" id="profileName">Traveler</div>
-      <div class="profile-email" id="profileEmail"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="bcc9cfd9cefccbddc5d0d392c8ceddcad9d0">[email&#160;protected]</a></div>
+      <div class="profile-email" id="profileEmail">Welcome to Waylo!</div>
+    </div>
+
+    <!-- История заявок -->
+    <div class="bookings-section">
+      <h3 class="bookings-title">Мои заявки</h3>
+      <div class="bookings-list" id="bookingsList">
+        <div class="bookings-empty" id="bookingsEmpty">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <p>У вас пока нет заявок</p>
+          <span>Забронируйте тур или отель</span>
+        </div>
+      </div>
     </div>
 
     <div class="profile-menu">
@@ -1723,11 +1920,6 @@ html, body {
       <div class="profile-item">
         <div class="profile-icon"><svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg></div>
         <span class="profile-text">Saved Places</span>
-        <span class="profile-arrow"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></span>
-      </div>
-      <div class="profile-item">
-        <div class="profile-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
-        <span class="profile-text">My Bookings</span>
         <span class="profile-arrow"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></span>
       </div>
       <div class="profile-item">
@@ -2394,6 +2586,7 @@ async function submitBooking(e) {
   const title = currentItem?.display_title || currentItem?.name || '';
   const city = currentItem?.city || currentItem?.from_city || '';
   const price = currentItem?.total_price || currentItem?.price_from || currentItem?.price_day || currentItem?.price || 0;
+  const image = currentItem?.image_url || currentItem?.gallery?.[0] || './hero.jpg';
   
   // Create request in Admin Panel's requests table
   const request = {
@@ -2407,7 +2600,8 @@ async function submitBooking(e) {
     travelers_count: parseInt(document.getElementById('bookingGuests').value) || 2,
     total_price: price,
     status: 'новая',
-    source: 'Telegram Mini App'
+    source: 'Telegram Mini App',
+    image: image
   };
   
   // 1. Сохранить в Supabase
@@ -2426,8 +2620,85 @@ async function submitBooking(e) {
     }
   }
   
+  // 3. Сохранить в локальную историю
+  saveBookingToHistory(request);
+  
+  // 4. Закрыть все окна
   closeBooking();
+  document.getElementById('navbar').style.display = 'flex';
+  
+  // 5. Показать уведомление и перейти в профиль
   toast(res ? '✅ Заявка отправлена!' : 'Ошибка отправки', !res);
+  
+  if (res) {
+    // Небольшая задержка перед переходом в профиль
+    setTimeout(() => {
+      switchView('profile');
+      renderBookingsHistory();
+    }, 500);
+  }
+}
+
+// Сохранение заявки в локальную историю
+function saveBookingToHistory(request) {
+  let history = [];
+  try {
+    history = JSON.parse(localStorage.getItem('waylo_bookings') || '[]');
+  } catch (e) {}
+  
+  history.unshift({
+    ...request,
+    created_at: new Date().toISOString()
+  });
+  
+  // Храним последние 20 заявок
+  if (history.length > 20) history = history.slice(0, 20);
+  
+  localStorage.setItem('waylo_bookings', JSON.stringify(history));
+}
+
+// Рендер истории заявок в профиле
+function renderBookingsHistory() {
+  const container = document.getElementById('bookingsList');
+  const emptyState = document.getElementById('bookingsEmpty');
+  
+  let history = [];
+  try {
+    history = JSON.parse(localStorage.getItem('waylo_bookings') || '[]');
+  } catch (e) {}
+  
+  if (history.length === 0) {
+    if (emptyState) emptyState.style.display = 'block';
+    return;
+  }
+  
+  if (emptyState) emptyState.style.display = 'none';
+  
+  // Очистить контейнер (кроме empty state)
+  container.innerHTML = history.map(booking => `
+    <div class="booking-card">
+      <div class="booking-card-img">
+        <img src="${booking.image || './hero.jpg'}" alt="">
+      </div>
+      <div class="booking-card-info">
+        <div class="booking-card-title">${booking.tour_name}</div>
+        <div class="booking-card-details">
+          📅 ${formatDate(booking.travel_date)} • 👥 ${booking.travelers_count} гостей
+        </div>
+        <div class="booking-card-bottom">
+          <span class="booking-card-price">$${booking.total_price}</span>
+          <span class="booking-card-status ${booking.status === 'подтверждена' ? 'confirmed' : ''}">${booking.status || 'новая'}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// Форматирование даты
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -2449,6 +2720,11 @@ function switchView(v) {
   
   if (v !== 'detail') {
     document.getElementById('navbar').style.display = 'flex';
+  }
+  
+  // При переходе на профиль — показать историю заявок
+  if (v === 'profile') {
+    renderBookingsHistory();
   }
 }
 
@@ -2631,80 +2907,239 @@ async function sendAIMessage() {
     
     document.getElementById('typing')?.remove();
     
-    let reply = 'Извините, сервис временно недоступен.';
-    
     if (response.ok) {
       const result = await response.json();
-      reply = result.reply || result.message || result.text || reply;
+      renderAIResponse(result);
     } else {
       // Fallback на локальные ответы
-      reply = getLocalReply(text);
+      const result = getLocalReply(text);
+      renderAIResponse(result);
     }
-    
-    messages.innerHTML += `
-      <div class="ai-message ai-bot">
-        <div class="ai-message-avatar">
-          <svg viewBox="0 0 24 24"><path d="M12 3l1.5 3.5L17 8l-3.5 1.5L12 13l-1.5-3.5L7 8l3.5-1.5L12 3z"/></svg>
-        </div>
-        <div class="ai-message-content"><p>${reply.replace(/\n/g, '</p><p>')}</p></div>
-      </div>
-    `;
-    messages.scrollTop = messages.scrollHeight;
     
   } catch (err) {
     document.getElementById('typing')?.remove();
     
     // Fallback на локальные ответы
-    const reply = getLocalReply(text);
-    
-    messages.innerHTML += `
-      <div class="ai-message ai-bot">
-        <div class="ai-message-avatar">
-          <svg viewBox="0 0 24 24"><path d="M12 3l1.5 3.5L17 8l-3.5 1.5L12 13l-1.5-3.5L7 8l3.5-1.5L12 3z"/></svg>
-        </div>
-        <div class="ai-message-content"><p>${reply.replace(/\n/g, '</p><p>')}</p></div>
-      </div>
-    `;
-    messages.scrollTop = messages.scrollHeight;
+    const result = getLocalReply(text);
+    renderAIResponse(result);
   }
 }
 
-// Локальные ответы если webhook недоступен
+// Рендер ответа AI с карточками
+function renderAIResponse(result) {
+  const messages = document.getElementById('aiMessages');
+  
+  let reply = result.reply || result.message || result.text || '';
+  let cards = result.cards || [];
+  
+  // Render text message
+  let html = `
+    <div class="ai-message ai-bot">
+      <div class="ai-message-avatar">
+        <svg viewBox="0 0 24 24"><path d="M12 3l1.5 3.5L17 8l-3.5 1.5L12 13l-1.5-3.5L7 8l3.5-1.5L12 3z"/></svg>
+      </div>
+      <div class="ai-message-content">
+        ${reply ? `<p>${reply.replace(/\n/g, '</p><p>')}</p>` : ''}
+  `;
+  
+  // Render cards if present
+  if (cards.length > 0) {
+    html += `<div class="ai-cards">`;
+    cards.forEach(card => {
+      const priceLabel = card.price_label || '';
+      html += `
+        <div class="ai-card" onclick="openCardFromAI('${card.type}', '${card.id}')">
+          <img src="${card.image || './hero.jpg'}" alt="">
+          <div class="ai-card-info">
+            <div class="ai-card-name">${card.name}</div>
+            <div class="ai-card-sub">${card.subtitle || ''}</div>
+            <div class="ai-card-bottom">
+              ${card.rating ? `<span class="ai-card-rating">⭐ ${card.rating}</span>` : ''}
+              ${card.price ? `<span class="ai-card-price">$${card.price}${priceLabel}</span>` : ''}
+            </div>
+          </div>
+        </div>
+      `;
+    });
+    html += `</div>`;
+  }
+  
+  html += `</div></div>`;
+  
+  messages.innerHTML += html;
+  messages.scrollTop = messages.scrollHeight;
+}
+
+// Открыть карточку из AI Chat
+function openCardFromAI(type, id) {
+  closeAI();
+  
+  let item = null;
+  switch(type) {
+    case 'hotel': item = data.hotels.find(h => h.id === id); break;
+    case 'tour': item = data.top_tours.find(t => t.id === id); break;
+    case 'guide': item = data.guides.find(g => g.id === id); break;
+    case 'transfer': item = data.transfers.find(t => t.id === id); break;
+    case 'restaurant': item = data.restaurants.find(r => r.id === id); break;
+    case 'sight': item = data.sights.find(s => s.id === id); break;
+  }
+  
+  if (item) {
+    showDetail(item, type);
+  }
+}
+
+// Локальные ответы если webhook недоступен — возвращают карточки!
 function getLocalReply(text) {
   const lower = text.toLowerCase();
   
   if (lower.includes('отел') || lower.includes('hotel')) {
-    const hotels = data.hotels.slice(0, 3);
+    const hotels = data.hotels.slice(0, 4);
     if (hotels.length) {
-      return `🏨 Вот лучшие отели:\n\n${hotels.map(h => 
-        `• ${h.name} - ${h.city}, ${h.stars}★, от $${h.price_from}/ночь`
-      ).join('\n')}\n\nНажмите на отель в списке для бронирования!`;
+      return {
+        reply: '🏨 Вот лучшие отели для вас:',
+        cards: hotels.map(h => ({
+          type: 'hotel',
+          id: h.id,
+          name: h.name,
+          image: h.image_url || h.gallery?.[0] || './hero.jpg',
+          subtitle: `${h.city} • ${h.stars}★`,
+          rating: h.rating,
+          price: h.price_from,
+          price_label: '/ночь'
+        }))
+      };
     }
   }
   
   if (lower.includes('тур') || lower.includes('tour')) {
-    const tours = data.top_tours.slice(0, 3);
+    const tours = data.top_tours.slice(0, 4);
     if (tours.length) {
-      return `🗺️ Популярные туры:\n\n${tours.map(t => 
-        `• ${t.display_title} - ${t.duration_days} дней, $${t.total_price}`
-      ).join('\n')}\n\nВыберите тур в разделе Tours!`;
+      return {
+        reply: '🗺️ Популярные туры:',
+        cards: tours.map(t => ({
+          type: 'tour',
+          id: t.id,
+          name: t.display_title,
+          image: t.image_url || './hero.jpg',
+          subtitle: `${t.city} • ${t.duration_days} дней`,
+          rating: t.rating,
+          price: t.total_price,
+          price_label: ''
+        }))
+      };
     }
   }
   
   if (lower.includes('гид') || lower.includes('guide')) {
-    const guides = data.guides.slice(0, 3);
+    const guides = data.guides.slice(0, 4);
     if (guides.length) {
-      return `👨‍🏫 Наши гиды:\n\n${guides.map(g => 
-        `• ${g.name} - ${g.city}, ${g.languages}, $${g.price_day}/день`
-      ).join('\n')}\n\nСмотрите раздел Guides!`;
+      return {
+        reply: '👨‍🏫 Наши профессиональные гиды:',
+        cards: guides.map(g => ({
+          type: 'guide',
+          id: g.id,
+          name: g.name,
+          image: g.gallery?.[0] || './hero.jpg',
+          subtitle: `${g.city} • ${g.languages}`,
+          rating: g.rating,
+          price: g.price_day,
+          price_label: '/день'
+        }))
+      };
     }
   }
   
-  if (lower.includes('привет') || lower.includes('hello') || lower.includes('салом')) {
-    return `Привет! 👋 Я Waylo AI, ваш travel-ассистент.\n\nЧем могу помочь?\n• 🏨 Найти отель\n• 🗺️ Подобрать тур\n• 👨‍🏫 Найти гида`;
+  if (lower.includes('трансфер') || lower.includes('transfer')) {
+    const transfers = data.transfers.slice(0, 4);
+    if (transfers.length) {
+      return {
+        reply: '🚗 Доступные трансферы:',
+        cards: transfers.map(t => ({
+          type: 'transfer',
+          id: t.id,
+          name: t.name,
+          image: t.gallery?.[0] || './hero.jpg',
+          subtitle: `${t.from_city} → ${t.to_city} • ${t.vehicle}`,
+          rating: null,
+          price: t.price,
+          price_label: ''
+        }))
+      };
+    }
   }
   
-  return `Спасибо за вопрос! 🙏\n\nИспользуйте каталог на главной странице для поиска отелей, туров и услуг.\n\nНапишите:\n• "Покажи отели"\n• "Какие есть туры?"\n• "Найди гида"`;
+  if (lower.includes('рестор') || lower.includes('еда') || lower.includes('food')) {
+    const restaurants = data.restaurants.slice(0, 4);
+    if (restaurants.length) {
+      return {
+        reply: '🍽️ Лучшие рестораны:',
+        cards: restaurants.map(r => ({
+          type: 'restaurant',
+          id: r.id,
+          name: r.name,
+          image: r.gallery?.[0] || './hero.jpg',
+          subtitle: `${r.city} • ${r.cuisine}`,
+          rating: r.rating,
+          price: r.avg_check,
+          price_label: ''
+        }))
+      };
+    }
+  }
+  
+  if (lower.includes('достоприм') || lower.includes('sight') || lower.includes('смотреть')) {
+    const sights = data.sights.slice(0, 4);
+    if (sights.length) {
+      return {
+        reply: '🏛️ Достопримечательности:',
+        cards: sights.map(s => ({
+          type: 'sight',
+          id: s.id,
+          name: s.name,
+          image: s.gallery?.[0] || './hero.jpg',
+          subtitle: `${s.city} • ${s.type}`,
+          rating: s.rating,
+          price: s.entry_price || 0,
+          price_label: ''
+        }))
+      };
+    }
+  }
+  
+  if (lower.includes('привет') || lower.includes('hello') || lower.includes('салом') || lower.includes('hi')) {
+    return {
+      reply: `Привет! 👋 Я Waylo AI, ваш travel-ассистент по Узбекистану!\n\nЧто вас интересует?`,
+      cards: []
+    };
+  }
+  
+  // Показываем микс всего
+  const mixCards = [];
+  if (data.top_tours[0]) mixCards.push({
+    type: 'tour',
+    id: data.top_tours[0].id,
+    name: data.top_tours[0].display_title,
+    image: data.top_tours[0].image_url || './hero.jpg',
+    subtitle: `${data.top_tours[0].city} • ${data.top_tours[0].duration_days} дней`,
+    rating: data.top_tours[0].rating,
+    price: data.top_tours[0].total_price
+  });
+  if (data.hotels[0]) mixCards.push({
+    type: 'hotel',
+    id: data.hotels[0].id,
+    name: data.hotels[0].name,
+    image: data.hotels[0].image_url || './hero.jpg',
+    subtitle: `${data.hotels[0].city} • ${data.hotels[0].stars}★`,
+    rating: data.hotels[0].rating,
+    price: data.hotels[0].price_from,
+    price_label: '/ночь'
+  });
+  
+  return {
+    reply: `Вот что я могу предложить! Спросите меня о:\n• 🏨 Отелях\n• 🗺️ Турах\n• 👨‍🏫 Гидах\n• 🚗 Трансферах`,
+    cards: mixCards
+  };
 }
 
 function buildContext() {
