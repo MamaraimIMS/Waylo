@@ -987,6 +987,11 @@ html, body {
   background: var(--bg);
   transform: translateY(100%);
   transition: transform 0.3s;
+  overflow-y: auto;
+  overflow-x: hidden;
+  touch-action: pan-y;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .module-selector.open {
@@ -1193,8 +1198,12 @@ html, body {
   z-index: 301;
   max-height: 90vh;
   overflow-y: auto;
+  overflow-x: hidden;
   transform: translateY(100%);
   transition: transform 0.3s;
+  touch-action: pan-y;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .module-edit-modal.open {
@@ -1688,6 +1697,11 @@ html, body {
   border-radius: 28px 28px 0 0;
   transform: translateY(100%);
   transition: transform 0.3s;
+  overflow-y: auto;
+  overflow-x: hidden;
+  touch-action: pan-y;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 .modal.open { transform: translateY(0); }
 
@@ -1860,6 +1874,9 @@ html, body {
   flex-direction: column;
   transform: translateY(100%);
   transition: transform 0.3s;
+  overflow: hidden;
+  touch-action: pan-y;
+  overscroll-behavior: contain;
 }
 
 .ai-modal.open {
@@ -3194,10 +3211,12 @@ function openModuleSelector(idx) {
   }
   
   document.getElementById('moduleSelector').classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
 
 function closeModuleSelector() {
   document.getElementById('moduleSelector').classList.remove('open');
+  document.body.style.overflow = '';
   editingModuleIndex = null;
 }
 
@@ -3279,11 +3298,13 @@ function openModuleEdit(idx) {
   document.getElementById('moduleEditBody').innerHTML = formHtml;
   document.getElementById('moduleEditOverlay').classList.add('open');
   document.getElementById('moduleEditModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
 
 function closeModuleEdit() {
   document.getElementById('moduleEditOverlay').classList.remove('open');
   document.getElementById('moduleEditModal').classList.remove('open');
+  document.body.style.overflow = '';
   editingModuleIndex = null;
   editingModule = null;
 }
@@ -4250,11 +4271,13 @@ function openBooking() {
   document.getElementById('bookingDate').value = d.toISOString().split('T')[0];
   document.getElementById('overlay').classList.add('open');
   document.getElementById('bookingModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
 
 function closeBooking() {
   document.getElementById('overlay').classList.remove('open');
   document.getElementById('bookingModal').classList.remove('open');
+  document.body.style.overflow = '';
 }
 
 async function submitBooking(e) {
@@ -4504,11 +4527,13 @@ const AI_WEBHOOK = 'https://alphagroupuz.app.n8n.cloud/webhook/waylo-ai';
 function openAI() {
   document.getElementById('aiModal').classList.add('open');
   document.getElementById('navbar').style.display = 'none';
+  document.body.style.overflow = 'hidden';
 }
 
 function closeAI() {
   document.getElementById('aiModal').classList.remove('open');
   document.getElementById('navbar').style.display = 'flex';
+  document.body.style.overflow = '';
 }
 
 function handleAIKey(e) {
