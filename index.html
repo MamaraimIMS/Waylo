@@ -433,6 +433,89 @@ html, body {
   stroke-width: 1;
 }
 
+/* Hero Tours (внутри hero при нажатии Tours) */
+.hero-tours {
+  width: 100%;
+  max-width: 100vw;
+  margin-top: 20px;
+  transition: all 0.3s ease;
+}
+
+.hero-tours.hidden {
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+  max-height: 0;
+  margin: 0;
+  overflow: hidden;
+}
+
+.hero-tours-scroll {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding: 0 20px 20px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.hero-tours-scroll::-webkit-scrollbar { display: none; }
+
+/* Tour Card Mini (для hero) */
+.tour-card-mini {
+  flex-shrink: 0;
+  width: 200px;
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  cursor: pointer;
+  scroll-snap-align: start;
+  transition: transform 0.2s;
+}
+
+.tour-card-mini:active {
+  transform: scale(0.98);
+}
+
+.tour-card-mini img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+}
+
+.tour-card-mini-info {
+  padding: 12px;
+}
+
+.tour-card-mini-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 8px;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.tour-card-mini-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+}
+
+.tour-card-mini-meta span {
+  color: #64748b;
+}
+
+.tour-card-mini-meta strong {
+  color: #14b8a6;
+  font-weight: 700;
+}
+
 /* Features */
 /* Popular Tours Section */
 .ai-tours-section {
@@ -2701,16 +2784,12 @@ html, body {
           </span>
           Top Tours
         </button>
+        
+        <!-- Контейнер для туров (появляется при нажатии Tours) -->
+        <div class="hero-tours hidden" id="heroTours">
+          <div class="hero-tours-scroll" id="heroToursRow"></div>
+        </div>
       </div>
-    </div>
-
-    <!-- POPULAR TOURS (минималистичный блок внизу) -->
-    <div class="ai-tours-section">
-      <div class="ai-tours-header">
-        <span class="ai-tours-title">Популярные туры</span>
-        <span class="ai-tours-badge">ТОП</span>
-      </div>
-      <div class="ai-tours-scroll" id="toursRow"></div>
     </div>
 
   </div>
@@ -3130,19 +3209,8 @@ function render() {
 }
 
 function renderTours() {
-  const el = document.getElementById('toursRow');
-  if (!data.top_tours.length) return;
-  
-  el.innerHTML = data.top_tours.map(t => `
-    <div class="card-h" onclick="openDetail('${t.id}', 'tour')">
-      <img src="${t.image_url || './hero.jpg'}" alt="">
-      ${t.badge_text ? `<div class="card-h-badge">${t.badge_text}</div>` : ''}
-      <div class="card-h-info">
-        <div class="card-h-title">${t.display_title}</div>
-        <div class="card-h-sub">${t.city} • ${t.duration_days} days</div>
-      </div>
-    </div>
-  `).join('');
+  // Туры теперь загружаются через loadHeroTours при нажатии на Tours
+  return;
 }
 
 function renderDestinations() {
@@ -5483,6 +5551,10 @@ function showTopTours() {
     setTimeout(() => btn.style.display = 'none', 300);
   }
   
+  // Скрываем чат если он открыт
+  const homeChat = document.getElementById('homeChat');
+  if (homeChat) homeChat.classList.add('hidden');
+  
   // Меняем текст
   const greeting = document.getElementById('aiGreeting');
   const prompt = document.getElementById('aiPrompt');
@@ -5499,13 +5571,52 @@ function showTopTours() {
     }, 300);
   }
   
-  // Скроллим к секции туров
+  // Показываем туры внутри hero
   setTimeout(() => {
-    const toursSection = document.querySelector('.ai-tours-section');
-    if (toursSection) {
-      toursSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const heroTours = document.getElementById('heroTours');
+    if (heroTours) {
+      heroTours.classList.remove('hidden');
+      // Загружаем туры в heroToursRow
+      loadHeroTours();
     }
   }, 400);
+  
+  // Глобус в idle
+  if (window.AIGlobe) window.AIGlobe.setState('idle');
+}
+
+// Загрузка туров в hero
+async function loadHeroTours() {
+  const container = document.getElementById('heroToursRow');
+  if (!container) return;
+  
+  try {
+    const { data } = await supabase
+      .from('top_tours')
+      .select('*')
+      .eq('approved', true)
+      .order('rating', { ascending: false })
+      .limit(10);
+    
+    if (data && data.length) {
+      container.innerHTML = data.map(t => `
+        <div class="tour-card-mini" onclick="openDetail('tour', ${JSON.stringify(t).replace(/"/g, '&quot;')})">
+          <img src="${t.image}" alt="${t.title}">
+          <div class="tour-card-mini-info">
+            <div class="tour-card-mini-title">${t.title}</div>
+            <div class="tour-card-mini-meta">
+              <span>${t.days || 3} дней</span>
+              <strong>$${t.price}</strong>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    } else {
+      container.innerHTML = '<p style="color:#94a3b8;padding:20px;">Туры скоро появятся</p>';
+    }
+  } catch (err) {
+    container.innerHTML = '<p style="color:#94a3b8;padding:20px;">Туры скоро появятся</p>';
+  }
 }
 
 function activateAI() {
