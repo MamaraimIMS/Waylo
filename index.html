@@ -817,6 +817,152 @@ html, body {
   font-weight: 700;
 }
 
+/* ══════════════════════════════════════════════════════════════
+   HOTEL ROOMS (номера отеля)
+   ══════════════════════════════════════════════════════════════ */
+.hotel-rooms {
+  margin-top: 20px;
+}
+
+.rooms-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.room-card {
+  background: #fff;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.room-card:active {
+  transform: scale(0.98);
+}
+
+.room-card.selected {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.15);
+}
+
+.room-card-inner {
+  display: flex;
+  gap: 14px;
+  padding: 14px;
+}
+
+.room-image {
+  width: 100px;
+  height: 80px;
+  border-radius: 10px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.room-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.room-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.room-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.room-details {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.room-details span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.room-details svg {
+  width: 14px;
+  height: 14px;
+  stroke: var(--text-muted);
+  stroke-width: 2;
+  fill: none;
+}
+
+.room-amenities {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.room-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.room-price {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--teal);
+}
+
+.room-price small {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.room-select-badge {
+  display: none;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: var(--teal);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 20px;
+}
+
+.room-card.selected .room-select-badge {
+  display: flex;
+}
+
+.room-select-badge svg {
+  width: 14px;
+  height: 14px;
+  stroke: #fff;
+  stroke-width: 2.5;
+  fill: none;
+}
+
+.rooms-empty {
+  text-align: center;
+  padding: 30px 20px;
+  background: var(--bg-gray);
+  border-radius: 14px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
 /* MODULE SELECTOR MODAL */
 .module-selector {
   position: fixed;
@@ -1870,6 +2016,12 @@ html, body {
           <strong id="modulesTotal">$0</strong>
         </div>
       </div>
+      
+      <!-- HOTEL ROOMS (номера отеля) -->
+      <div class="hotel-rooms" id="hotelRooms" style="display:none;">
+        <h3 class="detail-section-title">Доступные номера</h3>
+        <div class="rooms-list" id="roomsList"></div>
+      </div>
     </div>
     
     <div class="detail-footer">
@@ -2381,8 +2533,89 @@ function openDetail(id, type) {
     document.getElementById('tourModules').style.display = 'none';
   }
   
+  // Show/hide hotel rooms
+  if (type === 'hotel') {
+    document.getElementById('hotelRooms').style.display = 'block';
+    renderHotelRooms(item);
+  } else {
+    document.getElementById('hotelRooms').style.display = 'none';
+  }
+  
   switchView('detail');
   document.getElementById('navbar').style.display = 'none';
+}
+
+// Выбранный номер
+let selectedRoom = null;
+
+// Рендер номеров отеля
+function renderHotelRooms(hotel) {
+  const container = document.getElementById('roomsList');
+  const rooms = hotel.rooms || [];
+  
+  if (!rooms || rooms.length === 0) {
+    container.innerHTML = `
+      <div class="rooms-empty">
+        <p>Номера уточняйте при бронировании</p>
+      </div>
+    `;
+    return;
+  }
+  
+  selectedRoom = null;
+  
+  container.innerHTML = rooms.map((room, idx) => `
+    <div class="room-card" data-idx="${idx}" onclick="selectRoom(${idx})">
+      <div class="room-card-inner">
+        <div class="room-image">
+          <img src="${room.image || hotel.image_url || './hero.jpg'}" alt="">
+        </div>
+        <div class="room-info">
+          <div class="room-name">${room.name || 'Standard Room'}</div>
+          <div class="room-details">
+            <span>
+              <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              ${room.guests || 2} гостей
+            </span>
+            <span>
+              <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              ${room.beds || '1 кровать'}
+            </span>
+            <span>
+              <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+              ${room.size || '25'} м²
+            </span>
+          </div>
+          <div class="room-amenities">${room.amenities || 'Wi-Fi, Кондиционер, ТВ'}</div>
+          <div class="room-bottom">
+            <div class="room-price">$${room.price || hotel.price_from}<small>/ночь</small></div>
+            <div class="room-select-badge">
+              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+              Выбран
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// Выбор номера
+function selectRoom(idx) {
+  const rooms = currentItem?.rooms || [];
+  if (!rooms[idx]) return;
+  
+  // Убираем выделение со всех
+  document.querySelectorAll('.room-card').forEach(c => c.classList.remove('selected'));
+  
+  // Выделяем выбранный
+  const card = document.querySelector(`.room-card[data-idx="${idx}"]`);
+  if (card) card.classList.add('selected');
+  
+  selectedRoom = rooms[idx];
+  
+  // Обновляем цену в footer
+  document.getElementById('detailPrice').innerHTML = `$${selectedRoom.price || currentItem.price_from}<small>/ночь</small>`;
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -2547,11 +2780,20 @@ function openBooking() {
     const city = currentItem.city || currentItem.from_city || '';
     const img = currentItem.image_url || currentItem.gallery?.[0] || '';
     
-    let modulesHtml = '';
+    let extraHtml = '';
+    
+    // Для туров показываем модули
     if (currentType === 'tour' && currentModules.length > 0) {
-      modulesHtml = `<div class="booking-modules">${currentModules.map(m => 
+      extraHtml = `<div class="booking-modules">${currentModules.map(m => 
         `<div class="booking-module-item">• ${m.name} — $${m.price}</div>`
       ).join('')}</div>`;
+    }
+    
+    // Для отелей показываем выбранный номер
+    if (currentType === 'hotel' && selectedRoom) {
+      extraHtml = `<div class="booking-modules">
+        <div class="booking-module-item">🛏️ ${selectedRoom.name} — $${selectedRoom.price}/ночь</div>
+      </div>`;
     }
     
     document.getElementById('bookingPreview').innerHTML = `
@@ -2559,7 +2801,7 @@ function openBooking() {
       <div>
         <div class="booking-preview-name">${title}</div>
         <div class="booking-preview-loc">${city}</div>
-        ${modulesHtml}
+        ${extraHtml}
       </div>
     `;
   }
@@ -2585,8 +2827,15 @@ async function submitBooking(e) {
   
   const title = currentItem?.display_title || currentItem?.name || '';
   const city = currentItem?.city || currentItem?.from_city || '';
-  const price = currentItem?.total_price || currentItem?.price_from || currentItem?.price_day || currentItem?.price || 0;
+  let price = currentItem?.total_price || currentItem?.price_from || currentItem?.price_day || currentItem?.price || 0;
   const image = currentItem?.image_url || currentItem?.gallery?.[0] || './hero.jpg';
+  
+  // Если выбран номер — используем его цену
+  let roomInfo = '';
+  if (selectedRoom && currentType === 'hotel') {
+    price = selectedRoom.price || price;
+    roomInfo = selectedRoom.name || 'Standard Room';
+  }
   
   // Create request in Admin Panel's requests table
   const request = {
@@ -2594,7 +2843,7 @@ async function submitBooking(e) {
     client_name: document.getElementById('bookingName').value,
     phone: document.getElementById('bookingPhone').value,
     telegram: tg?.initDataUnsafe?.user?.username ? '@' + tg.initDataUnsafe.user.username : '',
-    tour_name: title,
+    tour_name: roomInfo ? `${title} — ${roomInfo}` : title,
     destination: city,
     travel_date: document.getElementById('bookingDate').value,
     travelers_count: parseInt(document.getElementById('bookingGuests').value) || 2,
@@ -2623,7 +2872,8 @@ async function submitBooking(e) {
   // 3. Сохранить в локальную историю
   saveBookingToHistory(request);
   
-  // 4. Закрыть все окна
+  // 4. Закрыть все окна и сбросить выбранный номер
+  selectedRoom = null;
   closeBooking();
   document.getElementById('navbar').style.display = 'flex';
   
