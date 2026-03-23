@@ -880,6 +880,12 @@ html, body {
   margin-bottom: 4px;
 }
 
+.room-season {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
 .room-details {
   font-size: 12px;
   color: var(--text-secondary);
@@ -2567,26 +2573,8 @@ function renderHotelRooms(hotel) {
   container.innerHTML = rooms.map((room, idx) => `
     <div class="room-card" data-idx="${idx}" onclick="selectRoom(${idx})">
       <div class="room-card-inner">
-        <div class="room-image">
-          <img src="${room.image || hotel.image_url || './hero.jpg'}" alt="">
-        </div>
-        <div class="room-info">
-          <div class="room-name">${room.name || 'Standard Room'}</div>
-          <div class="room-details">
-            <span>
-              <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              ${room.guests || 2} гостей
-            </span>
-            <span>
-              <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              ${room.beds || '1 кровать'}
-            </span>
-            <span>
-              <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-              ${room.size || '25'} м²
-            </span>
-          </div>
-          <div class="room-amenities">${room.amenities || 'Wi-Fi, Кондиционер, ТВ'}</div>
+        <div class="room-info" style="width:100%">
+          <div class="room-name">${room.type || 'Стандартный номер'}</div>
           <div class="room-bottom">
             <div class="room-price">$${room.price || hotel.price_from}<small>/ночь</small></div>
             <div class="room-select-badge">
@@ -2792,7 +2780,7 @@ function openBooking() {
     // Для отелей показываем выбранный номер
     if (currentType === 'hotel' && selectedRoom) {
       extraHtml = `<div class="booking-modules">
-        <div class="booking-module-item">🛏️ ${selectedRoom.name} — $${selectedRoom.price}/ночь</div>
+        <div class="booking-module-item">🛏️ ${selectedRoom.type || selectedRoom.name || 'Standard'} — $${selectedRoom.price}/ночь</div>
       </div>`;
     }
     
@@ -2834,7 +2822,7 @@ async function submitBooking(e) {
   let roomInfo = '';
   if (selectedRoom && currentType === 'hotel') {
     price = selectedRoom.price || price;
-    roomInfo = selectedRoom.name || 'Standard Room';
+    roomInfo = selectedRoom.type || selectedRoom.name || 'Standard Room';
   }
   
   // Create request in Admin Panel's requests table
