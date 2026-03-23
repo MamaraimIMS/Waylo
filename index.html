@@ -5591,31 +5591,34 @@ async function loadHeroTours() {
   if (!container) return;
   
   try {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('top_tours')
       .select('*')
       .eq('approved', true)
       .order('rating', { ascending: false })
       .limit(10);
     
+    console.log('Tours data:', data, 'Error:', error);
+    
     if (data && data.length) {
       container.innerHTML = data.map(t => `
-        <div class="tour-card-mini" onclick="openDetail('tour', ${JSON.stringify(t).replace(/"/g, '&quot;')})">
-          <img src="${t.image}" alt="${t.title}">
+        <div class="tour-card-mini" onclick="openDetail('${t.id}', 'tour')">
+          <img src="${t.image_url || 'https://images.unsplash.com/photo-1596484552834-6a58f850e0a1?w=400'}" alt="${t.display_title}">
           <div class="tour-card-mini-info">
-            <div class="tour-card-mini-title">${t.title}</div>
+            <div class="tour-card-mini-title">${t.display_title}</div>
             <div class="tour-card-mini-meta">
-              <span>${t.days || 3} дней</span>
-              <strong>$${t.price}</strong>
+              <span>${t.duration_days || 3} дней</span>
+              <strong>$${t.total_price || 299}</strong>
             </div>
           </div>
         </div>
       `).join('');
     } else {
-      container.innerHTML = '<p style="color:#94a3b8;padding:20px;">Туры скоро появятся</p>';
+      container.innerHTML = '<p style="color:#94a3b8;padding:20px;text-align:center;">Туры скоро появятся</p>';
     }
   } catch (err) {
-    container.innerHTML = '<p style="color:#94a3b8;padding:20px;">Туры скоро появятся</p>';
+    console.error('Error loading tours:', err);
+    container.innerHTML = '<p style="color:#94a3b8;padding:20px;text-align:center;">Туры скоро появятся</p>';
   }
 }
 
