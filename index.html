@@ -5414,10 +5414,51 @@ function switchView(v) {
     document.getElementById('navbar').classList.remove('hidden');
   }
   
+  // При переходе на главную — сбросить к начальному виду
+  if (v === 'home') {
+    resetHomeView();
+  }
+  
   // При переходе на профиль — показать историю заявок
   if (v === 'profile') {
     renderBookingsHistory();
   }
+}
+
+// Сброс главной страницы к начальному виду
+function resetHomeView() {
+  // Показываем кнопку Top Tours
+  const btn = document.getElementById('topToursBtn');
+  if (btn) {
+    btn.style.display = '';
+    btn.style.opacity = '1';
+    btn.style.transform = '';
+  }
+  
+  // Скрываем туры
+  const heroTours = document.getElementById('heroTours');
+  if (heroTours) heroTours.classList.add('hidden');
+  
+  // Скрываем чат
+  const homeChat = document.getElementById('homeChat');
+  if (homeChat) homeChat.classList.add('hidden');
+  
+  // Показываем подсказку "Нажмите"
+  const tapHint = document.querySelector('.ai-globe-tap');
+  if (tapHint) tapHint.style.display = '';
+  
+  // Возвращаем исходный текст
+  const greeting = document.getElementById('aiGreeting');
+  const prompt = document.getElementById('aiPrompt');
+  
+  if (greeting) greeting.innerHTML = 'Привет! Я <span>Waylo</span>';
+  if (prompt) prompt.textContent = 'Ваш персональный AI-эксперт по путешествиям в Узбекистане.';
+  
+  // Глобус в idle
+  if (window.AIGlobe) window.AIGlobe.setState('idle');
+  
+  // Скролл наверх
+  document.getElementById('view-home').scrollTo(0, 0);
 }
 
 function loadProfile() {
@@ -5591,21 +5632,17 @@ async function loadHeroTours() {
   if (!container) return;
   
   try {
-    const { data, error } = await supabase
-      .from('top_tours')
-      .select('*')
-      .eq('approved', true)
-      .order('rating', { ascending: false })
-      .limit(10);
+    // Используем функцию api() вместо supabase
+    const tours = await api('top_tours', '?approved=eq.true&order=rating.desc&limit=10');
     
-    console.log('Tours data:', data, 'Error:', error);
+    console.log('Tours loaded:', tours);
     
-    if (data && data.length) {
-      container.innerHTML = data.map(t => `
+    if (tours && tours.length) {
+      container.innerHTML = tours.map(t => `
         <div class="tour-card-mini" onclick="openDetail('${t.id}', 'tour')">
-          <img src="${t.image_url || 'https://images.unsplash.com/photo-1596484552834-6a58f850e0a1?w=400'}" alt="${t.display_title}">
+          <img src="${t.image_url || 'https://images.unsplash.com/photo-1596484552834-6a58f850e0a1?w=400'}" alt="${t.display_title}" onerror="this.src='https://images.unsplash.com/photo-1596484552834-6a58f850e0a1?w=400'">
           <div class="tour-card-mini-info">
-            <div class="tour-card-mini-title">${t.display_title}</div>
+            <div class="tour-card-mini-title">${t.display_title || 'Тур по Узбекистану'}</div>
             <div class="tour-card-mini-meta">
               <span>${t.duration_days || 3} дней</span>
               <strong>$${t.total_price || 299}</strong>
@@ -5614,12 +5651,37 @@ async function loadHeroTours() {
         </div>
       `).join('');
     } else {
-      container.innerHTML = '<p style="color:#94a3b8;padding:20px;text-align:center;">Туры скоро появятся</p>';
+      // Показываем демо-туры если база пустая
+      showDemoTours(container);
     }
   } catch (err) {
     console.error('Error loading tours:', err);
-    container.innerHTML = '<p style="color:#94a3b8;padding:20px;text-align:center;">Туры скоро появятся</p>';
+    showDemoTours(container);
   }
+}
+
+// Демо-туры для показа если база пустая
+function showDemoTours(container) {
+  const demoTours = [
+    { id: 'demo1', title: 'Золотое кольцо Узбекистана', image: 'https://images.unsplash.com/photo-1596484552834-6a58f850e0a1?w=400', days: 7, price: 899 },
+    { id: 'demo2', title: 'Самарканд - жемчужина Востока', image: 'https://images.unsplash.com/photo-1565967511849-76a60a516170?w=400', days: 3, price: 349 },
+    { id: 'demo3', title: 'Бухара - город музеев', image: 'https://images.unsplash.com/photo-1580654712603-eb43273aff33?w=400', days: 4, price: 449 },
+    { id: 'demo4', title: 'Хива - древний город', image: 'https://images.unsplash.com/photo-1622736338351-a8659db4f32c?w=400', days: 2, price: 249 },
+    { id: 'demo5', title: 'Ташкент модерн', image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400', days: 2, price: 199 }
+  ];
+  
+  container.innerHTML = demoTours.map(t => `
+    <div class="tour-card-mini" onclick="toast('Скоро будет доступно!')">
+      <img src="${t.image}" alt="${t.title}" onerror="this.src='https://images.unsplash.com/photo-1596484552834-6a58f850e0a1?w=400'">
+      <div class="tour-card-mini-info">
+        <div class="tour-card-mini-title">${t.title}</div>
+        <div class="tour-card-mini-meta">
+          <span>${t.days} дней</span>
+          <strong>$${t.price}</strong>
+        </div>
+      </div>
+    </div>
+  `).join('');
 }
 
 function activateAI() {
