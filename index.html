@@ -5554,8 +5554,7 @@ function activateAI() {
       homeChat.classList.remove('hidden');
       document.getElementById('homeChatInput')?.focus();
     }
-    // Возвращаем глобус в idle
-    if (window.AIGlobe) window.AIGlobe.setState('idle');
+    // Глобус остаётся в режиме processing пока чат открыт
   }, 500);
 }
 
