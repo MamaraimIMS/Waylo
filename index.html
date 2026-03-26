@@ -7451,8 +7451,8 @@ function renderServices() {
 .bb-header-title { font-size: 1rem; font-weight: 600; flex: 1; text-align: center; }
 .bb-page { display: none; }
 .bb-page.active { display: block; }
-.bb-page-1 { background: linear-gradient(135deg, #0d9488 0%, #06b6d4 100%); position: relative; min-height: 100vh; }
-.bb-page-1::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 60%; background: url('https://images.unsplash.com/photo-1596484552834-6a58f850e0a1?w=800&q=80') center bottom/cover no-repeat; opacity: 0.25; pointer-events: none; z-index: 0; }
+.bb-page-1 { background: linear-gradient(to bottom, transparent 0%, #0d9488 30%, #06b6d4 100%); position: relative; min-height: 100vh; }
+.bb-page-1::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 40%; background: url('header-bg.jpg') center top/cover no-repeat; pointer-events: none; z-index: 0; }
 .bb-home-hero { padding: 2rem 1.5rem; color: white; text-align: center; position: relative; z-index: 1; }
 .bb-home-hero h1 { font-size: 1.5rem; margin-bottom: 0.5rem; font-weight: 600; }
 .bb-home-hero p { font-size: 0.875rem; opacity: 0.9; margin-bottom: 1.5rem; }
@@ -7463,11 +7463,15 @@ function renderServices() {
 .bb-form-row { display: flex; gap: 0.75rem; }
 .bb-form-input { width: 100%; padding: 0.75rem; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.875rem; font-family: inherit; }
 .bb-form-input:focus { outline: none; border-color: #0d9488; background-color: #f0fdfa; }
+.bb-form-input[type="number"] { -moz-appearance: textfield; }
+.bb-form-input[type="number"]::-webkit-outer-spin-button,
+.bb-form-input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: inner-spin-button; opacity: 1; height: 2rem; }
 .bb-btn { padding: 0.75rem; border: none; border-radius: 1rem; font-size: 0.9375rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
 .bb-btn-primary { background-color: #0d9488; color: white; width: 100%; }
 .bb-btn-primary:hover { background-color: #0f766e; }
 .bb-btn-back { background: none; border: none; cursor: pointer; font-size: 1.5rem; padding: 0.5rem; }
-.bb-family-fields { background-color: #f0fdfa; padding: 1rem; border-radius: 12px; border: 1px solid #99f6e4; margin-top: 0.75rem; }
+.bb-family-fields { background-color: #f0fdfa; padding: 1rem; border-radius: 12px; border: 1px solid #99f6e4; margin-top: 0.75rem; animation: bbFadeIn 0.3s ease; }
+@keyframes bbFadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 .bb-tab-nav { display: flex; border-bottom: 1px solid #e5e7eb; background-color: white; }
 .bb-tab-btn { flex: 1; padding: 0.625rem; background: none; border: none; cursor: pointer; font-size: 0.8125rem; color: #9ca3af; border-bottom: 2px solid transparent; }
 .bb-tab-btn.active { color: #0d9488; border-bottom-color: #0d9488; font-weight: 600; }
@@ -7552,9 +7556,18 @@ function renderServices() {
 <div class="bb-form-group">
 <label><input type="checkbox" id="bbWithFamily" onchange="bbToggleFamilyFields()"> С семьёй</label>
 <div id="bbFamilyFields" class="bb-family-fields" style="display:none;">
-<div class="bb-form-row">
-<div><label style="font-size:0.75rem;">Взрослые</label><input type="number" class="bb-form-input" id="bbAdultsCount" value="2" min="1" max="10"></div>
-<div><label style="font-size:0.75rem;">Дети</label><input type="number" class="bb-form-input" id="bbChildrenCount" value="0" min="0" max="10"></div>
+<div class="bb-form-row" style="gap:0.5rem;">
+<div style="flex:2.25;">
+<label style="font-size:0.75rem;margin-bottom:0.25rem;display:block;">Взрослые</label>
+<input type="number" class="bb-form-input" id="bbAdultsCount" value="2" min="1" max="10" style="text-align:center;">
+</div>
+<div style="display:flex;align-items:center;justify-content:center;flex-shrink:0;padding-top:1.25rem;">
+<span style="font-size:1.25rem;color:#9ca3af;">+</span>
+</div>
+<div style="flex:2.25;">
+<label style="font-size:0.75rem;margin-bottom:0.25rem;display:block;">Дети</label>
+<input type="number" class="bb-form-input" id="bbChildrenCount" value="0" min="0" max="10" style="text-align:center;">
+</div>
 </div>
 </div>
 </div>
