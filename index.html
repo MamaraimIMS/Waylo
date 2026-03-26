@@ -7442,20 +7442,22 @@ function renderServices() {
     bottom: 0;
     background: #f3f4f6;
     z-index: 9999;
-    overflow: hidden;
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
 }
 #budgetBuilderOverlay.active { display: block; }
-.bb-container { max-width: 400px; margin: 0 auto; background-color: white; min-height: 100vh; display: flex; flex-direction: column; }
+.bb-container { max-width: 400px; margin: 0 auto; background-color: white; min-height: 100%; }
 .bb-header { background-color: white; padding: 0.75rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e5e7eb; position: sticky; top: 0; z-index: 10; }
 .bb-header-title { font-size: 1rem; font-weight: 600; flex: 1; text-align: center; }
-.bb-page { display: none; flex: 1; overflow-y: auto; flex-direction: column; }
-.bb-page.active { display: flex; }
-.bb-page-1 { background: linear-gradient(135deg, #0d9488 0%, #06b6d4 100%); }
-.bb-home-hero { padding: 2rem 1.5rem; color: white; text-align: center; }
+.bb-page { display: none; }
+.bb-page.active { display: block; }
+.bb-page-1 { background: linear-gradient(135deg, #0d9488 0%, #06b6d4 100%); position: relative; min-height: 100vh; }
+.bb-page-1::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 60%; background: url('https://images.unsplash.com/photo-1596484552834-6a58f850e0a1?w=800&q=80') center bottom/cover no-repeat; opacity: 0.25; pointer-events: none; z-index: 0; }
+.bb-home-hero { padding: 2rem 1.5rem; color: white; text-align: center; position: relative; z-index: 1; }
 .bb-home-hero h1 { font-size: 1.5rem; margin-bottom: 0.5rem; font-weight: 600; }
 .bb-home-hero p { font-size: 0.875rem; opacity: 0.9; margin-bottom: 1.5rem; }
 .bb-waylo-badge { display: inline-flex; align-items: center; gap: 0.5rem; background-color: rgba(255,255,255,0.2); padding: 0.5rem 1rem; border-radius: 9999px; font-size: 0.75rem; margin-bottom: 1rem; color: white; }
-.bb-form-section { padding: 1.5rem; background-color: white; margin: 1rem; border-radius: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+.bb-form-section { padding: 1.5rem; background-color: white; margin: 1rem; border-radius: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); position: relative; z-index: 1; }
 .bb-form-group { margin-bottom: 1.25rem; }
 .bb-form-group label { display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem; color: #374151; }
 .bb-form-row { display: flex; gap: 0.75rem; }
@@ -7469,7 +7471,7 @@ function renderServices() {
 .bb-tab-nav { display: flex; border-bottom: 1px solid #e5e7eb; background-color: white; }
 .bb-tab-btn { flex: 1; padding: 0.625rem; background: none; border: none; cursor: pointer; font-size: 0.8125rem; color: #9ca3af; border-bottom: 2px solid transparent; }
 .bb-tab-btn.active { color: #0d9488; border-bottom-color: #0d9488; font-weight: 600; }
-.bb-tab-content { display: none; padding: 0.75rem; flex: 1; overflow-y: auto; }
+.bb-tab-content { display: none; padding: 0.75rem; padding-bottom: 1.5rem; flex: 1; overflow-y: visible; }
 .bb-tab-content.active { display: block; }
 .bb-ai-hint { background: linear-gradient(135deg, #f0fdfa 0%, #e0f2fe 100%); border: 1px solid #99f6e4; border-radius: 10px; padding: 0.5rem 0.75rem; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; font-size: 0.75rem; color: #0f766e; }
 .bb-modules-container { display: flex; flex-direction: column; gap: 0.5rem; }
@@ -7528,7 +7530,7 @@ function renderServices() {
 <div class="bb-page bb-page-1 active" id="bbPage1">
 <div class="bb-home-hero">
 <div class="bb-waylo-badge"><span>✓</span> Waylo AI</div>
-<h1>Build by best Budget</h1>
+<h1>Собери поездку в Узбекистан</h1>
 <p>AI подберёт самый выгодный вариант</p>
 </div>
 <div class="bb-form-section">
@@ -7558,7 +7560,7 @@ function renderServices() {
 </div>
 <button class="bb-btn bb-btn-primary" onclick="bbGoToPage(2)">Найти лучшую цену</button>
 </div>
-<div style="text-align:center;padding:1rem;">
+<div style="text-align:center;padding:1rem;padding-bottom:2rem;position:relative;z-index:1;">
 <button class="bb-btn" style="background:rgba(255,255,255,0.2);color:white;" onclick="closeBudgetBuilder()">← Вернуться</button>
 </div>
 </div>
@@ -7604,7 +7606,7 @@ function renderServices() {
 <div class="bb-tab-content" id="bb-details-tab">
 <div class="bb-ai-hint"><span>📋</span><span>Детали появятся после подтверждения</span></div>
 </div>
-<div style="padding:0.75rem;border-top:1px solid #e5e7eb;background:white;">
+<div style="padding:0.75rem;padding-bottom:2rem;border-top:1px solid #e5e7eb;background:white;">
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
 <span style="font-size:0.875rem;color:#374151;font-weight:700;">Итого:</span>
 <span style="font-size:1.125rem;font-weight:700;color:#0d9488;" id="bbTotalPrice">$1,600</span>
@@ -7623,7 +7625,7 @@ function renderServices() {
 <div class="bb-service-item"><div class="bb-service-header"><span class="bb-service-name">🎭 Экскурсии</span><span class="bb-service-price">$30</span></div><div class="bb-service-desc">3 достопримечательности</div></div>
 <div style="background:linear-gradient(135deg,#0d9488 0%,#06b6d4 100%);border-radius:1rem;padding:1rem;color:white;margin-top:1rem;"><div style="display:flex;justify-content:space-between;font-size:1.25rem;font-weight:700;"><span>ИТОГО:</span><span>$1,600</span></div></div>
 </div>
-<div style="padding:1rem;border-top:1px solid #e5e7eb;"><button class="bb-btn bb-btn-primary" onclick="bbGoToPage(4)">Оформить бронирование</button></div>
+<div style="padding:1rem;padding-bottom:2rem;border-top:1px solid #e5e7eb;"><button class="bb-btn bb-btn-primary" onclick="bbGoToPage(4)">Оформить бронирование</button></div>
 </div>
 
 <!-- PAGE 4 -->
@@ -7635,7 +7637,7 @@ function renderServices() {
 <div class="bb-booking-item"><div class="bb-booking-info"><div class="bb-booking-icon train">✈️</div><div><div style="font-weight:500;">Авиабилеты</div><div style="font-size:0.75rem;color:#6b7280;">Париж ↔ Самарканд</div></div></div><span style="font-weight:600;">$1,010</span></div>
 <div class="bb-booking-item"><div class="bb-booking-info"><div class="bb-booking-icon tour">🎭</div><div><div style="font-weight:500;">Экскурсии</div><div style="font-size:0.75rem;color:#6b7280;">3 достопримечательности</div></div></div><span style="font-weight:600;">$30</span></div>
 </div>
-<div style="padding:1rem;border-top:1px solid #e5e7eb;"><button class="bb-btn bb-btn-primary" onclick="closeBudgetBuilder()">Вернуться на главную</button></div>
+<div style="padding:1rem;padding-bottom:2rem;border-top:1px solid #e5e7eb;"><button class="bb-btn bb-btn-primary" onclick="closeBudgetBuilder()">Вернуться на главную</button></div>
 </div>
 </div>
 </div>
@@ -7655,4 +7657,4 @@ function bbGenerateAlternative(){bbAltCount++;var c=document.getElementById('bbA
 function bbApplyAlternative(){alert('✅ Вариант применён!');document.querySelector('[onclick*="bb-plan-tab"]').click();}
 </script>
 </body>
-</html>п
+</html>
