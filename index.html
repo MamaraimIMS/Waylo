@@ -824,40 +824,54 @@ html, body {
    ══════════════════════════════════════════════════════════════ */
 .detail-hero {
   position: relative;
-  height: 320px;
+  /* Фиксированный aspect-ratio 4:3 — единый crop для всех фото */
+  width: 100%;
+  aspect-ratio: 4 / 3;
   overflow: hidden;
   touch-action: pan-y;
+  background: #111;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
-/* Карусель */
+/* Карусель — NO transition здесь, управляем через JS */
 .carousel-track {
   display: flex;
   height: 100%;
-  transition: transform 0.30s cubic-bezier(0.4,0,0.2,1);
+  width: 100%;
   will-change: transform;
+  /* transition задаётся через JS только при snap */
 }
 .carousel-slide {
   min-width: 100%;
+  width: 100%;
   height: 100%;
   flex-shrink: 0;
+  overflow: hidden;
 }
 .carousel-slide img {
   width: 100%;
   height: 100%;
+  /* cover + center = автоматический crop по центру */
   object-fit: cover;
+  object-position: center center;
   display: block;
+  pointer-events: none;
+  /* Prevent image drag on desktop */
+  -webkit-user-drag: none;
 }
 
 /* Точки-индикаторы */
 .carousel-dots {
   position: absolute;
-  bottom: 16px;
+  bottom: 12px;
   left: 0;
   right: 0;
   display: flex;
   justify-content: center;
   gap: 6px;
   pointer-events: none;
+  z-index: 3;
 }
 .carousel-dot {
   width: 7px;
@@ -4284,56 +4298,98 @@ function buildCarousel(gallery) {
   carouselTo(0, false);
 }
 
-function carouselTo(idx, animate) {
+function carouselTo(idx, snap) {
   const gallery = window._gallery;
   if (!gallery) return;
   idx = Math.max(0, Math.min(idx, gallery.length - 1));
   window._galleryIdx = idx;
-
   const track = document.getElementById('carouselTrack');
-  if (track) {
-    track.style.transition = animate === false ? 'none' : 'transform 0.30s cubic-bezier(0.4,0,0.2,1)';
-    track.style.transform = `translateX(-${idx * 100}%)`;
+  if (!track) return;
+  // snap=false → мгновенно (начальная позиция), snap=undefined/true → анимация
+  if (snap === false) {
+    track.style.transition = 'none';
+  } else {
+    track.style.transition = 'transform 0.32s cubic-bezier(0.25,0.46,0.45,0.94)';
   }
+  track.style.transform = `translateX(-${idx * 100}%)`;
   document.querySelectorAll('#carouselDots .carousel-dot').forEach((d, i) => {
     d.classList.toggle('active', i === idx);
   });
 }
 
-// Свайп влево/вправо на hero
+// ── Живой свайп: трек двигается за пальцем, снапится на release ──────
 (function() {
-  let sx = 0, sy = 0, active = false;
+  let startX = 0, startY = 0, curX = 0;
+  let dragging = false, lockAxis = null;
+  const SNAP_THRESHOLD = 0.25; // 25% ширины → переключить слайд
+  const VELOCITY_THRESHOLD = 0.3; // px/ms → быстрый флик
+
+  function getTrack() { return document.getElementById('carouselTrack'); }
+  function getHero()  { return document.getElementById('detailHero'); }
 
   document.addEventListener('touchstart', e => {
-    const hero = document.getElementById('detailHero');
+    const hero = getHero();
     if (!hero || !hero.contains(e.target)) return;
-    sx = e.touches[0].clientX;
-    sy = e.touches[0].clientY;
-    active = true;
+    if (!(window._gallery && window._gallery.length > 1)) return;
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    curX   = startX;
+    dragging = true;
+    lockAxis = null;
+    const track = getTrack();
+    if (track) track.style.transition = 'none'; // убираем анимацию во время drag
   }, { passive: true });
 
   document.addEventListener('touchmove', e => {
-    if (!active) return;
-    const dx = Math.abs(e.touches[0].clientX - sx);
-    const dy = Math.abs(e.touches[0].clientY - sy);
-    if (dx > dy + 5) e.preventDefault(); // блокируем скролл при горизонтальном свайпе
+    if (!dragging) return;
+    const dx = e.touches[0].clientX - startX;
+    const dy = e.touches[0].clientY - startY;
+    curX = e.touches[0].clientX;
+
+    // Определяем ось один раз
+    if (!lockAxis) {
+      if (Math.abs(dx) > 6 || Math.abs(dy) > 6) {
+        lockAxis = Math.abs(dx) >= Math.abs(dy) ? 'x' : 'y';
+      }
+    }
+    if (lockAxis !== 'x') return;
+    e.preventDefault(); // блокируем вертикальный скролл
+
+    const gallery = window._gallery;
+    const idx = window._galleryIdx || 0;
+    const w = getHero().offsetWidth;
+
+    // Rubber-band на краях
+    let offset = dx;
+    if ((idx === 0 && dx > 0) || (idx === gallery.length - 1 && dx < 0)) {
+      offset = dx * 0.25; // сопротивление
+    }
+
+    const track = getTrack();
+    if (track) track.style.transform = `translateX(calc(-${idx * 100}% + ${offset}px))`;
   }, { passive: false });
 
   document.addEventListener('touchend', e => {
-    if (!active) return;
-    active = false;
-    const hero = document.getElementById('detailHero');
-    if (!hero || !hero.contains(e.target)) return;
-    const dx = e.changedTouches[0].clientX - sx;
-    const dy = e.changedTouches[0].clientY - sy;
-    if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.5) {
-      const g = window._gallery;
-      if (!g) return;
-      carouselTo(dx < 0
-        ? Math.min(window._galleryIdx + 1, g.length - 1)
-        : Math.max(window._galleryIdx - 1, 0)
-      );
-    }
+    if (!dragging) return;
+    dragging = false;
+    if (lockAxis !== 'x') return;
+
+    const gallery = window._gallery;
+    if (!gallery) return;
+    const idx   = window._galleryIdx || 0;
+    const w     = getHero().offsetWidth;
+    const dx    = curX - startX;
+    const dt    = e.timeStamp;
+    const velocity = Math.abs(dx) / Math.max(dt - e.changedTouches[0].force, 50);
+
+    const isFlick    = Math.abs(dx) > 20 && Math.abs(dx) / w > 0.05;
+    const isHalfway  = Math.abs(dx) / w > SNAP_THRESHOLD;
+
+    let next = idx;
+    if ((isFlick || isHalfway) && dx < 0 && idx < gallery.length - 1) next = idx + 1;
+    if ((isFlick || isHalfway) && dx > 0 && idx > 0)                  next = idx - 1;
+
+    carouselTo(next); // со snap-анимацией
   }, { passive: true });
 })();
 
