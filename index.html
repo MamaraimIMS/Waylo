@@ -825,12 +825,54 @@ html, body {
 .detail-hero {
   position: relative;
   height: 320px;
+  overflow: hidden;
+  touch-action: pan-y;
 }
 
-.detail-hero > img {
+/* Карусель */
+.carousel-track {
+  display: flex;
+  height: 100%;
+  transition: transform 0.30s cubic-bezier(0.4,0,0.2,1);
+  will-change: transform;
+}
+.carousel-slide {
+  min-width: 100%;
+  height: 100%;
+  flex-shrink: 0;
+}
+.carousel-slide img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
+}
+
+/* Точки-индикаторы */
+.carousel-dots {
+  position: absolute;
+  bottom: 16px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  pointer-events: none;
+}
+.carousel-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.45);
+  transition: background .2s, transform .2s;
+  pointer-events: auto;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+}
+.carousel-dot.active {
+  background: #fff;
+  transform: scale(1.35);
 }
 
 .detail-nav {
@@ -840,6 +882,7 @@ html, body {
   right: 16px;
   display: flex;
   justify-content: space-between;
+  z-index: 2;
 }
 
 .detail-btn {
@@ -873,28 +916,9 @@ html, body {
   font-weight: 600;
 }
 
-.detail-gallery {
-  position: absolute;
-  bottom: 20px;
-  right: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.detail-thumb {
-  width: 55px;
-  height: 55px;
-  border-radius: 10px;
-  border: 3px solid #fff;
-  overflow: hidden;
-}
-
-.detail-thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
+/* старый gallery-thumb — больше не используется */
+.detail-gallery { display: none; }
+.detail-thumb { display: none; }
 
 .detail-card {
   background: var(--bg);
@@ -3413,8 +3437,9 @@ setTimeout(()=>{
 
   <!-- DETAIL VIEW -->
   <div class="view" id="view-detail">
-    <div class="detail-hero">
-      <img id="detailImg" src="" alt="">
+    <div class="detail-hero" id="detailHero">
+      <div class="carousel-track" id="carouselTrack"></div>
+      <div class="carousel-dots" id="carouselDots"></div>
       <div class="detail-nav">
         <button class="detail-btn" onclick="switchView('home')">
           <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
@@ -3424,7 +3449,6 @@ setTimeout(()=>{
         </button>
       </div>
       <div class="detail-badge" id="detailBadge"></div>
-      <div class="detail-gallery" id="detailGallery"></div>
     </div>
     
     <div class="detail-card">
@@ -4153,9 +4177,18 @@ function openDetail(id, type) {
   const price = item.total_price || item.price_from || item.price_day || item.price || item.entry_price || item.avg_check || 0;
   const rating = item.rating || 4.5;
   const badge = item.badge_text || '';
-  const gallery = item.gallery || [item.image_url];
-  
-  document.getElementById('detailImg').src = item.image_url || gallery[0] || './hero.jpg';
+  // Парсим gallery — может прийти как JSON-строка или массив
+  let rawGallery = item.gallery;
+  if (typeof rawGallery === 'string') {
+    try { rawGallery = JSON.parse(rawGallery); } catch(e) { rawGallery = []; }
+  }
+  if (!Array.isArray(rawGallery) || rawGallery.length === 0) {
+    rawGallery = item.image_url ? [item.image_url] : [];
+  }
+  const gallery = [...new Set(rawGallery.filter(u => u && u.length > 5))];
+  if (gallery.length === 0) gallery.push('./hero.jpg');
+  window._gallery = gallery;
+  window._galleryIdx = 0;
   document.getElementById('detailTitle').textContent = title;
   document.getElementById('detailAddress').querySelector('span').textContent = city + (item.address ? ', ' + item.address : '');
   document.getElementById('detailBadge').textContent = badge;
@@ -4202,10 +4235,8 @@ function openDetail(id, type) {
   }
   document.getElementById('detailInfo').innerHTML = infoHtml;
   
-  // Gallery
-  document.getElementById('detailGallery').innerHTML = gallery.slice(0, 3).map(img => 
-    `<div class="detail-thumb"><img src="${img || './hero.jpg'}" alt=""></div>`
-  ).join('');
+  // Карусель
+  buildCarousel(gallery);
   
   // Price
   const priceLabel = type === 'hotel' ? '/night' : type === 'guide' ? '/day' : '';
@@ -4231,6 +4262,80 @@ function openDetail(id, type) {
   switchView('detail');
   document.getElementById('navbar').classList.add('hidden');
 }
+
+// ══════════════════════════════════════════════════════════════
+// CAROUSEL
+// ══════════════════════════════════════════════════════════════
+function buildCarousel(gallery) {
+  const track = document.getElementById('carouselTrack');
+  const dots  = document.getElementById('carouselDots');
+  if (!track) return;
+
+  track.innerHTML = gallery.map((url, i) =>
+    `<div class="carousel-slide"><img src="${url}" alt="" onerror="this.src='./hero.jpg'"></div>`
+  ).join('');
+
+  dots.innerHTML = gallery.length > 1
+    ? gallery.map((_, i) =>
+        `<button class="carousel-dot${i === 0 ? ' active' : ''}" onclick="carouselTo(${i})"></button>`
+      ).join('')
+    : '';
+
+  carouselTo(0, false);
+}
+
+function carouselTo(idx, animate) {
+  const gallery = window._gallery;
+  if (!gallery) return;
+  idx = Math.max(0, Math.min(idx, gallery.length - 1));
+  window._galleryIdx = idx;
+
+  const track = document.getElementById('carouselTrack');
+  if (track) {
+    track.style.transition = animate === false ? 'none' : 'transform 0.30s cubic-bezier(0.4,0,0.2,1)';
+    track.style.transform = `translateX(-${idx * 100}%)`;
+  }
+  document.querySelectorAll('#carouselDots .carousel-dot').forEach((d, i) => {
+    d.classList.toggle('active', i === idx);
+  });
+}
+
+// Свайп влево/вправо на hero
+(function() {
+  let sx = 0, sy = 0, active = false;
+
+  document.addEventListener('touchstart', e => {
+    const hero = document.getElementById('detailHero');
+    if (!hero || !hero.contains(e.target)) return;
+    sx = e.touches[0].clientX;
+    sy = e.touches[0].clientY;
+    active = true;
+  }, { passive: true });
+
+  document.addEventListener('touchmove', e => {
+    if (!active) return;
+    const dx = Math.abs(e.touches[0].clientX - sx);
+    const dy = Math.abs(e.touches[0].clientY - sy);
+    if (dx > dy + 5) e.preventDefault(); // блокируем скролл при горизонтальном свайпе
+  }, { passive: false });
+
+  document.addEventListener('touchend', e => {
+    if (!active) return;
+    active = false;
+    const hero = document.getElementById('detailHero');
+    if (!hero || !hero.contains(e.target)) return;
+    const dx = e.changedTouches[0].clientX - sx;
+    const dy = e.changedTouches[0].clientY - sy;
+    if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      const g = window._gallery;
+      if (!g) return;
+      carouselTo(dx < 0
+        ? Math.min(window._galleryIdx + 1, g.length - 1)
+        : Math.max(window._galleryIdx - 1, 0)
+      );
+    }
+  }, { passive: true });
+})();
 
 // Выбранный номер
 let selectedRoom = null;
