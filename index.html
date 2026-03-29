@@ -515,6 +515,12 @@ html, body {
   padding: 0 20px;
   margin-bottom: 16px;
 }
+.ai-tours-back {
+  width: 36px; height: 36px; border-radius: 12px;
+  background: #f1f5f9; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.ai-tours-back svg { width: 20px; height: 20px; stroke: #1e293b; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
 
 .ai-tours-title {
   font-size: 18px;
@@ -2988,6 +2994,12 @@ html, body {
         
         <!-- Контейнер для туров (появляется при нажатии Tours) -->
         <div class="hero-tours hidden" id="heroTours">
+          <div class="ai-tours-header">
+            <button class="ai-tours-back" onclick="backToHome()">
+              <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <span class="ai-tours-title">Top Tours</span>
+          </div>
           <div class="hero-tours-scroll" id="heroToursRow"></div>
         </div>
 
@@ -6408,12 +6420,34 @@ function switchView(v, pushHistory) {
 
 // Назад по стеку навигации
 function goBack() {
-  if (_navStack.length > 0) {
-    const prev = _navStack.pop();
-    switchView(prev, false);
+  const prev = _navStack.length > 0 ? _navStack.pop() : 'home';
+  if (prev === 'tours') {
+    // Активируем view-home (Top Tours живёт внутри него)
+    document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
+    const homeView = document.getElementById('view-home');
+    if (homeView) homeView.classList.add('active');
+    _currentView = 'tours';
+    showTopTours();
   } else {
-    switchView('home', false);
+    switchView(prev, false);
   }
+}
+
+// Из Top Tours → Главная
+function backToHome() {
+  _navStack.length = 0;
+  _currentView = 'home';
+  // Скрываем Tours, показываем главную
+  const heroTours = document.getElementById('heroTours');
+  if (heroTours) heroTours.classList.add('hidden');
+  const btn = document.getElementById('topToursBtn');
+  if (btn) { btn.style.display = ''; btn.style.opacity = '1'; btn.style.transform = ''; }
+  const greeting = document.getElementById('aiGreeting');
+  const prompt = document.getElementById('aiPrompt');
+  if (greeting) greeting.innerHTML = 'Hi! I am <span>Waylo</span>';
+  if (prompt) prompt.textContent = 'Your personal AI is a travel expert in Uzbekistan.';
+  document.getElementById('navbar').classList.remove('hidden');
+  switchView('home', false);
 }
 
 // Сброс главной страницы к начальному виду
@@ -6570,6 +6604,12 @@ let appStarted = false;
 
 function showTopTours() {
   appStarted = true;
+  // Пушим текущий view в стек чтобы Back вернул сюда
+  if (_currentView && _currentView !== 'tours') {
+    _navStack.push(_currentView);
+    if (_navStack.length > 20) _navStack.shift();
+  }
+  _currentView = 'tours';
   // Top Tours — скрываем navbar, есть кнопка Back
   document.getElementById('navbar').classList.add('hidden');
   
