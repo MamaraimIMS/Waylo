@@ -6466,9 +6466,10 @@ function resetHomeView() {
   const heroTours = document.getElementById('heroTours');
   if (heroTours) heroTours.classList.add('hidden');
   
-  // Скрываем чат
+  // Скрываем чат и восстанавливаем navbar
   const homeChat = document.getElementById('homeChat');
   if (homeChat) homeChat.classList.add('hidden');
+  document.getElementById('navbar').classList.remove('hidden');
   
   // Показываем подсказку "Нажмите"
   const tapHint = document.querySelector('.ai-globe-tap');
@@ -6718,11 +6719,9 @@ function showDemoTours(container) {
 }
 
 function activateAI() {
-  // Показываем navbar если ещё не показан
-  if (!appStarted) {
-    appStarted = true;
-    document.getElementById('navbar').classList.remove('hidden');
-  }
+  appStarted = true;
+  // Скрываем navbar — у Waylo AI чата свой интерфейс
+  document.getElementById('navbar').classList.add('hidden');
   
   // Скрываем кнопку Top Tours
   const btn = document.getElementById('topToursBtn');
