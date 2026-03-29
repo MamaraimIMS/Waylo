@@ -254,6 +254,7 @@ html, body {
   width: 100%;
   max-width: 340px;
   margin-top: 20px;
+  margin-bottom: calc(110px + var(--safe-bottom));
   transition: all 0.3s ease;
 }
 
@@ -2397,7 +2398,7 @@ html, body {
 .ai-modal {
   position: fixed;
   inset: 0;
-  z-index: 200;
+  z-index: 500;
   background: var(--bg);
   display: flex;
   flex-direction: column;
@@ -2657,9 +2658,10 @@ html, body {
   align-items: center;
   gap: 10px;
   padding: 12px 20px;
-  padding-bottom: calc(12px + var(--safe-bottom));
+  padding-bottom: calc(16px + var(--safe-bottom));
   background: var(--bg);
   border-top: 1px solid #f1f5f9;
+  flex-shrink: 0;
 }
 
 .ai-voice-btn {
@@ -6759,9 +6761,15 @@ function activateAI() {
     const homeChat = document.getElementById('homeChat');
     if (homeChat) {
       homeChat.classList.remove('hidden');
+      // Скроллим view-home вниз чтобы input был виден над navbar
+      const homeView = document.getElementById('view-home');
+      if (homeView) {
+        setTimeout(() => {
+          homeView.scrollTo({ top: homeView.scrollHeight, behavior: 'smooth' });
+        }, 100);
+      }
       document.getElementById('homeChatInput')?.focus();
     }
-    // Глобус остаётся в режиме processing пока чат открыт
   }, 500);
 }
 
@@ -6825,7 +6833,9 @@ async function sendHomeChatMessage() {
 }
 
 function openAI() {
-  document.getElementById('aiModal').classList.add('open');
+  const modal = document.getElementById('aiModal');
+  modal.classList.add('open');
+  // Скрываем navbar и блокируем скролл
   document.getElementById('navbar').classList.add('hidden');
   document.body.style.overflow = 'hidden';
   setGlobeState('processing');
