@@ -3696,6 +3696,10 @@ setTimeout(()=>{
   <div class="view" id="view-catalogue">
     <div class="cat-header">
       <div class="cat-header-top">
+        <button onclick="goBack()" style="background:none;border:none;cursor:pointer;padding:4px 8px 4px 0;display:flex;align-items:center;gap:6px;color:var(--teal);font-size:14px;font-weight:600">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+          Back
+        </button>
         <span class="cat-title">Catalogue</span>
         <span class="cat-count" id="catCount">0 items</span>
       </div>
@@ -6370,8 +6374,12 @@ function switchView(v, pushHistory) {
   const n = document.querySelector(`[data-view="${v}"]`);
   if (n) n.classList.add('active');
 
-  if (v !== 'detail') {
-    document.getElementById('navbar').classList.remove('hidden');
+  // navbar: скрываем на detail и catalogue (у catalogue свой хедер)
+  const navbar = document.getElementById('navbar');
+  if (v === 'detail' || v === 'catalogue') {
+    navbar.classList.add('hidden');
+  } else {
+    navbar.classList.remove('hidden');
   }
 
   if (v === 'home') { resetHomeView(); }
@@ -7497,6 +7505,14 @@ function filterCatalogue() {
 
 function renderCatalogueGrid() {
   const grid = document.getElementById('catGrid');
+  // Если данные ещё не загружены — показываем индикатор загрузки
+  const totalLoaded = Object.values(data||{}).reduce((s,a) => s + (Array.isArray(a)?a.length:0), 0);
+  if (!totalLoaded) {
+    grid.innerHTML = `<div class="cat-empty"><div class="cat-empty-icon">⏳</div><p>Loading...</p></div>`;
+    // Повторить через 500ms когда данные придут
+    setTimeout(renderCatalogueGrid, 500);
+    return;
+  }
   let items = getAllCatItems();
 
   if (catCurrentTab !== 'all') {
@@ -7505,7 +7521,7 @@ function renderCatalogueGrid() {
 
   if (catSearchQuery) {
     items = items.filter(x =>
-      (x.name||'').toLowerCase().includes(catSearchQuery) ||
+      (x.display_title||x.name||'').toLowerCase().includes(catSearchQuery) ||
       (x.city||'').toLowerCase().includes(catSearchQuery) ||
       (x.cuisine||'').toLowerCase().includes(catSearchQuery) ||
       (x.type||'').toLowerCase().includes(catSearchQuery)
@@ -7530,7 +7546,7 @@ function renderCatalogueGrid() {
       <div class="cat-card-img-placeholder" style="display:none">${CAT_EMOJI[item._type]||'📌'}</div>
       <div class="cat-card-body">
         <div class="cat-card-category" style="color:${meta.color}">${meta.label}</div>
-        <div class="cat-card-name">${item.name}</div>
+        <div class="cat-card-name">${item.display_title || item.name || ""}</div>
         <div class="cat-card-sub">${sub}</div>
         <div class="cat-card-footer">
           <span class="cat-card-price">${price}</span>
