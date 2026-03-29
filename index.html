@@ -4350,6 +4350,22 @@ function buildCarousel(gallery) {
     : '';
 
   carouselTo(0, false);
+  startCarouselAutoplay(gallery.length);
+}
+
+// Автослайд каждые 2 сек
+let _carouselTimer = null;
+function startCarouselAutoplay(total) {
+  if (_carouselTimer) clearInterval(_carouselTimer);
+  if (!total || total <= 1) return;
+  _carouselTimer = setInterval(() => {
+    const idx = (window._galleryIdx || 0);
+    carouselTo((idx + 1) % total);
+  }, 2000);
+}
+
+function stopCarouselAutoplay() {
+  if (_carouselTimer) { clearInterval(_carouselTimer); _carouselTimer = null; }
 }
 
 function carouselTo(idx, snap) {
@@ -4390,8 +4406,9 @@ function carouselTo(idx, snap) {
     curX   = startX;
     dragging = true;
     lockAxis = null;
+    stopCarouselAutoplay(); // пауза при ручном свайпе
     const track = getTrack();
-    if (track) track.style.transition = 'none'; // убираем анимацию во время drag
+    if (track) track.style.transition = 'none';
   }, { passive: true });
 
   document.addEventListener('touchmove', e => {
@@ -4444,6 +4461,10 @@ function carouselTo(idx, snap) {
     if ((isFlick || isHalfway) && dx > 0 && idx > 0)                  next = idx - 1;
 
     carouselTo(next); // со snap-анимацией
+    // Перезапускаем автослайд после ручного свайпа
+    if (window._gallery && window._gallery.length > 1) {
+      startCarouselAutoplay(window._gallery.length);
+    }
   }, { passive: true });
 })();
 
@@ -6456,6 +6477,7 @@ function switchView(v, pushHistory) {
 
 // Назад по стеку навигации
 function goBack() {
+  stopCarouselAutoplay(); // останавливаем слайдер при выходе
   const prev = _navStack.length > 0 ? _navStack.pop() : 'home';
   if (prev === 'tours') {
     // Активируем view-home (Top Tours живёт внутри него)
