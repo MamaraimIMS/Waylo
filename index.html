@@ -2862,6 +2862,12 @@ html, body {
   display: flex; align-items: center; justify-content: space-between;
   margin-bottom: 14px;
 }
+.cat-back-btn {
+  width: 36px; height: 36px; border-radius: 12px;
+  background: #f1f5f9; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.cat-back-btn svg { width: 20px; height: 20px; stroke: var(--text); stroke-width: 2; fill: none; }
 .cat-title { font-size: 22px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; }
 .cat-count { font-size: 13px; color: var(--text-muted); font-weight: 500; }
 .cat-search {
@@ -3696,9 +3702,8 @@ setTimeout(()=>{
   <div class="view" id="view-catalogue">
     <div class="cat-header">
       <div class="cat-header-top">
-        <button onclick="goBack()" style="background:none;border:none;cursor:pointer;padding:4px 8px 4px 0;display:flex;align-items:center;gap:6px;color:var(--teal);font-size:14px;font-weight:600">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
-          Back
+        <button class="cat-back-btn" onclick="goBack()">
+          <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
         </button>
         <span class="cat-title">Catalogue</span>
         <span class="cat-count" id="catCount">0 items</span>
@@ -3732,7 +3737,7 @@ setTimeout(()=>{
 
 <!-- NAVBAR -->
 <nav class="navbar hidden" id="navbar">
-  <div class="nav-item active" data-view="home" onclick="_navStack.length=0; switchView('home')">
+  <div class="nav-item active" data-view="home" onclick="switchView('home','clear')">
     <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
     <span>Home</span>
   </div>
@@ -3744,11 +3749,11 @@ setTimeout(()=>{
     <svg viewBox="0 0 24 24"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
     <span>Waylo AI</span>
   </div>
-  <div class="nav-item" data-view="profile" onclick="_navStack.length=0; switchView('profile')">
+  <div class="nav-item" data-view="profile" onclick="switchView('profile','clear')">
     <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
     <span>Profile</span>
   </div>
-  <div class="nav-item" data-view="catalogue" onclick="_navStack.length=0; switchView('catalogue')">
+  <div class="nav-item" data-view="catalogue" onclick="switchView('catalogue','clear')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
     <span>Catalogue</span>
   </div>
@@ -3973,13 +3978,21 @@ let currentType = null;
 async function api(table, query = '') {
   try {
     const r = await fetch(`${CONFIG.SUPABASE_URL}/rest/v1/${table}${query}`, {
-      headers: { 
-        'apikey': CONFIG.SUPABASE_KEY, 
-        'Authorization': `Bearer ${CONFIG.SUPABASE_KEY}` 
+      headers: {
+        'apikey': CONFIG.SUPABASE_KEY,
+        'Authorization': `Bearer ${CONFIG.SUPABASE_KEY}`,
+        'Content-Type': 'application/json'
       }
     });
-    return r.ok ? await r.json() : [];
-  } catch { return []; }
+    if (!r.ok) {
+      console.warn(`[api] ${table} → ${r.status}`, await r.text().catch(()=>''));
+      return [];
+    }
+    return await r.json();
+  } catch(e) {
+    console.warn(`[api] ${table} fetch error:`, e.message);
+    return [];
+  }
 }
 
 async function post(table, body) {
@@ -4002,27 +4015,34 @@ async function post(table, body) {
 // LOAD DATA — from Admin Panel tables
 // ══════════════════════════════════════════════════════════════
 async function loadData() {
-  const [
-    top_tours, 
-    top_destinations, 
-    hotels, 
-    sights, 
-    guides, 
-    transfers, 
-    restaurants
-  ] = await Promise.all([
-    api('top_tours', '?approved=eq.true&order=created_at.desc'),
-    api('top_destinations', '?approved=eq.true&order=created_at.desc'),
-    api('hotels', '?active=eq.true&order=rating.desc'),
-    api('sights', '?active=eq.true&order=rating.desc'),
-    api('guides', '?active=eq.true&order=rating.desc'),
-    api('transfers', '?active=eq.true&order=price.asc'),
-    api('restaurants', '?active=eq.true&order=rating.desc')
-  ]);
-  
-  data = { top_tours, top_destinations, hotels, sights, guides, transfers, restaurants };
-  render();
-  loadProfile();
+  try {
+    const [
+      top_tours,
+      top_destinations,
+      hotels,
+      sights,
+      guides,
+      transfers,
+      restaurants
+    ] = await Promise.all([
+      api('top_tours',       '?order=created_at.desc'),
+      api('top_destinations','?order=created_at.desc'),
+      api('hotels',          '?order=created_at.desc'),
+      api('sights',          '?order=created_at.desc'),
+      api('guides',          '?order=created_at.desc'),
+      api('transfers',       '?order=created_at.desc'),
+      api('restaurants',     '?order=created_at.desc')
+    ]);
+
+    data = { top_tours, top_destinations, hotels, sights, guides, transfers, restaurants };
+    render();
+    loadProfile();
+    // Обновляем каталог после загрузки данных
+    renderCatalogueGrid();
+
+  } catch(e) {
+    console.error('[loadData] error:', e);
+  }
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -6354,6 +6374,9 @@ function startApp() {
   document.getElementById('app').classList.add('active');
   document.getElementById('navbar').classList.remove('hidden');
   loadData();
+  // Сбрасываем стек при старте
+  _navStack.length = 0;
+  _currentView = 'home';
 }
 
 // Стек навигации — запоминаем откуда пришли
@@ -6361,8 +6384,11 @@ const _navStack = [];
 let _currentView = 'home';
 
 function switchView(v, pushHistory) {
-  // pushHistory=false используется при goBack() чтобы не дублировать стек
-  if (pushHistory !== false && _currentView && _currentView !== v) {
+  // pushHistory=false → goBack (не пушим)
+  // pushHistory='clear' → прямой тап на navbar (сбрасываем стек)
+  if (pushHistory === 'clear') {
+    _navStack.length = 0;
+  } else if (pushHistory !== false && _currentView && _currentView !== v) {
     _navStack.push(_currentView);
     if (_navStack.length > 20) _navStack.shift();
   }
@@ -7505,14 +7531,6 @@ function filterCatalogue() {
 
 function renderCatalogueGrid() {
   const grid = document.getElementById('catGrid');
-  // Если данные ещё не загружены — показываем индикатор загрузки
-  const totalLoaded = Object.values(data||{}).reduce((s,a) => s + (Array.isArray(a)?a.length:0), 0);
-  if (!totalLoaded) {
-    grid.innerHTML = `<div class="cat-empty"><div class="cat-empty-icon">⏳</div><p>Loading...</p></div>`;
-    // Повторить через 500ms когда данные придут
-    setTimeout(renderCatalogueGrid, 500);
-    return;
-  }
   let items = getAllCatItems();
 
   if (catCurrentTab !== 'all') {
