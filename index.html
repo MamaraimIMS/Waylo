@@ -3455,7 +3455,7 @@ setTimeout(()=>{
       <div class="carousel-track" id="carouselTrack"></div>
       <div class="carousel-dots" id="carouselDots"></div>
       <div class="detail-nav">
-        <button class="detail-btn" onclick="switchView('home')">
+        <button class="detail-btn" onclick="goBack()">
           <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
         </button>
         <button class="detail-btn">
@@ -3511,7 +3511,7 @@ setTimeout(()=>{
   <!-- PROFILE VIEW -->
   <div class="view" id="view-profile">
     <header class="profile-head">
-      <button class="profile-back" onclick="switchView('home')">
+      <button class="profile-back" onclick="goBack()">
         <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
       </button>
       <span class="profile-title">Profile</span>
@@ -3728,7 +3728,7 @@ setTimeout(()=>{
 
 <!-- NAVBAR -->
 <nav class="navbar hidden" id="navbar">
-  <div class="nav-item active" data-view="home" onclick="switchView('home')">
+  <div class="nav-item active" data-view="home" onclick="_navStack.length=0; switchView('home')">
     <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
     <span>Home</span>
   </div>
@@ -3740,11 +3740,11 @@ setTimeout(()=>{
     <svg viewBox="0 0 24 24"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
     <span>Waylo AI</span>
   </div>
-  <div class="nav-item" data-view="profile" onclick="switchView('profile')">
+  <div class="nav-item" data-view="profile" onclick="_navStack.length=0; switchView('profile')">
     <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
     <span>Profile</span>
   </div>
-  <div class="nav-item" data-view="catalogue" onclick="switchView('catalogue')">
+  <div class="nav-item" data-view="catalogue" onclick="_navStack.length=0; switchView('catalogue')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
     <span>Catalogue</span>
   </div>
@@ -6352,28 +6352,41 @@ function startApp() {
   loadData();
 }
 
-function switchView(v) {
+// Стек навигации — запоминаем откуда пришли
+const _navStack = [];
+let _currentView = 'home';
+
+function switchView(v, pushHistory) {
+  // pushHistory=false используется при goBack() чтобы не дублировать стек
+  if (pushHistory !== false && _currentView && _currentView !== v) {
+    _navStack.push(_currentView);
+    if (_navStack.length > 20) _navStack.shift();
+  }
+  _currentView = v;
+
   document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
   document.getElementById(`view-${v}`).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
   const n = document.querySelector(`[data-view="${v}"]`);
   if (n) n.classList.add('active');
-  
+
   if (v !== 'detail') {
     document.getElementById('navbar').classList.remove('hidden');
   }
-  
-  // При переходе на главную — сбросить к начальному виду
-  if (v === 'home') {
-    resetHomeView();
-  }
-  
+
+  if (v === 'home') { resetHomeView(); }
   if (v === 'services') { renderServices(); }
   if (v === 'catalogue') { renderCatalogue(); }
+  if (v === 'profile') { renderBookingsHistory(); }
+}
 
-  // При переходе на профиль — показать историю заявок
-  if (v === 'profile') {
-    renderBookingsHistory();
+// Назад по стеку навигации
+function goBack() {
+  if (_navStack.length > 0) {
+    const prev = _navStack.pop();
+    switchView(prev, false);
+  } else {
+    switchView('home', false);
   }
 }
 
