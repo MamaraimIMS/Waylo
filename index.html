@@ -2970,7 +2970,10 @@ html, body {
 <!-- ONBOARDING -->
 <div class="onboarding" id="onboarding">
   <div class="onboarding-image">
-    <video id="introVideo" src="./Intro.mp4" autoplay muted loop playsinline poster="./hero.jpg"></video>
+    <video id="introVideo" autoplay muted loop playsinline preload="auto"
+  style="width:100%;height:100%;object-fit:cover;display:block">
+  <source src="./Intro.mp4" type="video/mp4">
+</video>
   </div>
   <div class="onboarding-content">
     <h1 class="onboarding-title">Explore<br>Uzbekistan<br>with Waylo</h1>
@@ -8008,14 +8011,34 @@ function bbApplyAlternative(){alert('✅ Вариант применён!');docu
     const v = document.getElementById('introVideo');
     if (!v) return;
     v.muted = true;
+    v.volume = 0;
     v.loop = true;
-    const p = v.play();
-    if (p !== undefined) p.catch(() => {});
+    v.setAttribute('muted', '');
+    v.setAttribute('playsinline', '');
+    v.setAttribute('webkit-playsinline', '');
+    try { v.play().catch(function(){}); } catch(e) {}
   }
-  document.addEventListener('DOMContentLoaded', forcePlay);
-  document.addEventListener('touchstart', forcePlay, { once: true });
-  document.addEventListener('click', forcePlay, { once: true });
+  // Запускаем сразу и несколько раз подряд
+  forcePlay();
+  setTimeout(forcePlay, 100);
   setTimeout(forcePlay, 500);
+  setTimeout(forcePlay, 1000);
+  document.addEventListener('DOMContentLoaded', forcePlay);
+  // Telegram WebView срабатывает на visibilitychange
+  document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) forcePlay();
+  });
+  // Если видео остановилось — перезапускаем
+  document.addEventListener('DOMContentLoaded', function() {
+    var v = document.getElementById('introVideo');
+    if (!v) return;
+    v.addEventListener('pause', function() {
+      setTimeout(forcePlay, 200);
+    });
+    v.addEventListener('ended', forcePlay);
+    v.addEventListener('loadeddata', forcePlay);
+    v.addEventListener('canplay', forcePlay);
+  });
 })();
 </script>
 </body>
