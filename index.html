@@ -257,6 +257,31 @@ html, body {
   margin-bottom: calc(110px + var(--safe-bottom));
   transition: all 0.3s ease;
 }
+.home-chat-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  background: rgba(0,0,0,0.05);
+  border-radius: 16px 16px 0 0;
+  margin-bottom: -1px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+}
+.home-chat-back {
+  width: 30px; height: 30px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.8);
+  border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.home-chat-back svg {
+  width: 18px; height: 18px;
+  stroke: #1e293b; stroke-width: 2.5; fill: none;
+  stroke-linecap: round; stroke-linejoin: round;
+}
 
 .home-chat.hidden {
   opacity: 0;
@@ -2457,7 +2482,7 @@ html, body {
   color: rgba(255,255,255,0.8);
 }
 
-.ai-close {
+.ai-close, .ai-back {
   width: 40px;
   height: 40px;
   background: rgba(255,255,255,0.2);
@@ -2467,9 +2492,10 @@ html, body {
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  flex-shrink: 0;
 }
 
-.ai-close svg {
+.ai-close svg, .ai-back svg {
   width: 20px;
   height: 20px;
   stroke: #fff;
@@ -2978,6 +3004,12 @@ html, body {
         
         <!-- Встроенный чат на главной -->
         <div class="home-chat hidden" id="homeChat">
+          <div class="home-chat-header">
+            <button class="home-chat-back" onclick="closeHomeChat()">
+              <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <span>Waylo AI</span>
+          </div>
           <div class="home-chat-messages" id="homeChatMessages"></div>
           <div class="home-chat-input">
             <input type="text" id="homeChatInput" placeholder="Спросите что-нибудь..." onkeypress="handleHomeChatKey(event)">
@@ -3874,6 +3906,9 @@ setTimeout(()=>{
 <!-- AI CHAT MODAL -->
 <div class="ai-modal" id="aiModal">
   <div class="ai-header">
+    <button class="ai-back" onclick="closeAI()">
+      <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
     <div class="ai-header-info">
       <div class="ai-avatar">
         <svg viewBox="0 0 24 24"><path d="M12 3l1.5 3.5L17 8l-3.5 1.5L12 13l-1.5-3.5L7 8l3.5-1.5L12 3z"/><path d="M19 10l1 2 2 1-2 1-1 2-1-2-2-1 2-1 1-2z"/><path d="M5 14l1 2 2 1-2 1-1 2-1-2-2-1 2-1 1-2z"/></svg>
@@ -3883,9 +3918,7 @@ setTimeout(()=>{
         <div class="ai-status">● Online</div>
       </div>
     </div>
-    <button class="ai-close" onclick="closeAI()">
-      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
+    <div style="width:40px"></div>
   </div>
   
   <div class="ai-messages" id="aiMessages">
@@ -6834,6 +6867,24 @@ async function sendHomeChatMessage() {
   }
   
   messages.scrollTop = messages.scrollHeight;
+}
+
+function closeHomeChat() {
+  // Скрываем инлайн-чат и возвращаем главную
+  const homeChat = document.getElementById('homeChat');
+  if (homeChat) homeChat.classList.add('hidden');
+  // Восстанавливаем navbar
+  document.getElementById('navbar').classList.remove('hidden');
+  // Возвращаем исходный вид глобуса
+  if (window.AIGlobe) window.AIGlobe.setState('idle');
+  // Восстанавливаем текст
+  const greeting = document.getElementById('aiGreeting');
+  const prompt = document.getElementById('aiPrompt');
+  const tapHint = document.querySelector('.ai-globe-tap');
+  if (greeting) greeting.innerHTML = 'Hi! I am <span>Waylo</span>';
+  if (prompt) prompt.textContent = 'Your personal AI is a travel expert in Uzbekistan.';
+  if (tapHint) tapHint.style.display = '';
+  _currentView = 'home';
 }
 
 function openAI() {
