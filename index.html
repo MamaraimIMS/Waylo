@@ -4281,7 +4281,6 @@ function openDetail(id, type) {
   }
   
   switchView('detail');
-  document.getElementById('navbar').classList.add('hidden');
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -6383,9 +6382,9 @@ function switchView(v, pushHistory) {
   const n = document.querySelector(`[data-view="${v}"]`);
   if (n) n.classList.add('active');
 
-  // navbar: скрываем на detail и catalogue (у catalogue свой хедер)
+  // navbar: скрываем на detail, profile, catalogue — у них свой header/back
   const navbar = document.getElementById('navbar');
-  if (v === 'detail' || v === 'catalogue') {
+  if (v === 'detail' || v === 'profile' || v === 'catalogue') {
     navbar.classList.add('hidden');
   } else {
     navbar.classList.remove('hidden');
@@ -6570,11 +6569,9 @@ const aiGreetings = [
 let appStarted = false;
 
 function showTopTours() {
-  // Показываем navbar если ещё не показан
-  if (!appStarted) {
-    appStarted = true;
-    document.getElementById('navbar').classList.remove('hidden');
-  }
+  appStarted = true;
+  // Top Tours — скрываем navbar, есть кнопка Back
+  document.getElementById('navbar').classList.add('hidden');
   
   // Скрываем кнопку Top Tours
   const btn = document.getElementById('topToursBtn');
