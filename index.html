@@ -6805,6 +6805,8 @@ async function sendHomeChatMessage() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        action: 'chat',
+        user_id: tg?.initDataUnsafe?.user?.id || 'anonymous',
         message: text,
         context: context,
         user: tg?.initDataUnsafe?.user || null
@@ -6816,7 +6818,10 @@ async function sendHomeChatMessage() {
     
     if (response.ok) {
       const result = await response.json();
-      messages.innerHTML += `<div class="home-chat-msg bot">${result.reply || 'Извините, не могу ответить сейчас.'}</div>`;
+      const reply = result.reply || result.message || result.text
+        || (Array.isArray(result) && result[0]?.reply)
+        || 'Я здесь, чтобы помочь! Задайте вопрос о турах, отелях или достопримечательностях Узбекистана.';
+      messages.innerHTML += `<div class="home-chat-msg bot">${reply}</div>`;
     } else {
       const result = getLocalReply(text);
       messages.innerHTML += `<div class="home-chat-msg bot">${result.reply}</div>`;
@@ -6939,6 +6944,8 @@ async function sendAIMessage() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        action: 'chat',
+        user_id: tg?.initDataUnsafe?.user?.id || 'anonymous',
         message: text,
         context: context,
         user: tg?.initDataUnsafe?.user || null
@@ -6946,28 +6953,26 @@ async function sendAIMessage() {
     });
     
     document.getElementById('typing')?.remove();
-    
-    // Возвращаем глобус в режим ожидания
     if (window.AIGlobe) window.AIGlobe.setState('idle');
     
     if (response.ok) {
-      const result = await response.json();
-      renderAIResponse(result);
+      const rawResult = await response.json();
+      // Нормализуем ответ: n8n может вернуть {reply}, {message}, {text} или массив
+      const result = Array.isArray(rawResult) ? rawResult[0] : rawResult;
+      const normalized = {
+        reply: result.reply || result.message || result.text || result.output || '',
+        cards: result.cards || [],
+        suggestions: result.suggestions || []
+      };
+      renderAIResponse(normalized);
     } else {
-      // Fallback на локальные ответы
-      const result = getLocalReply(text);
-      renderAIResponse(result);
+      renderAIResponse(getLocalReply(text));
     }
     
   } catch (err) {
     document.getElementById('typing')?.remove();
-    
-    // Возвращаем глобус в режим ожидания
     if (window.AIGlobe) window.AIGlobe.setState('idle');
-    
-    // Fallback на локальные ответы
-    const result = getLocalReply(text);
-    renderAIResponse(result);
+    renderAIResponse(getLocalReply(text));
   }
 }
 
@@ -7206,7 +7211,12 @@ function getLocalReply(text) {
 }
 
 function buildContext() {
-  let ctx = 'ДОСТУПНЫЕ ДАННЫЕ:\n\n';
+  let ctx = `Ты AI-ассистент Waylo. Помогай планировать путешествия в Узбекистан.
+Отвечай на русском, будь конкретным, предлагай варианты из данных ниже.
+
+ДОСТУПНЫЕ ДАННЫЕ:
+
+`;
   
   if (data.top_tours.length) {
     ctx += 'ТУРЫ:\n' + data.top_tours.map(t => 
