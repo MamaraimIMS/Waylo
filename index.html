@@ -248,6 +248,20 @@ html, body {
   line-height: 1.6;
   color: #94a3b8;
   transition: opacity 0.3s ease;
+  min-height: 1.6em;
+}
+.tw-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: #14b8a6;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  animation: tw-blink 0.7s step-end infinite;
+}
+@keyframes tw-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
 }
 
 /* Home Chat (встроенный чат на главной) */
@@ -3003,7 +3017,7 @@ html, body {
         
         <div class="ai-intro">
           <h1 class="ai-intro-title" id="aiGreeting">Hi! I am <span>Waylo</span></h1>
-          <p class="ai-intro-text" id="aiPrompt">Your personal AI is a travel expert in Uzbekistan.</p>
+          <p class="ai-intro-text" id="aiPrompt"></p>
         </div>
         
         <!-- Встроенный чат на главной -->
@@ -6428,9 +6442,61 @@ function startApp() {
   document.getElementById('app').classList.add('active');
   document.getElementById('navbar').classList.remove('hidden');
   loadData();
-  // Сбрасываем стек при старте
   _navStack.length = 0;
   _currentView = 'home';
+  startTypewriter();
+}
+
+// ── TYPEWRITER ─────────────────────────────────────────────────────────
+const TW_MESSAGES = [
+  'Давай создадим путешествие под твой бюджет',
+  'Лучший тур для тебя и твоей семьи',
+  'Найду идеальный отель в Узбекистане',
+  'Самарканд, Бухара или Хива — выбирай!',
+  'Спланирую маршрут за несколько секунд',
+  'Твой персональный AI travel-ассистент'
+];
+
+let _twTimer = null;
+let _twIdx = 0;
+
+function startTypewriter() {
+  const el = document.getElementById('aiPrompt');
+  if (!el) return;
+  if (_twTimer) clearTimeout(_twTimer);
+  _twIdx = 0;
+  typeNextMessage(el);
+}
+
+function stopTypewriter() {
+  if (_twTimer) { clearTimeout(_twTimer); _twTimer = null; }
+  const el = document.getElementById('aiPrompt');
+  if (el) el.innerHTML = '';
+}
+
+function typeNextMessage(el) {
+  const text = TW_MESSAGES[_twIdx % TW_MESSAGES.length];
+  let i = 0;
+  el.innerHTML = '<span class="tw-cursor"></span>';
+
+  function typeChar() {
+    if (i <= text.length) {
+      el.innerHTML = text.slice(0, i) + '<span class="tw-cursor"></span>';
+      i++;
+      _twTimer = setTimeout(typeChar, 45);
+    } else {
+      // Текст набран — пауза 2 сек, затем стираем
+      _twTimer = setTimeout(() => eraseMessage(el, text), 2000);
+    }
+  }
+  typeChar();
+}
+
+function eraseMessage(el, text) {
+  // Мгновенно очищаем текст
+  el.innerHTML = '<span class="tw-cursor"></span>';
+  _twIdx++;
+  _twTimer = setTimeout(() => typeNextMessage(el), 300);
 }
 
 // Стек навигации — запоминаем откуда пришли
@@ -6462,7 +6528,8 @@ function switchView(v, pushHistory) {
     navbar.classList.remove('hidden');
   }
 
-  if (v === 'home') { resetHomeView(); }
+  if (v === 'home') { resetHomeView(); startTypewriter(); }
+  else { stopTypewriter(); }
   if (v === 'services') { renderServices(); }
   if (v === 'catalogue') {
     const hasData = Object.values(data).some(a => Array.isArray(a) && a.length > 0);
