@@ -264,6 +264,27 @@ html, body {
   50% { opacity: 0; }
 }
 
+/* ── SKELETON LOADER ────────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s infinite linear;
+  border-radius: 10px;
+}
+.skeleton-card {
+  background: #fff;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 2px 14px rgba(0,0,0,0.07);
+}
+.skeleton-img  { height: 130px; }
+.skeleton-line { height: 14px; margin: 10px 12px 6px; }
+.skeleton-line.short { width: 60%; height: 12px; margin-bottom: 12px; }
+
 /* Home Chat (встроенный чат на главной) */
 .home-chat {
   width: 100%;
@@ -3771,10 +3792,10 @@ setTimeout(()=>{
     </div>
     <div class="cat-body">
       <div class="cat-grid" id="catGrid">
-        <div class="cat-empty">
-          <div class="cat-empty-icon">📋</div>
-          <p>Loading catalogue...</p>
-        </div>
+        <div class="skeleton-card"><div class="skeleton skeleton-img"></div><div class="skeleton skeleton-line"></div><div class="skeleton skeleton-line short"></div></div>
+        <div class="skeleton-card"><div class="skeleton skeleton-img"></div><div class="skeleton skeleton-line"></div><div class="skeleton skeleton-line short"></div></div>
+        <div class="skeleton-card"><div class="skeleton skeleton-img"></div><div class="skeleton skeleton-line"></div><div class="skeleton skeleton-line short"></div></div>
+        <div class="skeleton-card"><div class="skeleton skeleton-img"></div><div class="skeleton skeleton-line"></div><div class="skeleton skeleton-line short"></div></div>
       </div>
     </div>
   </div>
@@ -4060,32 +4081,82 @@ async function post(table, body) {
 }
 
 // ══════════════════════════════════════════════════════════════
-// LOAD DATA — from Admin Panel tables
+// LOAD DATA — оптимизировано: кэш + select + лимит
 // ══════════════════════════════════════════════════════════════
-async function loadData() {
+
+// Нужные колонки для каждой таблицы (без gallery/base64 — это главный тормоз)
+const API_FIELDS = {
+  top_tours:        'id,display_title,city,duration_days,total_price,badge_text,rating,description,image_url,modules,approved,created_at',
+  top_destinations: 'id,display_title,city,badge_text,rating,price,description,image_url,approved,created_at',
+  hotels:           'id,name,city,stars,rating,price_from,board_type,description,image_url,active,created_at',
+  sights:           'id,name,city,type,entry_price,description,image_url,active,created_at',
+  guides:           'id,name,city,languages,price_day,rating,description,image_url,active,created_at',
+  transfers:        'id,name,from_city,to_city,vehicle,price,duration_hours,description,image_url,active,created_at',
+  restaurants:      'id,name,city,cuisine,avg_check,rating,description,image_url,active,created_at'
+};
+
+const CACHE_KEY = 'waylo_data_v2';
+const CACHE_TTL = 5 * 60 * 1000; // 5 минут
+
+function saveCache(d) {
   try {
-    const [
-      top_tours,
-      top_destinations,
-      hotels,
-      sights,
-      guides,
-      transfers,
-      restaurants
-    ] = await Promise.all([
-      api('top_tours',       '?order=created_at.desc'),
-      api('top_destinations','?order=created_at.desc'),
-      api('hotels',          '?order=created_at.desc'),
-      api('sights',          '?order=created_at.desc'),
-      api('guides',          '?order=created_at.desc'),
-      api('transfers',       '?order=created_at.desc'),
-      api('restaurants',     '?order=created_at.desc')
+    localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), d }));
+  } catch(e) {}
+}
+
+function loadCache() {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    const { ts, d } = JSON.parse(raw);
+    if (Date.now() - ts > CACHE_TTL) return null;
+    return d;
+  } catch(e) { return null; }
+}
+
+async function loadData() {
+  // ── Шаг 1: мгновенно показываем кэш (0ms) ───────────────────
+  const cached = loadCache();
+  if (cached) {
+    data = cached;
+    render();
+    renderCatalogueGrid();
+    // Обновляем в фоне тихо
+    loadDataFresh(true);
+    return;
+  }
+
+  // ── Шаг 2: первый запуск — грузим с сервера ─────────────────
+  await loadDataFresh(false);
+}
+
+async function loadDataFresh(silent) {
+  try {
+    // Приоритет 1: главные данные (top_tours, destinations) — грузим первыми
+    const [top_tours, top_destinations] = await Promise.all([
+      api('top_tours',        `?select=${API_FIELDS.top_tours}&order=created_at.desc&limit=20`),
+      api('top_destinations', `?select=${API_FIELDS.top_destinations}&order=created_at.desc&limit=10`)
+    ]);
+
+    if (!silent) {
+      data.top_tours = top_tours;
+      data.top_destinations = top_destinations;
+      render();
+    }
+
+    // Приоритет 2: каталог — параллельно
+    const [hotels, sights, guides, transfers, restaurants] = await Promise.all([
+      api('hotels',      `?select=${API_FIELDS.hotels}&order=created_at.desc&limit=20`),
+      api('sights',      `?select=${API_FIELDS.sights}&order=created_at.desc&limit=30`),
+      api('guides',      `?select=${API_FIELDS.guides}&order=created_at.desc&limit=20`),
+      api('transfers',   `?select=${API_FIELDS.transfers}&order=created_at.desc&limit=20`),
+      api('restaurants', `?select=${API_FIELDS.restaurants}&order=created_at.desc&limit=20`)
     ]);
 
     data = { top_tours, top_destinations, hotels, sights, guides, transfers, restaurants };
+    saveCache(data);
     render();
     loadProfile();
-    // Обновляем каталог после загрузки данных
     renderCatalogueGrid();
 
   } catch(e) {
@@ -6791,7 +6862,7 @@ async function loadHeroTours() {
   
   try {
     // Используем функцию api() вместо supabase
-    const tours = await api('top_tours', '?order=created_at.desc');
+    const tours = data.top_tours?.length ? data.top_tours : await api('top_tours', `?select=${API_FIELDS.top_tours}&order=created_at.desc&limit=20`);
     
     console.log('Tours loaded:', tours);
     
