@@ -4095,7 +4095,7 @@ const API_FIELDS = {
   restaurants:      'id,name,city,cuisine,avg_check,rating,description,image_url,active,created_at'
 };
 
-const CACHE_KEY = 'waylo_data_v2';
+const CACHE_KEY = 'waylo_data_v3';
 const CACHE_TTL = 5 * 60 * 1000; // 5 минут
 
 function saveCache(d) {
@@ -4132,35 +4132,40 @@ async function loadData() {
 
 async function loadDataFresh(silent) {
   try {
-    // Приоритет 1: главные данные (top_tours, destinations) — грузим первыми
+    // Приоритет 1: top_tours + destinations (главная страница)
     const [top_tours, top_destinations] = await Promise.all([
-      api('top_tours',        `?select=${API_FIELDS.top_tours}&order=created_at.desc&limit=20`),
-      api('top_destinations', `?select=${API_FIELDS.top_destinations}&order=created_at.desc&limit=10`)
+      api('top_tours',        '?order=created_at.desc&limit=20'),
+      api('top_destinations', '?order=created_at.desc&limit=10')
     ]);
 
-    if (!silent) {
-      data.top_tours = top_tours;
-      data.top_destinations = top_destinations;
-      render();
-    }
+    data.top_tours        = top_tours;
+    data.top_destinations = top_destinations;
+    if (!silent) { render(); }
 
-    // Приоритет 2: каталог — параллельно
+    // Приоритет 2: каталог — всё параллельно
     const [hotels, sights, guides, transfers, restaurants] = await Promise.all([
-      api('hotels',      `?select=${API_FIELDS.hotels}&order=created_at.desc&limit=20`),
-      api('sights',      `?select=${API_FIELDS.sights}&order=created_at.desc&limit=30`),
-      api('guides',      `?select=${API_FIELDS.guides}&order=created_at.desc&limit=20`),
-      api('transfers',   `?select=${API_FIELDS.transfers}&order=created_at.desc&limit=20`),
-      api('restaurants', `?select=${API_FIELDS.restaurants}&order=created_at.desc&limit=20`)
+      api('hotels',      '?order=created_at.desc&limit=20'),
+      api('sights',      '?order=created_at.desc&limit=30'),
+      api('guides',      '?order=created_at.desc&limit=20'),
+      api('transfers',   '?order=created_at.desc&limit=20'),
+      api('restaurants', '?order=created_at.desc&limit=20')
     ]);
 
-    data = { top_tours, top_destinations, hotels, sights, guides, transfers, restaurants };
+    data.hotels      = hotels;
+    data.sights      = sights;
+    data.guides      = guides;
+    data.transfers   = transfers;
+    data.restaurants = restaurants;
+
     saveCache(data);
+
+    // Обновляем UI
     render();
     loadProfile();
     renderCatalogueGrid();
 
   } catch(e) {
-    console.error('[loadData] error:', e);
+    console.error('[loadDataFresh] error:', e);
   }
 }
 
@@ -6606,11 +6611,17 @@ function switchView(v, pushHistory) {
     const hasData = Object.values(data).some(a => Array.isArray(a) && a.length > 0);
     if (hasData) {
       renderCatalogue();
+      // Тихо обновляем в фоне
+      loadDataFresh(true).then(() => renderCatalogueGrid());
     } else {
-      // Данные ещё грузятся — показываем скелетон и ждём
+      // Показываем скелетон и грузим
       const grid = document.getElementById('catGrid');
-      if (grid) grid.innerHTML = '<div class="cat-empty"><p style="color:#94a3b8;font-size:14px">Loading...</p></div>';
-      loadData().then(() => renderCatalogue());
+      if (grid) grid.innerHTML = [1,2,3,4].map(() =>
+        `<div class="skeleton-card"><div class="skeleton skeleton-img"></div>
+         <div class="skeleton skeleton-line"></div>
+         <div class="skeleton skeleton-line short"></div></div>`
+      ).join('');
+      loadDataFresh(false).then(() => renderCatalogue());
     }
   }
   if (v === 'profile') { renderBookingsHistory(); }
@@ -6862,7 +6873,7 @@ async function loadHeroTours() {
   
   try {
     // Используем функцию api() вместо supabase
-    const tours = data.top_tours?.length ? data.top_tours : await api('top_tours', `?select=${API_FIELDS.top_tours}&order=created_at.desc&limit=20`);
+    const tours = data.top_tours?.length ? data.top_tours : await api('top_tours', '?order=created_at.desc&limit=20');
     
     console.log('Tours loaded:', tours);
     
