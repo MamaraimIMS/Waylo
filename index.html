@@ -8193,10 +8193,10 @@ function renderServices() {
 <script>
 function openBudgetBuilder(){document.getElementById('budgetBuilderOverlay').classList.add('active');document.body.style.overflow='hidden';}
 function closeBudgetBuilder(){document.getElementById('budgetBuilderOverlay').classList.remove('active');document.body.style.overflow='';document.querySelectorAll('.bb-page').forEach(p=>p.classList.remove('active'));document.getElementById('bbPage1').classList.add('active');}
-function bbGoToPage(n){
+async function bbGoToPage(n){
   document.querySelectorAll('.bb-page').forEach(p=>p.classList.remove('active'));
   document.getElementById('bbPage'+n).classList.add('active');
-  if(n===2){ bbUpdateRouteSummary(); bbBuildPlan(); }
+  if(n===2){ bbUpdateRouteSummary(); var tEl=document.getElementById("bbTotalPrice"); if(tEl)tEl.textContent="$0"; await bbBuildPlan(); }
   if(n===3){ bbRenderSummary(); }
 }
 function bbToggleFamilyFields(){document.getElementById('bbFamilyFields').style.display=document.getElementById('bbWithFamily').checked?'block':'none';}
@@ -8447,7 +8447,7 @@ function bbFormatDateAvia(dateStr) {
 // Состояние плана
 var bbPlan = { modules: [], nights: 0, adults: 2, kids: 0, fromIATA: '', toIATA: '', d1: '', d2: '' };
 
-function bbBuildPlan() {
+async function bbBuildPlan() {
   var from   = (document.getElementById('bbFromCity')?.value || '').trim();
   var toRaw  = (document.getElementById('bbToCity')?.value  || '').trim();
   var toCity = toRaw.toLowerCase();
@@ -8475,48 +8475,54 @@ function bbBuildPlan() {
   if (!container) return;
   container.innerHTML = '<div style="text-align:center;padding:2rem;color:#9ca3af;">⏳ Подбираем варианты...</div>';
 
-  // Если данные ещё не загружены — грузим и повторяем
-  var hasData = (data.hotels||[]).length > 0 || (data.sights||[]).length > 0;
-  if (!hasData) {
-    loadDataFresh(false).then(function() { bbBuildPlan(); });
-    return;
-  }
+  // Загружаем данные напрямую (всегда актуально)
+  try {
+    var bbFetched = await Promise.all([
+      api('hotels',      '?active=eq.true&order=created_at.desc&limit=20'),
+      api('sights',      '?active=eq.true&order=created_at.desc&limit=30'),
+      api('transfers',   '?active=eq.true&order=created_at.desc&limit=20'),
+      api('guides',      '?active=eq.true&order=created_at.desc&limit=20'),
+      api('restaurants', '?active=eq.true&order=created_at.desc&limit=20')
+    ]);
+    data.hotels      = (bbFetched[0] && bbFetched[0].length) ? bbFetched[0] : (data.hotels      || []);
+    data.sights      = (bbFetched[1] && bbFetched[1].length) ? bbFetched[1] : (data.sights      || []);
+    data.transfers   = (bbFetched[2] && bbFetched[2].length) ? bbFetched[2] : (data.transfers   || []);
+    data.guides      = (bbFetched[3] && bbFetched[3].length) ? bbFetched[3] : (data.guides      || []);
+    data.restaurants = (bbFetched[4] && bbFetched[4].length) ? bbFetched[4] : (data.restaurants || []);
+    console.log('[BB] loaded:', data.hotels.length, 'hotels,', data.sights.length, 'sights,', data.transfers.length, 'transfers');
+  } catch(e) { console.warn('[BB] fetch error:', e); }
 
   // ── Фильтрация данных по городу назначения ──────────────
   var hotelsList    = (data.hotels      || []).filter(function(h){ return h.active !== false; });
-  var transfersList = (data.transfers   || []).filter(function(t){ return t.active !== false; });
-  var sightsList    = (data.sights      || []).filter(function(s){ return s.active !== false; });
-  var guidesList    = (data.guides      || []).filter(function(g){ return g.active !== false; });
+  var hotelsList    = (data.hotels      || []);
+  var transfersList = (data.transfers   || []);
+  var sightsList    = (data.sights      || []);
+  var guidesList    = (data.guides      || []);
+  var restListAll   = (data.restaurants || []);
 
-  // Умный матч города: проверяем все слова (ташкент → tashkent, ташкент)
-  function matchCity(item) {
-    var itemCity = (item.city || item.to_city || '').toLowerCase().trim();
-    if (!itemCity) return false;
-    // Точное совпадение
-    if (itemCity === toCity) return true;
-    // Частичное совпадение по первому слову
-    var keyword = toCity.split(/[\s-]/)[0];
-    if (keyword.length >= 3 && itemCity.includes(keyword)) return true;
-    // Совпадение по IATA (ташкент = TAS)
-    var iata = bbCityToIATA(item.city || '');
-    if (iata && iata === toIATA) return true;
-    return false;
+  // Сортируем: сначала совпадение по городу, потом остальные
+  function sortByCity(arr) {
+    return arr.slice().sort(function(a,b){
+      var ca = (a.city||a.to_city||'').toLowerCase();
+      var cb = (b.city||b.to_city||'').toLowerCase();
+      var kw = toCity.substring(0,5);
+      var sa = (ca === toCity || ca.indexOf(kw) >= 0) ? 1 : 0;
+      var sb = (cb === toCity || cb.indexOf(kw) >= 0) ? 1 : 0;
+      return sb - sa;
+    });
   }
 
-  var cityHotels    = hotelsList.filter(matchCity);
-  var cityTransfers = transfersList.filter(matchCity);
-  var citySights    = sightsList.filter(matchCity).slice(0, 4);
-  var cityGuides    = guidesList.filter(matchCity).slice(0, 2);
+  // Всегда берём данные — город в приоритете, fallback на всё
+  var cityHotels    = sortByCity(hotelsList).slice(0, 3);
+  var cityTransfers = sortByCity(transfersList).slice(0, 2);
+  var citySights    = sortByCity(sightsList).slice(0, 4);
+  var cityGuides    = sortByCity(guidesList).slice(0, 2);
+  var cityRests     = sortByCity(restListAll).slice(0, 2);
 
-  // Fallback: если нет по городу — берём ВСЁ что есть
-  var usedFallback = false;
-  if (!cityHotels.length)    { cityHotels    = hotelsList.slice(0, 3);    usedFallback = true; }
-  if (!cityTransfers.length) { cityTransfers = transfersList.slice(0, 2); }
-  if (!citySights.length)    { citySights    = sightsList.slice(0, 4);    }
-  if (!cityGuides.length)    { cityGuides    = guidesList.slice(0, 1);    }
+  // Лучший отель = наименьшая цена из доступных
+  cityHotels.sort(function(a,b){ return (a.price_from||0)-(b.price_from||0); });
 
   // ── Строим модули ───────────────────────────────────────
-  // Начинаем с выбранного авиабилета
   var modules = [];
 
   if (bbSelectedFlightData) {
@@ -8530,67 +8536,98 @@ function bbBuildPlan() {
     });
   }
 
-  // Все отели как отдельные модули (первые 3) с возможностью выбора
-  cityHotels.sort(function(a,b){ return (a.price_from||0)-(b.price_from||0); });
-  var hotel = cityHotels[0];
+  // ── Демо-данные если Supabase пустой ─────────────────────
+  var BB_DEMO = {
+    hotels: {
+      'самарканд': { name:'Registan Plaza', stars:4, price_from:85,  board_type:'BB', city:'Самарканд' },
+      'бухара':    { name:'Hotel Minzifa',  stars:4, price_from:70,  board_type:'BB', city:'Бухара'    },
+      'хива':      { name:'Orient Star',    stars:4, price_from:65,  board_type:'BB', city:'Хива'      },
+      'ташкент':   { name:'Hyatt Regency',  stars:5, price_from:180, board_type:'BB', city:'Ташкент'   },
+      'default':   { name:'Boutique Hotel', stars:3, price_from:60,  board_type:'BB', city:''          }
+    },
+    transfers: {
+      'самарканд': { name:'Самарканд ↔ Аэропорт', vehicle:'Sedan', price:40, from_city:'Аэропорт', to_city:'Самарканд' },
+      'бухара':    { name:'Бухара ↔ Аэропорт',    vehicle:'Sedan', price:35, from_city:'Аэропорт', to_city:'Бухара'    },
+      'ташкент':   { name:'Ташкент ↔ Аэропорт',   vehicle:'Sedan', price:25, from_city:'Аэропорт', to_city:'Ташкент'   },
+      'default':   { name:'Аэропорт ↔ Отель',      vehicle:'Sedan', price:30, from_city:'Аэропорт', to_city:''          }
+    },
+    sights: {
+      'самарканд': [{ name:'Площадь Регистан', entry_price:8 },{ name:'Гур-Эмир', entry_price:5 },{ name:'Шахи-Зинда', entry_price:5 }],
+      'бухара':    [{ name:'Крепость Арк', entry_price:6 },{ name:'Пои-Калян', entry_price:5 },{ name:'Ляби-Хауз', entry_price:0 }],
+      'хива':      [{ name:'Ичан-Кала', entry_price:10 },{ name:'Минарет Кальта', entry_price:5 }],
+      'ташкент':   [{ name:'Хаст-Имам', entry_price:5 },{ name:'Базар Чорсу', entry_price:0 },{ name:'Ташкент TV башня', entry_price:8 }],
+      'default':   [{ name:'Исторический центр', entry_price:5 },{ name:'Местный рынок', entry_price:0 }]
+    },
+    guides: {
+      'самарканд': { name:'Тимур Каримов', languages:'Русский, English', price_day:80, city:'Самарканд' },
+      'бухара':    { name:'Лола Азимова',  languages:'Русский, Français', price_day:75, city:'Бухара'   },
+      'default':   { name:'Профессиональный гид', languages:'Русский, English', price_day:70, city:''   }
+    }
+  };
+
+  function bbDemoKey(obj) {
+    var k = toCity.substring(0,6);
+    for (var key in obj) { if (key !== 'default' && k.indexOf(key.substring(0,4)) >= 0) return key; }
+    return 'default';
+  }
+
+  // ── Отель ────────────────────────────────────────────────
+  var hotel = cityHotels[0] || BB_DEMO.hotels[bbDemoKey(BB_DEMO.hotels)];
   if (hotel) {
     modules.push({
       icon: '🏨', type: 'hotel', title: 'Отель',
       subtitle: hotel.name + ' ' + '⭐'.repeat(Math.min(hotel.stars||3,5)) + ' · ' + nights + ' ночей',
       price: hotel.price_from || 0, priceTotal: (hotel.price_from||0)*nights, per: '/ночь',
-      detail: (usedFallback ? '🌍 ' : '') + (hotel.city||'') + (hotel.board_type ? ' · ' + hotel.board_type : ''),
-      altList: cityHotels.slice(1, 3).map(function(h){ return h.name + ' ($' + h.price_from + ')'; }),
-      canDelete: true, canSwap: cityHotels.length > 1
+      detail: (hotel.city||toRaw) + (hotel.board_type ? ' · ' + hotel.board_type : ''),
+      altList: cityHotels.slice(1,3).map(function(h){ return h.name+' ($'+h.price_from+')'; }),
+      canDelete: true
     });
   }
 
-  // Трансферы
-  if (cityTransfers.length) {
-    var tr = cityTransfers[0];
+  // ── Трансфер ─────────────────────────────────────────────
+  var tr = cityTransfers[0] || BB_DEMO.transfers[bbDemoKey(BB_DEMO.transfers)];
+  if (tr) {
     modules.push({
       icon: '🚐', type: 'transfer', title: 'Трансфер',
-      subtitle: (tr.from_city||'') + ' ↔ ' + (tr.to_city||toRaw),
-      price: tr.price || 0, priceTotal: (tr.price||0)*2, per: '/поездка',
-      detail: (tr.vehicle||'') + ' · туда и обратно',
+      subtitle: (tr.from_city||'Аэропорт') + ' ↔ ' + (tr.to_city||toRaw),
+      price: tr.price||0, priceTotal: (tr.price||0)*2, per: '/поездка',
+      detail: (tr.vehicle||'Sedan') + ' · туда и обратно',
       canDelete: true
     });
   }
 
-  // Достопримечательности
-  if (citySights.length) {
-    var sightPrice = citySights.reduce(function(s,x){ return s+(x.entry_price||0); }, 0);
+  // ── Достопримечательности ─────────────────────────────────
+  var sightsArr = citySights.length ? citySights : BB_DEMO.sights[bbDemoKey(BB_DEMO.sights)];
+  if (sightsArr && sightsArr.length) {
+    var sp = sightsArr.reduce(function(s,x){ return s+(x.entry_price||0); }, 0);
     modules.push({
       icon: '🎭', type: 'sights', title: 'Достопримечательности',
-      subtitle: citySights.map(function(s){ return s.name; }).join(', '),
-      price: sightPrice, priceTotal: sightPrice*travelers, per: '/чел',
-      detail: citySights.length + ' объектов',
+      subtitle: sightsArr.map(function(s){ return s.name; }).join(', '),
+      price: sp, priceTotal: sp*travelers, per: '/чел',
+      detail: sightsArr.length + ' объектов · входные билеты',
       canDelete: true
     });
   }
 
-  // Рестораны
-  var restList = (data.restaurants||[]).filter(function(r){ return r.active!==false; });
-  var cityRest = restList.filter(matchCity);
-  if (!cityRest.length) cityRest = restList.slice(0,1);
-  if (cityRest.length) {
-    var rest = cityRest[0];
-    modules.push({
-      icon: '🍽️', type: 'restaurant', title: 'Рестораны',
-      subtitle: rest.name + (rest.cuisine ? ' · ' + rest.cuisine : ''),
-      price: rest.avg_check || 0, priceTotal: (rest.avg_check||0)*travelers, per: '/чел',
-      detail: rest.city || '',
-      canDelete: true
-    });
-  }
+  // ── Рестораны ─────────────────────────────────────────────
+  var rest = cityRests[0];
+  if (!rest) rest = { name:'Местная кухня', cuisine:'Узбекская', avg_check:15, city:toRaw };
+  modules.push({
+    icon: '🍽️', type: 'restaurant', title: 'Рестораны',
+    subtitle: rest.name + (rest.cuisine ? ' · '+rest.cuisine : ''),
+    price: rest.avg_check||15, priceTotal: (rest.avg_check||15)*travelers, per: '/чел',
+    detail: (rest.city||toRaw) + ' · ужин включён',
+    canDelete: true
+  });
 
-  // Гиды
-  if (cityGuides.length) {
-    var guide = cityGuides[0];
+  // ── Гид ──────────────────────────────────────────────────
+  var guide = cityGuides[0] || BB_DEMO.guides[bbDemoKey(BB_DEMO.guides)];
+  if (guide) {
     modules.push({
       icon: '👨‍🏫', type: 'guide', title: 'Гид',
       subtitle: guide.name + ' · ' + (guide.languages||''),
-      price: guide.price_day || 0, priceTotal: guide.price_day||0, per: '/день',
-      detail: (guide.city||'') + (guide.experience_years ? ' · ' + guide.experience_years + ' лет опыта' : ''),
+      price: guide.price_day||70, priceTotal: guide.price_day||70, per: '/день',
+      detail: (guide.city||toRaw) + (guide.experience_years ? ' · '+guide.experience_years+' лет' : ''),
       canDelete: true
     });
   }
