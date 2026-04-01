@@ -8449,7 +8449,8 @@ var bbPlan = { modules: [], nights: 0, adults: 2, kids: 0, fromIATA: '', toIATA:
 
 function bbBuildPlan() {
   var from   = (document.getElementById('bbFromCity')?.value || '').trim();
-  var toCity = (document.getElementById('bbToCity')?.value || '').trim().toLowerCase();
+  var toRaw  = (document.getElementById('bbToCity')?.value  || '').trim();
+  var toCity = toRaw.toLowerCase();
   var d1     = document.getElementById('bbDateFrom')?.value || '';
   var d2     = document.getElementById('bbDateTo')?.value   || '';
   var family = document.getElementById('bbWithFamily')?.checked;
@@ -8457,35 +8458,14 @@ function bbBuildPlan() {
   var kids   = family ? (parseInt(document.getElementById('bbChildrenCount')?.value) || 0) : 0;
   var travelers = adults + kids;
 
-  // Количество ночей из дат
-  var nights = 0;
-  if (d1 && d2) {
-    var ms = new Date(d2) - new Date(d1);
-    nights = Math.max(1, Math.round(ms / 86400000));
-  } else {
-    nights = 3; // дефолт
-  }
+  var nights = (d1 && d2) ? Math.max(1, Math.round((new Date(d2) - new Date(d1)) / 86400000)) : 3;
 
   var fromIATA = bbCityToIATA(from) || 'TAS';
-  var toIATA   = bbCityToIATA(toCity) || 'SKD';
+  var toIATA   = bbCityToIATA(toRaw) || 'SKD';
 
   bbPlan.nights   = nights;
   bbPlan.adults   = adults;
   bbPlan.kids     = kids;
-  bbPlan.modules  = [];
-
-  // Добавляем выбранный авиабилет как первый модуль
-  if (bbSelectedFlightData) {
-    var fl = bbSelectedFlightData;
-    bbPlan.modules.push({
-      icon: '✈️', type: 'flight', title: 'Авиабилет',
-      subtitle: fl.fromIATA + ' → ' + fl.toIATA + ' · ' + fl.airline + ' · ' + fl.depTime,
-      price: fl.price,
-      priceTotal: fl.price,
-      per: '/все',
-      detail: fl.duration + (fl.stops === 0 ? ' · прямой' : ' · ' + fl.stops + ' пересадка')
-    });
-  }
   bbPlan.fromIATA = fromIATA;
   bbPlan.toIATA   = toIATA;
   bbPlan.d1       = d1;
@@ -8495,93 +8475,130 @@ function bbBuildPlan() {
   if (!container) return;
   container.innerHTML = '<div style="text-align:center;padding:2rem;color:#9ca3af;">⏳ Подбираем варианты...</div>';
 
-  // Ищем в уже загруженных данных
-  var hotelsList     = (data.hotels      || []).filter(h => h.active !== false);
-  var transfersList  = (data.transfers   || []).filter(t => t.active !== false);
-  var sightsList     = (data.sights      || []).filter(s => s.active !== false);
-  var guidesList     = (data.guides      || []).filter(g => g.active !== false);
+  // Если данные ещё не загружены — грузим и повторяем
+  var hasData = (data.hotels||[]).length > 0 || (data.sights||[]).length > 0;
+  if (!hasData) {
+    loadDataFresh(false).then(function() { bbBuildPlan(); });
+    return;
+  }
 
-  // Фильтрация по городу назначения
+  // ── Фильтрация данных по городу назначения ──────────────
+  var hotelsList    = (data.hotels      || []).filter(function(h){ return h.active !== false; });
+  var transfersList = (data.transfers   || []).filter(function(t){ return t.active !== false; });
+  var sightsList    = (data.sights      || []).filter(function(s){ return s.active !== false; });
+  var guidesList    = (data.guides      || []).filter(function(g){ return g.active !== false; });
+
+  // Умный матч города: проверяем все слова (ташкент → tashkent, ташкент)
   function matchCity(item) {
-    var city = (item.city || item.to_city || '').toLowerCase();
-    return toCity && city.includes(toCity.split(' ')[0]);
+    var itemCity = (item.city || item.to_city || '').toLowerCase().trim();
+    if (!itemCity) return false;
+    // Точное совпадение
+    if (itemCity === toCity) return true;
+    // Частичное совпадение по первому слову
+    var keyword = toCity.split(/[\s-]/)[0];
+    if (keyword.length >= 3 && itemCity.includes(keyword)) return true;
+    // Совпадение по IATA (ташкент = TAS)
+    var iata = bbCityToIATA(item.city || '');
+    if (iata && iata === toIATA) return true;
+    return false;
   }
 
   var cityHotels    = hotelsList.filter(matchCity);
   var cityTransfers = transfersList.filter(matchCity);
-  var citySights    = sightsList.filter(matchCity).slice(0, 3);
-  var cityGuides    = guidesList.filter(matchCity).slice(0, 1);
+  var citySights    = sightsList.filter(matchCity).slice(0, 4);
+  var cityGuides    = guidesList.filter(matchCity).slice(0, 2);
 
-  // Fallback: если нет по городу — берём всё
-  if (!cityHotels.length)    cityHotels    = hotelsList.slice(0, 3);
-  if (!cityTransfers.length) cityTransfers = transfersList.slice(0, 2);
-  if (!citySights.length)    citySights    = sightsList.slice(0, 3);
+  // Fallback: если нет по городу — берём ВСЁ что есть
+  var usedFallback = false;
+  if (!cityHotels.length)    { cityHotels    = hotelsList.slice(0, 3);    usedFallback = true; }
+  if (!cityTransfers.length) { cityTransfers = transfersList.slice(0, 2); }
+  if (!citySights.length)    { citySights    = sightsList.slice(0, 4);    }
+  if (!cityGuides.length)    { cityGuides    = guidesList.slice(0, 1);    }
 
-  // Выбираем лучший отель (наименьшая цена или первый)
-  var hotel = cityHotels.sort((a,b)=>(a.price_from||0)-(b.price_from||0))[0];
-  var transfer = cityTransfers[0];
-
-  // Строим модули
+  // ── Строим модули ───────────────────────────────────────
+  // Начинаем с выбранного авиабилета
   var modules = [];
 
-  // Отель
-  if (hotel) {
-    var hotelTotal = (hotel.price_from || 0) * nights;
+  if (bbSelectedFlightData) {
+    var fl = bbSelectedFlightData;
     modules.push({
-      icon: '🏨', type: 'hotel', title: 'Отель',
-      subtitle: hotel.name + ' ' + '⭐'.repeat(Math.min(hotel.stars||3,5)) + ' · ' + nights + ' ночей',
-      price: hotel.price_from || 0,
-      priceTotal: hotelTotal,
-      per: '/ночь',
-      detail: hotel.city + (hotel.board_type ? ' · ' + hotel.board_type : '')
+      icon: '✈️', type: 'flight', title: 'Авиабилет',
+      subtitle: fl.fromIATA + ' → ' + fl.toIATA + ' · ' + fl.airline + ' · ' + fl.depTime,
+      price: fl.price, priceTotal: fl.price, per: '/все',
+      detail: fl.duration + (fl.stops === 0 ? ' · прямой' : ' · ' + fl.stops + ' пересадка'),
+      canDelete: true
     });
   }
 
-  // Трансфер
-  if (transfer) {
-    var trTotal = (transfer.price || 0) * 2; // туда и обратно
+  // Все отели как отдельные модули (первые 3) с возможностью выбора
+  cityHotels.sort(function(a,b){ return (a.price_from||0)-(b.price_from||0); });
+  var hotel = cityHotels[0];
+  if (hotel) {
+    modules.push({
+      icon: '🏨', type: 'hotel', title: 'Отель',
+      subtitle: hotel.name + ' ' + '⭐'.repeat(Math.min(hotel.stars||3,5)) + ' · ' + nights + ' ночей',
+      price: hotel.price_from || 0, priceTotal: (hotel.price_from||0)*nights, per: '/ночь',
+      detail: (usedFallback ? '🌍 ' : '') + (hotel.city||'') + (hotel.board_type ? ' · ' + hotel.board_type : ''),
+      altList: cityHotels.slice(1, 3).map(function(h){ return h.name + ' ($' + h.price_from + ')'; }),
+      canDelete: true, canSwap: cityHotels.length > 1
+    });
+  }
+
+  // Трансферы
+  if (cityTransfers.length) {
+    var tr = cityTransfers[0];
     modules.push({
       icon: '🚐', type: 'transfer', title: 'Трансфер',
-      subtitle: (transfer.from_city || '') + ' ↔ ' + (transfer.to_city || ''),
-      price: transfer.price || 0,
-      priceTotal: trTotal,
-      per: '/поездка',
-      detail: transfer.vehicle || ''
+      subtitle: (tr.from_city||'') + ' ↔ ' + (tr.to_city||toRaw),
+      price: tr.price || 0, priceTotal: (tr.price||0)*2, per: '/поездка',
+      detail: (tr.vehicle||'') + ' · туда и обратно',
+      canDelete: true
     });
   }
 
   // Достопримечательности
   if (citySights.length) {
-    var sightNames = citySights.map(s => s.name).join(', ');
-    var sightPrice = citySights.reduce((sum,s) => sum + (s.entry_price||0), 0);
-    var sightTotal = sightPrice * travelers;
+    var sightPrice = citySights.reduce(function(s,x){ return s+(x.entry_price||0); }, 0);
     modules.push({
       icon: '🎭', type: 'sights', title: 'Достопримечательности',
-      subtitle: sightNames,
-      price: sightPrice,
-      priceTotal: sightTotal,
-      per: '/чел',
-      detail: citySights.length + ' объектов'
+      subtitle: citySights.map(function(s){ return s.name; }).join(', '),
+      price: sightPrice, priceTotal: sightPrice*travelers, per: '/чел',
+      detail: citySights.length + ' объектов',
+      canDelete: true
     });
   }
 
-  // Гид (если есть)
+  // Рестораны
+  var restList = (data.restaurants||[]).filter(function(r){ return r.active!==false; });
+  var cityRest = restList.filter(matchCity);
+  if (!cityRest.length) cityRest = restList.slice(0,1);
+  if (cityRest.length) {
+    var rest = cityRest[0];
+    modules.push({
+      icon: '🍽️', type: 'restaurant', title: 'Рестораны',
+      subtitle: rest.name + (rest.cuisine ? ' · ' + rest.cuisine : ''),
+      price: rest.avg_check || 0, priceTotal: (rest.avg_check||0)*travelers, per: '/чел',
+      detail: rest.city || '',
+      canDelete: true
+    });
+  }
+
+  // Гиды
   if (cityGuides.length) {
     var guide = cityGuides[0];
-    var guideTotal = (guide.price_day || 0);
     modules.push({
       icon: '👨‍🏫', type: 'guide', title: 'Гид',
-      subtitle: guide.name + ' · ' + (guide.languages || ''),
-      price: guide.price_day || 0,
-      priceTotal: guideTotal,
-      per: '/день',
-      detail: guide.city || ''
+      subtitle: guide.name + ' · ' + (guide.languages||''),
+      price: guide.price_day || 0, priceTotal: guide.price_day||0, per: '/день',
+      detail: (guide.city||'') + (guide.experience_years ? ' · ' + guide.experience_years + ' лет опыта' : ''),
+      canDelete: true
     });
   }
 
   bbPlan.modules = modules;
-  bbRenderModules(modules, nights, travelers, from, toCity, d1, d2);
+  bbRenderModules(modules, nights, travelers, from, toRaw, d1, d2);
 }
+
 
 function bbRenderModules(modules, nights, travelers, from, toCity, d1, d2) {
   var container = document.getElementById('bbModulesContainer');
@@ -8594,26 +8611,30 @@ function bbRenderModules(modules, nights, travelers, from, toCity, d1, d2) {
   }
 
   var cardsHtml = modules.map(function(m, i) {
+    var alts = m.altList && m.altList.length
+      ? '<div style="font-size:10px;color:#94a3b8;margin-top:4px">Альт: ' + m.altList.join(' | ') + '</div>'
+      : '';
     return '<div class="bb-module-card" data-idx="' + i + '">' +
       '<div class="bb-module-header">' +
         '<div class="bb-module-icon ' + m.type + '">' + m.icon + '</div>' +
         '<div class="bb-module-info">' +
           '<div class="bb-module-title">' + m.title + '</div>' +
           '<div class="bb-module-subtitle">' + m.subtitle + '</div>' +
+          alts +
         '</div>' +
         '<div class="bb-module-price">' +
           '<span class="price-value">$' + m.price + '</span>' +
           '<span class="price-per">' + m.per + '</span>' +
         '</div>' +
         '<div class="bb-module-actions">' +
-          '<button class="bb-module-btn delete" onclick="bbDeleteModuleIdx(' + i + ', this)">✕</button>' +
+          '<button class="bb-module-btn delete" title="Удалить" onclick="bbDeleteModuleIdx(' + i + ', this)">✕</button>' +
         '</div>' +
       '</div>' +
       (m.detail ? '<div class="bb-module-details"><span>' + m.detail + '</span></div>' : '') +
     '</div>';
   }).join('');
 
-  container.innerHTML = cardsHtml;
+  container.innerHTML = cardsHtml || '<div style="text-align:center;padding:2rem;color:#9ca3af">Нет модулей</div>';
   bbUpdateTotal();
 }
 
@@ -8635,9 +8656,11 @@ function bbUpdateTotal() {
   var travelers = (bbPlan.adults || 2) + (bbPlan.kids || 0);
   var total = 0;
   bbPlan.modules.forEach(function(m) {
-    if (m.type === 'hotel')    total += (m.price || 0) * nights;
-    else if (m.per === '/чел') total += (m.price || 0) * travelers;
-    else                       total += (m.priceTotal || 0);
+    if (m.type === 'hotel')         total += (m.price || 0) * nights;
+    else if (m.type === 'flight')   total += (m.price || 0);       // уже итоговая цена
+    else if (m.per === '/чел')      total += (m.price || 0) * travelers;
+    else if (m.per === '/поездка')  total += (m.price || 0) * 2;   // туда+обратно
+    else                            total += (m.priceTotal || m.price || 0);
   });
   var el = document.getElementById('bbTotalPrice');
   if (el) el.textContent = '$' + total.toLocaleString();
