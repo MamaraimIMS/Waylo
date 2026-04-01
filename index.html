@@ -8159,10 +8159,47 @@ var bbAltCount=0;
 function bbGenerateAlternative(){bbAltCount++;var c=document.getElementById('bbAlternativeContainer'),m=document.getElementById('bbAltModules'),bp={fTo:245,fBack:260,h:85,tr:25,s:15},alt={f:[{n:'Uzbekistan Airways',m:1.15,r:'Прямой рейс'},{n:'Turkish Airlines',m:1.22,r:'Лучший сервис'},{n:'Aeroflot',m:1.18,r:'Больше багажа'}],h:[{n:'Grand Samarkand ⭐⭐⭐⭐',m:1.18,r:'Завтрак включён'},{n:'Platan Hotel ⭐⭐⭐⭐',m:1.22,r:'Бассейн + SPA'}],t:[{n:'Comfort Transfer',m:1.20,r:'Комфорт-класс'},{n:'Express Transfer',m:1.28,r:'Встреча с табличкой'}],s:[{n:'Расширенный (4 объекта)',m:1.25,r:'+1 объект'},{n:'С аудиогидом',m:1.18,r:'Аудиогид RU'}]},fTo=alt.f[Math.floor(Math.random()*alt.f.length)],fBack=alt.f[Math.floor(Math.random()*alt.f.length)],h=alt.h[Math.floor(Math.random()*alt.h.length)],tr=alt.t[Math.floor(Math.random()*alt.t.length)],s=alt.s[Math.floor(Math.random()*alt.s.length)],np={fTo:Math.round(bp.fTo*fTo.m),fBack:Math.round(bp.fBack*fBack.m),h:Math.round(bp.h*h.m),tr:Math.round(bp.tr*tr.m),s:Math.round(bp.s*s.m)},df={fTo:np.fTo-bp.fTo,fBack:np.fBack-bp.fBack,h:np.h-bp.h,tr:np.tr-bp.tr,s:np.s-bp.s},nt=(np.fTo+np.fBack)*2+np.h*6+np.tr*2+np.s*2,bt=1600,d=nt-bt,p=Math.round(d/bt*100);document.getElementById('bbAltBadge').textContent='Вариант #'+bbAltCount;document.getElementById('bbAltType').textContent='+'+p+'%';m.innerHTML='<div class="bb-alt-module-row"><div class="bb-alt-module-info"><span>✈️ '+fTo.n+'</span><span class="module-reason">'+fTo.r+'</span></div><div class="bb-alt-module-price"><span>$'+np.fTo+'</span><span class="price-diff">+$'+df.fTo+'</span></div></div><div class="bb-alt-module-row"><div class="bb-alt-module-info"><span>🏨 '+h.n+'</span><span class="module-reason">'+h.r+'</span></div><div class="bb-alt-module-price"><span>$'+np.h+'/н</span><span class="price-diff">+$'+df.h+'</span></div></div><div class="bb-alt-module-row"><div class="bb-alt-module-info"><span>🚐 '+tr.n+'</span><span class="module-reason">'+tr.r+'</span></div><div class="bb-alt-module-price"><span>$'+np.tr+'</span><span class="price-diff">+$'+df.tr+'</span></div></div><div class="bb-alt-module-row"><div class="bb-alt-module-info"><span>🎭 '+s.n+'</span><span class="module-reason">'+s.r+'</span></div><div class="bb-alt-module-price"><span>$'+np.s+'</span><span class="price-diff">+$'+df.s+'</span></div></div><div class="bb-alt-module-row"><div class="bb-alt-module-info"><span>✈️ '+fBack.n+'</span><span class="module-reason">'+fBack.r+'</span></div><div class="bb-alt-module-price"><span>$'+np.fBack+'</span><span class="price-diff">+$'+df.fBack+'</span></div></div>';document.getElementById('bbAltTotalPrice').textContent='$'+nt.toLocaleString();document.getElementById('bbAltSavings').textContent='Дороже на $'+d+' (+'+p+'%) за улучшенный сервис';c.style.display='block';}
 function bbApplyAlternative(){alert('✅ Вариант применён!');document.querySelector('[onclick*="bb-plan-tab"]').click();}
 
-// ══ РЕАЛЬНЫЕ ДАННЫЕ ИЗ SUPABASE ══════════════════════════════
+// ══ РЕАЛЬНЫЕ ДАННЫЕ: AVIASALES + SUPABASE ════════════════════
+
+// City name → IATA code (для Aviasales)
+var BB_IATA = {
+  'ташкент':'TAS','tashkent':'TAS',
+  'самарканд':'SKD','samarkand':'SKD',
+  'бухара':'BHK','bukhara':'BHK',
+  'хива':'UGC','khiva':'UGC','urgench':'UGC','ургенч':'UGC',
+  'фергана':'FEG','fergana':'FEG',
+  'навои':'NVI','navoi':'NVI',
+  'нукус':'NCU','nukus':'NCU',
+  'карши':'KSQ','karshi':'KSQ',
+  'термез':'TMJ','termez':'TMJ',
+  'наманган':'NMA','namangan':'NMA',
+  'москва':'MOW','moscow':'MOW',
+  'санкт-петербург':'LED','спб':'LED','st.petersburg':'LED',
+  'стамбул':'IST','istanbul':'IST',
+  'алматы':'ALA','almaty':'ALA',
+  'дубай':'DXB','dubai':'DXB',
+  'астана':'NQZ','astana':'NQZ',
+  'баку':'GYD','baku':'GYD',
+  'минск':'MSQ','minsk':'MSQ',
+  'paris':'CDG','париж':'CDG',
+  'london':'LHR','лондон':'LHR',
+  'berlin':'BER','берлин':'BER',
+  'dubai':'DXB',
+};
+
+function bbCityToIATA(cityName) {
+  if (!cityName) return '';
+  var key = cityName.trim().toLowerCase();
+  return BB_IATA[key] || '';
+}
+
+function bbFormatDateAvia(dateStr) {
+  if (!dateStr) return '';
+  return dateStr.replace(/-/g, ''); // 2026-05-10 → 20260510
+}
 
 // Состояние плана
-var bbPlan = { modules: [], nights: 0, adults: 2, kids: 0 };
+var bbPlan = { modules: [], nights: 0, adults: 2, kids: 0, fromIATA: '', toIATA: '', d1: '', d2: '' };
 
 function bbBuildPlan() {
   var from   = (document.getElementById('bbFromCity')?.value || '').trim();
@@ -8183,10 +8220,17 @@ function bbBuildPlan() {
     nights = 3; // дефолт
   }
 
-  bbPlan.nights  = nights;
-  bbPlan.adults  = adults;
-  bbPlan.kids    = kids;
-  bbPlan.modules = [];
+  var fromIATA = bbCityToIATA(from) || 'TAS';
+  var toIATA   = bbCityToIATA(toCity) || 'SKD';
+
+  bbPlan.nights   = nights;
+  bbPlan.adults   = adults;
+  bbPlan.kids     = kids;
+  bbPlan.modules  = [];
+  bbPlan.fromIATA = fromIATA;
+  bbPlan.toIATA   = toIATA;
+  bbPlan.d1       = d1;
+  bbPlan.d2       = d2;
 
   var container = document.getElementById('bbModulesContainer');
   if (!container) return;
@@ -8284,13 +8328,42 @@ function bbRenderModules(modules, nights, travelers, from, toCity, d1, d2) {
   var container = document.getElementById('bbModulesContainer');
   if (!container) return;
 
+  // ── Aviasales блок (всегда показываем) ────────────────────
+  var fromIATA = bbPlan.fromIATA || 'TAS';
+  var toIATA   = bbPlan.toIATA   || 'SKD';
+  var dateStr  = bbFormatDateAvia(d1);
+  var retStr   = bbFormatDateAvia(d2);
+  var pax      = (bbPlan.adults || 2) + (bbPlan.kids || 0);
+  var aviaLink = 'https://www.aviasales.ru/search/' + fromIATA + dateStr + toIATA + pax + (retStr ? '1' : '');
+  var tpLink   = 'https://tp.media/r?marker=603041&trs=300024&p=4114&u=' +
+    encodeURIComponent('https://www.aviasales.ru/search/' + fromIATA + dateStr + toIATA + pax + '1');
+
+  var aviaBlock = '<div class="bb-module-card" style="border:2px solid #14b8a6">' +
+    '<div class="bb-module-header">' +
+      '<div class="bb-module-icon flight">✈️</div>' +
+      '<div class="bb-module-info">' +
+        '<div class="bb-module-title">Авиабилеты</div>' +
+        '<div class="bb-module-subtitle">' + (from || fromIATA) + ' → ' + (toCity || toIATA) + (d1 ? ' · ' + d1 : '') + '</div>' +
+      '</div>' +
+      '<div class="bb-module-price">' +
+        '<span class="price-value" style="font-size:11px;color:#14b8a6">Aviasales</span>' +
+      '</div>' +
+    '</div>' +
+    '<div style="padding:8px 0 4px">' +
+      '<a href="' + aviaLink + '" target="_blank" style="display:block;background:linear-gradient(135deg,#14b8a6,#0891b2);color:white;text-align:center;padding:10px;border-radius:10px;text-decoration:none;font-weight:600;font-size:14px">' +
+        '🔍 Найти билеты на Aviasales' +
+      '</a>' +
+    '</div>' +
+    '<div class="bb-module-details"><span>Реальные цены • Все авиакомпании</span></div>' +
+  '</div>';
+
   if (!modules.length) {
-    container.innerHTML = '<div style="text-align:center;padding:2rem;color:#9ca3af;">😔 Нет данных для этого направления.<br>Добавьте отели и сервисы через Admin Panel.</div>';
+    container.innerHTML = aviaBlock + '<div style="text-align:center;padding:1rem;color:#9ca3af;font-size:13px">Добавьте отели и сервисы<br>через Admin Panel</div>';
     document.getElementById('bbTotalPrice').textContent = '$0';
     return;
   }
 
-  var html = modules.map(function(m, i) {
+  var cardsHtml = modules.map(function(m, i) {
     return '<div class="bb-module-card" data-idx="' + i + '">' +
       '<div class="bb-module-header">' +
         '<div class="bb-module-icon ' + m.type + '">' + m.icon + '</div>' +
@@ -8310,7 +8383,7 @@ function bbRenderModules(modules, nights, travelers, from, toCity, d1, d2) {
     '</div>';
   }).join('');
 
-  container.innerHTML = html;
+  container.innerHTML = aviaBlock + cardsHtml;
   bbUpdateTotal();
 }
 
@@ -8346,9 +8419,20 @@ function bbRenderSummary() {
   if (!body) return;
   var nights    = bbPlan.nights || 1;
   var travelers = (bbPlan.adults || 2) + (bbPlan.kids || 0);
-  var total = bbPlan.total || 0;
+  var total     = bbPlan.total || 0;
 
-  var html = bbPlan.modules.map(function(m) {
+  var fromIATA = bbPlan.fromIATA || 'TAS';
+  var toIATA   = bbPlan.toIATA   || 'SKD';
+  var dateStr  = bbFormatDateAvia(bbPlan.d1);
+  var aviaLink = 'https://www.aviasales.ru/search/' + fromIATA + dateStr + toIATA + travelers + '1';
+
+  var aviaRow = '<div class="bb-service-item" style="border:1.5px solid #14b8a6;border-radius:12px;padding:12px;margin-bottom:8px">' +
+    '<div class="bb-service-header"><span class="bb-service-name">✈️ Авиабилеты</span><span style="color:#14b8a6;font-weight:600;font-size:12px">Aviasales</span></div>' +
+    '<div class="bb-service-desc">Реальные цены всех авиакомпаний</div>' +
+    '<a href="' + aviaLink + '" target="_blank" style="display:block;margin-top:8px;background:linear-gradient(135deg,#14b8a6,#0891b2);color:white;text-align:center;padding:8px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:600">🔍 Подобрать билеты на Aviasales</a>' +
+  '</div>';
+
+  var html = aviaRow + bbPlan.modules.map(function(m) {
     var cost = m.type === 'hotel' ? (m.price * nights) :
                m.per === '/чел'  ? (m.price * travelers) : m.priceTotal;
     return '<div class="bb-service-item">' +
@@ -8362,9 +8446,11 @@ function bbRenderSummary() {
 
   html += '<div style="background:linear-gradient(135deg,#0d9488,#06b6d4);border-radius:1rem;padding:1rem;color:white;margin-top:1rem;">' +
     '<div style="display:flex;justify-content:space-between;font-size:1.25rem;font-weight:700;">' +
-    '<span>ИТОГО:</span><span>$' + total.toLocaleString() + '</span></div></div>';
+    '<span>ИТОГО (без авиа):</span><span>$' + total.toLocaleString() + '</span></div>' +
+    '<div style="font-size:11px;opacity:0.8;margin-top:4px">+ авиабилеты по ценам Aviasales</div>' +
+  '</div>';
 
-  body.innerHTML = html || '<p style="color:#9ca3af;text-align:center;padding:2rem;">Нет выбранных модулей</p>';
+  body.innerHTML = html;
 }
 
 // ── Сбор данных из Budget Builder ────────────────────────────
