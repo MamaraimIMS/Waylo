@@ -4132,37 +4132,40 @@ async function loadData() {
 
 async function loadDataFresh(silent) {
   try {
-    // Приоритет 1: top_tours + destinations (главная страница)
+    // ── Приоритет 1: top_tours + destinations → сразу рендерим главную ──
     const [top_tours, top_destinations] = await Promise.all([
       api('top_tours',        '?order=created_at.desc&limit=20'),
       api('top_destinations', '?order=created_at.desc&limit=10')
     ]);
-
     data.top_tours        = top_tours;
     data.top_destinations = top_destinations;
-    if (!silent) { render(); }
+    if (!silent) render();
 
-    // Приоритет 2: каталог — всё параллельно
-    const [hotels, sights, guides, transfers, restaurants] = await Promise.all([
-      api('hotels',      '?order=created_at.desc&limit=20'),
-      api('sights',      '?order=created_at.desc&limit=30'),
-      api('guides',      '?order=created_at.desc&limit=20'),
-      api('transfers',   '?order=created_at.desc&limit=20'),
-      api('restaurants', '?order=created_at.desc&limit=20')
-    ]);
+    // ── Приоритет 2: каждая таблица рендерит каталог КАК ТОЛЬКО загрузилась ──
+    // Не ждём остальных — hotels покажется через ~0.5с независимо от sights/guides
+    const renderNow = () => { if (!silent) renderCatalogueGrid(); };
 
-    data.hotels      = hotels;
-    data.sights      = sights;
-    data.guides      = guides;
-    data.transfers   = transfers;
-    data.restaurants = restaurants;
+    api('hotels', '?order=created_at.desc&limit=20').then(r => {
+      data.hotels = r; renderNow();
+    });
+    api('sights', '?order=created_at.desc&limit=30').then(r => {
+      data.sights = r; renderNow();
+    });
+    api('restaurants', '?order=created_at.desc&limit=20').then(r => {
+      data.restaurants = r; renderNow();
+    });
+    api('guides', '?order=created_at.desc&limit=20').then(r => {
+      data.guides = r; renderNow();
+    });
+    api('transfers', '?order=created_at.desc&limit=20').then(r => {
+      data.transfers = r; renderNow();
+    });
 
-    saveCache(data);
-
-    // Обновляем UI
-    render();
-    loadProfile();
-    renderCatalogueGrid();
+    // Сохраняем кэш через 4с — к тому времени все таблицы точно загрузились
+    setTimeout(() => {
+      saveCache(data);
+      loadProfile();
+    }, 4000);
 
   } catch(e) {
     console.error('[loadDataFresh] error:', e);
