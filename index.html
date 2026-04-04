@@ -8091,6 +8091,7 @@ function renderServices() {
 <!-- PAGE 1 -->
 <div class="bb-page bb-page-1 active" id="bbPage1">
 <div class="bb-home-hero">
+<button onclick="closeBudgetBuilder()" style="position:absolute;top:16px;left:16px;background:rgba(255,255,255,0.2);border:none;border-radius:50%;width:38px;height:38px;color:white;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;">←</button>
 <div class="bb-waylo-badge"><span>✓</span> Waylo AI</div>
 <h1>Create your Trip</h1>
 <p>Выберите направление и мы подберём тур</p>
@@ -8110,10 +8111,10 @@ function renderServices() {
 <div style="flex:1;">
   <select class="bb-form-input" id="bbToCity" style="cursor:pointer;">
     <option value="">Куда</option>
-    <option value="Ташкент">🏙️ Ташкент</option>
-    <option value="Самарканд">🕌 Самарканд</option>
-    <option value="Бухара">🏺 Бухара</option>
-    <option value="Хива">🏰 Хива</option>
+    <option value="Ташкент">Ташкент</option>
+    <option value="Самарканд">Самарканд</option>
+    <option value="Бухара">Бухара</option>
+    <option value="Хива">Хива</option>
   </select>
 </div>
 </div>
@@ -8152,11 +8153,8 @@ function renderServices() {
 </div>
 
 <button class="bb-btn bb-btn-primary" onclick="bbFindTours()" style="margin-top:8px;">
-  🗺️ Подобрать Тур
+  Подобрать Тур
 </button>
-</div>
-<div style="text-align:center;padding:1rem;padding-bottom:2rem;position:relative;z-index:1;">
-<button class="bb-btn" style="background:rgba(255,255,255,0.2);color:white;" onclick="closeBudgetBuilder()">← Вернуться</button>
 </div>
 </div>
 
