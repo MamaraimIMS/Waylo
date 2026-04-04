@@ -8239,11 +8239,26 @@ function renderServices() {
 <div style="flex:1;overflow-y:auto;padding:12px 14px;padding-bottom:20px;" id="bbModulesList"></div>
 <!-- Итог + кнопка -->
 <div style="padding:14px;border-top:1px solid #e5e7eb;background:#fff;">
+  <!-- Каталог добавления модулей -->
+  <button onclick="bbOpenCatalogue()" style="width:100%;padding:10px;margin-bottom:12px;background:#f8fafc;border:1.5px dashed #94a3b8;border-radius:12px;color:#64748b;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+    <span style="font-size:18px;">+</span> Выбрать из каталога
+  </button>
+  <!-- Итого -->
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
     <span style="font-size:14px;color:#6b7280;">Итого за поездку:</span>
     <span style="font-size:22px;font-weight:800;color:#0d9488;" id="bbGrandTotal">$0</span>
   </div>
   <button class="bb-btn bb-btn-primary" id="bbSubmitBtn" onclick="bbSubmitRequest()">Отправить заявку</button>
+</div>
+<!-- Каталог модулей (modal) -->
+<div id="bbCatalogueModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.5);justify-content:flex-end;flex-direction:column;align-items:stretch;">
+  <div style="background:#fff;border-radius:24px 24px 0 0;padding:20px;max-height:70vh;overflow-y:auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <span style="font-size:17px;font-weight:700;color:#1e293b;">Добавить в поездку</span>
+      <button onclick="bbCloseCatalogue()" style="background:#f1f5f9;border:none;border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer;color:#64748b;">✕</button>
+    </div>
+    <div id="bbCatalogueList"></div>
+  </div>
 </div>
 </div>
 
@@ -9103,13 +9118,21 @@ function bbRenderModulePage() {
 
 function bbModPrice(m) {
   if (!m.active || !m.selected) return 0;
+  // Каталожные модули с готовой ценой
+  if (m._customPrice) return m._customPrice;
   var s = m.selected, n = m.nights||1, p = m.pax||1;
   if (m.id==='flight')     return s.price||0;
+  if (m.isAvia)            return s.price||0;
   if (m.id==='hotel')      return (s.price||0)*(s.nights||n)*p;
   if (m.id==='transfer')   return (s.price||0)*n;
   if (m.id==='sights')     return (s.items||[]).reduce(function(a,x){return a+(x.price||0);},0)*p;
   if (m.id==='restaurant') return (s.price||0)*(s.nights||n)*p;
-  return 0;
+  // Для id с суффиксом (hotel_1234, sights_5678)
+  if (m.id.indexOf('hotel')>=0)      return (s.price||0)*(s.nights||n)*p;
+  if (m.id.indexOf('transfer')>=0)   return (s.price||0)*n;
+  if (m.id.indexOf('sights')>=0)     return (s.items||[]).reduce(function(a,x){return a+(x.price||0);},0)*p;
+  if (m.id.indexOf('restaurant')>=0) return (s.price||0)*(s.nights||n)*p;
+  return s.price||0;
 }
 
 function bbModSub(m) {
@@ -9302,12 +9325,13 @@ async function bbShowFlightSearch(i) {
   var opts = document.getElementById('bbOpts'+i);
   if (!opts) return;
 
-  if (opts.style.display === 'block' && opts.innerHTML) {
+  // Если уже загружены варианты — переключаем список
+  if (m.selected && opts.style.display === 'block') {
     opts.style.display = 'none'; return;
   }
 
   opts.style.display = 'block';
-  opts.innerHTML = '<div style="text-align:center;padding:12px;color:#94a3b8;font-size:13px">Ищем рейсы...</div>';
+  opts.innerHTML = '<div style="text-align:center;padding:12px;color:#94a3b8;font-size:13px">⏳ Ищем рейсы...</div>';
 
   var fromI = bbCityToIATA(m.from||'') || 'TAS';
   var toI   = bbCityToIATA(m.toCity||'') || 'SKD';
@@ -9321,12 +9345,22 @@ async function bbShowFlightSearch(i) {
   }catch(e){}
   if(!flights.length) flights=bbGenerateDemoFlights(fromI,toI,m.from||'',m.toCity||'',d1,m.d2||'',pax);
 
-  // Показываем ОДИН самый дешёвый сразу, остальные — по запросу
   flights.sort(function(a,b){return a.price-b.price;});
   m.options = flights;
 
+  // Если первый вызов (нет выбранного) — автовыбираем самый дешёвый
+  if (!m.selected && flights.length) {
+    m.selected = flights[0];
+    m.active = true;
+    opts.style.display = 'none';
+    bbRenderModules3();
+    return;
+  }
+
+  // Иначе показываем полный список для выбора
   opts.innerHTML = flights.map(function(f,j){
-    return '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid #e5e7eb;border-radius:12px;margin-bottom:6px;cursor:pointer;background:#fff" '+
+    var isSelected = m.selected && m.selected.depTime===f.depTime && m.selected.airline===f.airline;
+    return '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid '+(isSelected?'#14b8a6':'#e5e7eb')+';border-radius:12px;margin-bottom:6px;cursor:pointer;background:'+(isSelected?'#f0fdfa':'#fff')+'" '+
       'onclick="bbSelectFlight3('+i+','+j+')">' +
       '<div style="flex:1">' +
         '<div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">' +
@@ -9336,7 +9370,10 @@ async function bbShowFlightSearch(i) {
         '</div>' +
         '<div style="font-size:11px;color:#64748b">'+f.airline+' · '+f.duration+' · '+(f.stops===0?'прямой':f.stops+' пересадка')+'</div>' +
       '</div>' +
-      '<div style="font-size:18px;font-weight:800;color:#0d9488;flex-shrink:0">$'+f.price+'</div>' +
+      '<div style="text-align:right;flex-shrink:0">' +
+        (j===0?'<div style="font-size:9px;color:#0d9488;font-weight:700;background:#f0fdfa;border-radius:4px;padding:1px 5px;margin-bottom:2px">AI выбор</div>':'')+
+        '<div style="font-size:18px;font-weight:800;color:#0d9488">$'+f.price+'</div>' +
+      '</div>' +
     '</div>';
   }).join('');
 }
@@ -9347,7 +9384,146 @@ function bbSelectFlight3(modIdx, flightIdx) {
   if(!f) return;
   m.active = true;
   m.selected = f;
+  var opts = document.getElementById('bbOpts'+modIdx);
+  if (opts) opts.style.display = 'none';
   bbRenderModules3();
+}
+
+// ══ КАТАЛОГ ДОБАВЛЕНИЯ МОДУЛЕЙ ════════════════════════════════
+
+var BB_CATALOGUE_ITEMS = [
+  { icon:'🏨', label:'Отель',                   type:'hotel',      id:'hotel' },
+  { icon:'🚐', label:'Трансфер',                type:'transfer',   id:'transfer' },
+  { icon:'🎭', label:'Достопримечательность',    type:'sight',      id:'sights' },
+  { icon:'🍽️', label:'Ресторан',                type:'restaurant', id:'restaurant' },
+  { icon:'👨‍🏫', label:'Гид',                   type:'guide',      id:'guide' },
+  { icon:'🎟️', label:'Входной билет (музей)',   type:'sight',      id:'sights' },
+  { icon:'🎪', label:'Развлечение',             type:'restaurant', id:'entertainment' },
+  { icon:'💆', label:'СПА & Отдых',             type:'restaurant', id:'spa' },
+];
+
+function bbOpenCatalogue() {
+  var modal = document.getElementById('bbCatalogueModal');
+  var list  = document.getElementById('bbCatalogueList');
+  if (!modal || !list) return;
+
+  // Собираем доступные варианты из data + demo
+  var toCity = document.getElementById('bbToCity')?.value || 'Самарканд';
+  var nights = bbPlan.nights || 3;
+  var pax    = (bbPlan.adults||2) + (bbPlan.kids||0);
+
+  var allHotels  = (data.hotels      ||[]).length ? data.hotels      : [];
+  var allTrans   = (data.transfers   ||[]).length ? data.transfers   : [];
+  var allSights  = (data.sights      ||[]).length ? data.sights      : [];
+  var allRests   = (data.restaurants ||[]).length ? data.restaurants : [];
+  var allGuides  = (data.guides      ||[]).length ? data.guides      : [];
+
+  // Строим секции каталога
+  var sections = [
+    { title:'🏨 Отели', items: allHotels.slice(0,5).map(function(h){
+      return { label:h.name+' '+'⭐'.repeat(Math.min(h.stars||3,5)), sub:(h.city||toCity)+' · '+(h.board_type||'BB'), price:(h.price_from||0)*nights*pax, modId:'hotel',
+        sel:{ name:h.name, stars:h.stars||3, price:h.price_from||0, board:h.board_type||'BB', city:h.city||toCity, nights:nights, pax:pax } };
+    })},
+    { title:'🚐 Трансферы', items: allTrans.slice(0,4).map(function(t){
+      return { label:t.name||('Трансфер '+t.vehicle), sub:(t.from_city||'Аэропорт')+' → '+(t.to_city||toCity), price:(t.price||0)*nights, modId:'transfer',
+        sel:{ name:t.name||'Трансфер', vehicle:t.vehicle||'Sedan', price:t.price||0, nights:nights } };
+    })},
+    { title:'🎭 Достопримечательности', items: allSights.slice(0,6).map(function(s){
+      return { label:s.name, sub:s.description||s.type||toCity, price:(s.entry_price||0)*pax, modId:'sights',
+        sel:{ items:[{ name:s.name, price:s.entry_price||0 }], pax:pax } };
+    })},
+    { title:'🍽️ Рестораны', items: allRests.slice(0,4).map(function(r){
+      return { label:r.name, sub:(r.cuisine||'')+(r.description?' · '+r.description:''), price:(r.avg_check||0)*nights*pax, modId:'restaurant',
+        sel:{ name:r.name, cuisine:r.cuisine||'', price:r.avg_check||0, nights:nights, pax:pax, note:'' } };
+    })},
+    { title:'👨‍🏫 Гиды', items: allGuides.slice(0,3).map(function(g){
+      return { label:g.name, sub:(g.languages||'')+(g.city?' · '+g.city:''), price:g.price_day||0, modId:'guide',
+        sel:{ name:g.name, vehicle:'', price:g.price_day||0, nights:1 } };
+    })},
+  ];
+
+  // Если нет данных из Supabase — показываем демо
+  if (!allHotels.length && !allSights.length) {
+    sections = [
+      { title:'🎭 Достопримечательности', items:[
+        { label:'Площадь Регистан', sub:'Самарканд · вход', price:8*pax, modId:'sights', sel:{ items:[{name:'Площадь Регистан',price:8}], pax:pax } },
+        { label:'Мавзолей Гур-Эмир', sub:'Самарканд · вход', price:5*pax, modId:'sights', sel:{ items:[{name:'Мавзолей Гур-Эмир',price:5}], pax:pax } },
+        { label:'Шахи-Зинда', sub:'Самарканд · вход', price:5*pax, modId:'sights', sel:{ items:[{name:'Шахи-Зинда',price:5}], pax:pax } },
+        { label:'Мечеть Биби-Ханым', sub:'Самарканд · вход', price:5*pax, modId:'sights', sel:{ items:[{name:'Мечеть Биби-Ханым',price:5}], pax:pax } },
+      ]},
+      { title:'🍽️ Рестораны', items:[
+        { label:'Caravan Samarkand', sub:'Узбекская кухня', price:25*nights*pax, modId:'restaurant', sel:{ name:'Caravan Samarkand', cuisine:'Узбекская', price:25, nights:nights, pax:pax, note:'' } },
+        { label:'Silk Road Restaurant', sub:'Шведский стол', price:35*nights*pax, modId:'restaurant', sel:{ name:'Silk Road Restaurant', cuisine:'Смешанная', price:35, nights:nights, pax:pax, note:'' } },
+      ]},
+      { title:'💆 Развлечения', items:[
+        { label:'СПА процедуры', sub:'При отеле', price:50*pax, modId:'restaurant', sel:{ name:'СПА', cuisine:'Релакс', price:50, nights:1, pax:pax, note:'' } },
+        { label:'Конная прогулка', sub:'Загородная экскурсия', price:30*pax, modId:'sights', sel:{ items:[{name:'Конная прогулка',price:30}], pax:pax } },
+      ]},
+    ];
+  }
+
+  list.innerHTML = sections.filter(function(s){ return s.items.length; }).map(function(sec){
+    return '<div style="margin-bottom:16px">' +
+      '<div style="font-size:13px;font-weight:700;color:#64748b;margin-bottom:8px;">'+sec.title+'</div>' +
+      sec.items.map(function(item, idx){
+        var secIdx = JSON.stringify(item).replace(/"/g,'&quot;');
+        return '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e5e7eb;border-radius:12px;margin-bottom:6px;background:#fff;cursor:pointer" '+
+          'onclick="bbCatalogueAdd(this)" '+
+          'data-label="'+item.label.replace(/"/g,'&quot;')+'" '+
+          'data-modid="'+item.modId+'" '+
+          'data-price="'+item.price+'" '+
+          'data-sel="'+JSON.stringify(item.sel).replace(/"/g,'&quot;')+'">' +
+          '<div style="flex:1">' +
+            '<div style="font-size:14px;font-weight:600;color:#1e293b">'+item.label+'</div>' +
+            '<div style="font-size:11px;color:#94a3b8">'+item.sub+'</div>' +
+          '</div>' +
+          '<div style="font-size:15px;font-weight:700;color:#0d9488;flex-shrink:0">'+(item.price?'$'+item.price:'')+'</div>' +
+          '<div style="font-size:18px;color:#d1d5db;flex-shrink:0">+</div>' +
+        '</div>';
+      }).join('') +
+    '</div>';
+  }).join('');
+
+  modal.style.display = 'flex';
+}
+
+function bbCatalogueAdd(el) {
+  var modId = el.dataset.modid;
+  var label = el.dataset.label;
+  var price = parseFloat(el.dataset.price)||0;
+  var sel   = {};
+  try { sel = JSON.parse(el.dataset.sel.replace(/&quot;/g,'"')); } catch(e){}
+
+  var nights = bbPlan.nights||3;
+  var pax    = (bbPlan.adults||2)+(bbPlan.kids||0);
+
+  // Добавляем новый модуль в bbModules
+  var icons  = { hotel:'🏨', transfer:'🚐', sights:'🎭', restaurant:'🍽️', guide:'👨‍🏫', entertainment:'🎪', spa:'💆' };
+  var titles = { hotel:'Отель', transfer:'Трансфер', sights:'Достопримечательность', restaurant:'Питание', guide:'Гид', entertainment:'Развлечение', spa:'СПА' };
+  var clses  = { hotel:'hotel', transfer:'transfer', sights:'sight', restaurant:'restaurant', guide:'transfer' };
+
+  bbModules.push({
+    id: modId+'_'+Date.now(), icon: icons[modId]||'📌',
+    cls: clses[modId]||'restaurant', title: titles[modId]||label,
+    active: true, selected: sel, options: [],
+    nights: nights, pax: pax,
+    _customLabel: label, _customPrice: price
+  });
+
+  bbCloseCatalogue();
+  bbRenderModules3();
+
+  // Визуальная подсветка добавленного
+  var list = document.getElementById('bbModulesList');
+  if (list) {
+    var last = list.lastElementChild;
+    if (last) { last.style.border = '2px solid #14b8a6'; setTimeout(function(){ last.style.border = ''; }, 1500); }
+  }
+}
+
+function bbCloseCatalogue() {
+  var modal = document.getElementById('bbCatalogueModal');
+  if (modal) modal.style.display = 'none';
 }
 
 function bbCalcTotal3() {
@@ -9407,13 +9583,17 @@ function bbCollectData() {
   const adults = bbPlan.adults || 2;
   const kids   = bbPlan.kids   || 0;
 
-  // Берём реальные модули из bbPlan
-  const modules = (bbPlan.modules || []).map(m => ({
-    title: m.title + ': ' + m.subtitle,
-    price: '$' + m.price
-  }));
+  // Берём модули из bbModules (новая система active/passive)
+  const activeModules = (bbModules || []).filter(function(m){ return m.active && m.selected; });
+  const modules = activeModules.map(function(m) {
+    var price = bbModPrice ? bbModPrice(m) : 0;
+    var sub   = bbModSub   ? bbModSub(m)   : '';
+    return { title: m.title + (sub ? ': '+sub : ''), price: '$'+price };
+  });
 
-  const totalText = document.getElementById('bbTotalPrice')?.textContent || '$0';
+  // Итог из bbGrandTotal (актуальная сумма)
+  const totalEl = document.getElementById('bbGrandTotal');
+  const totalText = totalEl ? totalEl.textContent : ('$'+(bbPlan.total||0));
   return { from, to, d1, d2, adults, kids, modules, totalText };
 }
 
