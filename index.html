@@ -9042,70 +9042,71 @@ function bbRenderModulePage() {
   dRests     = dRests.map(function(r){ return { name:r.name, cuisine:r.cuisine||'', price:r.avg_check||0, note:r.description||r.note||'' }; });
 
   // Строим модули
+  // ── Новая структура модулей: active/passive ──────────────
   bbModules = [
     {
       id:'flight', icon:'✈️', cls:'flight', title:'Авиабилеты (туда-обратно)',
-      sub: (from||'Откуда') + ' ↔ ' + toCity + ' · ' + pax + ' пасс.',
-      price: 0, pricePer: 'Поиск на Aviasales', priceTotal: 0,
+      active: false,         // passive до поиска
       isAvia: true,
-      upgrades: [
-        { name:'Эконом класс', note:'Узбекистон хаво йуллари', price:220 },
-        { name:'Бизнес класс', note:'Turkish Airlines', price:680 },
-        { name:'Прямой рейс', note:'Silk Avia', price:310 }
-      ]
+      selected: null,        // выбранный рейс
+      options: [],           // загружаются при поиске
+      pax: pax, from: from, toCity: toCity, d1: d1, d2: d2
     },
     {
       id:'hotel', icon:'🏨', cls:'hotel', title:'Отель',
-      sub: dHotels[0].name + ' ' + '⭐'.repeat(Math.min(dHotels[0].stars,5)) + ' · ' + nights + ' ночей',
-      price: dHotels[0].price * nights * pax,
-      pricePer: '$'+dHotels[0].price+'/ночь · '+dHotels[0].board,
-      priceTotal: dHotels[0].price * nights * pax,
-      upgrades: dHotels.slice(1,4).map(function(h){
-        return { name:h.name+' '+'⭐'.repeat(Math.min(h.stars,5)), note:h.city+' · '+h.board, price:h.price*nights*pax };
-      })
+      active: true,
+      selected: { name:dHotels[0].name, stars:dHotels[0].stars, price:dHotels[0].price, board:dHotels[0].board, city:dHotels[0].city, nights:nights, pax:pax },
+      options: dHotels,
+      nights: nights, pax: pax
     },
     {
       id:'transfer', icon:'🚐', cls:'transfer', title:'Трансфер',
-      sub: 'Аэропорт ↔ Отель · Экскурсии · Трансфер на день',
-      price: dTransfers[0].price * nights,
-      pricePer: '$'+dTransfers[0].price+'/день · '+dTransfers[0].name,
-      priceTotal: dTransfers[0].price * nights,
-      upgrades: dTransfers.slice(1,3).map(function(t){
-        return { name:t.name, note:t.vehicle, price:t.price*nights };
-      })
+      active: true,
+      selected: { name:dTransfers[0].name, vehicle:dTransfers[0].vehicle, price:dTransfers[0].price, nights:nights },
+      options: dTransfers,
+      nights: nights
     },
     {
       id:'sights', icon:'🎭', cls:'sight', title:'Достопримечательности',
-      sub: dSights.slice(0,3).map(function(s){ return s.name; }).join(', '),
-      price: dSights.slice(0,3).reduce(function(acc,s){ return acc+s.price; },0) * pax,
-      pricePer: 'Входные билеты · '+dSights.slice(0,3).length+' объектов',
-      priceTotal: dSights.slice(0,3).reduce(function(acc,s){ return acc+s.price; },0) * pax,
-      upgrades: [
-        {
-          name: 'Расширенный ('+dSights.length+' объектов)',
-          note: dSights.map(function(s){ return s.name; }).join(', '),
-          price: dSights.reduce(function(acc,s){ return acc+s.price; },0) * pax
-        },
-        {
-          name: 'С аудиогидом',
-          note: 'Аудиогид на рус./англ. языках',
-          price: (dSights.slice(0,3).reduce(function(acc,s){ return acc+s.price; },0) + 10) * pax
-        }
-      ]
+      active: true,
+      selected: { items: dSights.slice(0,3), pax:pax },
+      options: dSights,
+      pax: pax
     },
     {
       id:'restaurant', icon:'🍽️', cls:'restaurant', title:'Питание',
-      sub: dRests[0].name + (dRests[0].cuisine ? ' · '+dRests[0].cuisine : ''),
-      price: dRests[0].price * nights * pax,
-      pricePer: '$'+dRests[0].price+'/чел · ужин+обед · '+nights+' дней',
-      priceTotal: dRests[0].price * nights * pax,
-      upgrades: dRests.slice(1,3).map(function(r){
-        return { name:r.name, note:r.cuisine+(r.note?' · '+r.note:''), price:r.price*nights*pax };
-      })
+      active: true,
+      selected: { name:dRests[0].name, cuisine:dRests[0].cuisine, price:dRests[0].price, nights:nights, pax:pax, note:dRests[0].note||'' },
+      options: dRests,
+      nights: nights, pax: pax
     }
   ];
 
   bbRenderModules3();
+}
+
+// ══ РЕНДЕР МОДУЛЕЙ (Active / Passive) ════════════════════════
+
+function bbModPrice(m) {
+  if (!m.active || !m.selected) return 0;
+  var s = m.selected, n = m.nights||1, p = m.pax||1;
+  if (m.id==='flight')     return s.price||0;
+  if (m.id==='hotel')      return (s.price||0)*(s.nights||n)*p;
+  if (m.id==='transfer')   return (s.price||0)*n;
+  if (m.id==='sights')     return (s.items||[]).reduce(function(a,x){return a+(x.price||0);},0)*p;
+  if (m.id==='restaurant') return (s.price||0)*(s.nights||n)*p;
+  return 0;
+}
+
+function bbModSub(m) {
+  if (!m.active || !m.selected) return '';
+  var s = m.selected, n = m.nights||1;
+  if (m.id==='flight')     return s.airline+' · '+s.depTime+' – '+s.arrTime+' · '+s.duration+(s.stops===0?' · прямой':'');
+  if (m.id==='hotel')      return s.name+' '+'⭐'.repeat(Math.min(s.stars||3,5))+' · '+(s.nights||n)+' ночей · '+(s.board||'BB');
+  if (m.id==='transfer')   return s.name+(s.vehicle?' · '+s.vehicle:'')+' · '+n+' дней';
+  if (m.id==='sights')     return (s.items||[]).map(function(x){return x.name;}).join(', ');
+  if (m.id==='restaurant') return s.name+(s.cuisine?' · '+s.cuisine:'')+' · '+(s.nights||n)+' дней';
+  return '';
 }
 
 function bbRenderModules3() {
@@ -9113,35 +9114,87 @@ function bbRenderModules3() {
   if (!list) return;
 
   list.innerHTML = bbModules.map(function(m, i) {
+    var price = bbModPrice(m);
+
+    // ── ПАССИВНЫЙ РЕЖИМ ──────────────────────────────────────
+    if (!m.active) {
+      var btnLabel = {
+        flight: 'Найти авиабилеты',
+        hotel: 'Выбрать отель',
+        transfer: 'Выбрать трансфер',
+        sights: 'Выбрать достопримечательности',
+        restaurant: 'Выбрать ресторан'
+      }[m.id] || 'Выбрать';
+
+      return '<div class="bb-mod" id="bbMod'+i+'" style="border:1.5px dashed #d1d5db;background:#fafafa;">' +
+        '<div class="bb-mod-header" style="opacity:0.5">' +
+          '<div class="bb-mod-icon '+m.cls+'" style="background:#f1f5f9">'+m.icon+'</div>' +
+          '<div class="bb-mod-body">' +
+            '<div class="bb-mod-title">'+m.title+'</div>' +
+            '<div class="bb-mod-sub" style="color:#cbd5e1">Не выбрано</div>' +
+          '</div>' +
+        '</div>' +
+        '<div style="padding:0 14px 14px">' +
+          '<button class="bb-mod-btn upgrade" style="width:100%;padding:12px;font-size:14px" onclick="bbActivateModule('+i+')">' +
+            '+ '+btnLabel +
+          '</button>' +
+          '<div id="bbOpts'+i+'" style="display:none;margin-top:8px;"></div>' +
+        '</div>' +
+      '</div>';
+    }
+
+    // ── АКТИВНЫЙ РЕЖИМ: АВИАБИЛЕТЫ ───────────────────────────
     if (m.isAvia) {
+      var flightCard = m.selected
+        ? '<div style="padding:10px 12px;background:#f0fdfa;border:1.5px solid #14b8a6;border-radius:12px;margin-bottom:8px">' +
+            '<div style="display:flex;align-items:center;gap:10px">' +
+              '<div style="flex:1">' +
+                '<div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">' +
+                  '<span style="font-size:15px;font-weight:800;color:#1e293b">'+m.selected.depTime+'</span>' +
+                  '<div style="flex:1;height:1px;background:#99f6e4;position:relative"><span style="position:absolute;top:-8px;left:50%;font-size:12px">✈</span></div>' +
+                  '<span style="font-size:15px;font-weight:800;color:#1e293b">'+m.selected.arrTime+'</span>' +
+                '</div>' +
+                '<div style="font-size:11px;color:#0d9488">'+m.selected.airline+' · '+m.selected.duration+(m.selected.stops===0?' · прямой':'')+'</div>' +
+              '</div>' +
+              '<div style="font-size:18px;font-weight:800;color:#0d9488">$'+m.selected.price+'</div>' +
+            '</div>' +
+          '</div>'
+        : '<div style="padding:10px;text-align:center;color:#94a3b8;font-size:13px">Нажмите "Найти билеты" для поиска</div>';
+
       return '<div class="bb-mod" id="bbMod'+i+'">' +
         '<div class="bb-mod-header">' +
           '<div class="bb-mod-icon flight">'+m.icon+'</div>' +
           '<div class="bb-mod-body">' +
             '<div class="bb-mod-title">'+m.title+'</div>' +
-            '<div class="bb-mod-sub">'+m.sub+'</div>' +
+            '<div style="font-size:11px;font-weight:700;color:#3b82f6;background:#eff6ff;padding:2px 8px;border-radius:6px;display:inline-block;margin-top:3px">Aviasales</div>' +
           '</div>' +
-          '<div style="flex-shrink:0;font-size:11px;font-weight:700;color:#3b82f6;background:#eff6ff;padding:3px 8px;border-radius:6px">Aviasales</div>' +
+          (m.selected ? '<div class="bb-mod-price"><div class="bb-mod-price-val">$'+m.selected.price+'</div><div class="bb-mod-price-per">итого</div></div>' : '') +
         '</div>' +
-        '<div style="padding:0 14px 14px;">' +
-          '<div style="display:flex;gap:8px;margin-bottom:10px;">' +
-            '<button class="bb-mod-btn upgrade" style="flex:2;background:#eff6ff;color:#1d4ed8;font-size:13px;padding:10px" onclick="bbAviaSearch3()">Найти рейсы</button>' +
-            '<button class="bb-mod-btn remove" style="flex:1" onclick="bbRemoveMod('+i+')">Убрать</button>' +
+        '<div style="padding:0 14px 14px">' +
+          flightCard +
+          '<div style="display:flex;gap:8px;margin-top:8px">' +
+            '<button class="bb-mod-btn upgrade" style="flex:2" onclick="bbShowFlightSearch('+i+')">'+
+              (m.selected?'Найти другой билет':'Найти билеты')+
+            '</button>' +
+            '<button class="bb-mod-btn remove" style="flex:1" onclick="bbDeactivate('+i+')">Убрать</button>' +
           '</div>' +
-          '<div id="bbAviaLoading3" style="display:none;text-align:center;padding:10px;color:#94a3b8;font-size:13px;">Ищем рейсы...</div>' +
-          '<div id="bbAviaResults3"></div>' +
-          '<div id="bbAviaSelected3"></div>' +
+          '<div id="bbOpts'+i+'" style="display:none;margin-top:8px"></div>' +
         '</div>' +
       '</div>';
     }
 
-    var upgrades = (m.upgrades||[]).map(function(u,j){
-      return '<div class="bb-mod-upgrade-item" onclick="bbApplyUpgrade('+i+','+j+')">' +
-        '<div class="bb-mod-upgrade-info">' +
-          '<div class="bb-mod-upgrade-name">'+u.name+'</div>' +
-          '<div class="bb-mod-upgrade-note">'+u.note+'</div>' +
-        '</div>' +
-        '<div class="bb-mod-upgrade-price">'+(u.price?'$'+u.price:'')+' </div>' +
+    // ── АКТИВНЫЙ РЕЖИМ: ОБЫЧНЫЙ МОДУЛЬ ───────────────────────
+    var sub = bbModSub(m);
+    var optList = (m.options||[]).map(function(opt, j) {
+      var optName='', optNote='', optPrice=0;
+      var n=m.nights||1, p=m.pax||1;
+      if(m.id==='hotel')      { optName=opt.name+' '+'⭐'.repeat(Math.min(opt.stars||3,5)); optNote=(opt.city||'')+(opt.board?' · '+opt.board:''); optPrice=(opt.price||0)*n*p; }
+      if(m.id==='transfer')   { optName=opt.name; optNote=opt.vehicle||''; optPrice=(opt.price||0)*n; }
+      if(m.id==='sights')     { optName=opt.name; optNote=opt.note||''; optPrice=(opt.price||0)*p; }
+      if(m.id==='restaurant') { optName=opt.name; optNote=(opt.cuisine||'')+(opt.note?' · '+opt.note:''); optPrice=(opt.price||0)*n*p; }
+      return '<div class="bb-mod-upgrade-item" onclick="bbPickOption('+i+','+j+')">' +
+        '<div class="bb-mod-upgrade-info"><div class="bb-mod-upgrade-name">'+optName+'</div><div class="bb-mod-upgrade-note">'+optNote+'</div></div>' +
+        '<div class="bb-mod-upgrade-price">'+(optPrice?'$'+optPrice:'бесплатно')+'</div>' +
       '</div>';
     }).join('');
 
@@ -9150,126 +9203,143 @@ function bbRenderModules3() {
         '<div class="bb-mod-icon '+m.cls+'">'+m.icon+'</div>' +
         '<div class="bb-mod-body">' +
           '<div class="bb-mod-title">'+m.title+'</div>' +
-          '<div class="bb-mod-sub">'+m.sub+'</div>' +
-          '<div style="font-size:11px;color:#94a3b8;margin-top:3px">'+m.pricePer+'</div>' +
+          '<div class="bb-mod-sub">'+sub+'</div>' +
         '</div>' +
-        '<div class="bb-mod-price">' +
-          '<div class="bb-mod-price-val">$'+m.price+'</div>' +
-          '<div class="bb-mod-price-per">итого</div>' +
-        '</div>' +
+        '<div class="bb-mod-price"><div class="bb-mod-price-val">$'+price+'</div><div class="bb-mod-price-per">итого</div></div>' +
       '</div>' +
       '<div class="bb-mod-actions">' +
-        '<button class="bb-mod-btn upgrade" onclick="bbToggleUpgrade('+i+')">Улучшить ↑</button>' +
-        '<button class="bb-mod-btn remove" onclick="bbRemoveMod('+i+')">Убрать</button>' +
+        '<button class="bb-mod-btn upgrade" onclick="bbToggleOpts('+i+')">Заменить ↑</button>' +
+        '<button class="bb-mod-btn remove" onclick="bbDeactivate('+i+')">Убрать</button>' +
       '</div>' +
-      (upgrades ? '<div class="bb-mod-upgrade-panel" id="bbUpg'+i+'">'+upgrades+'</div>' : '') +
+      '<div id="bbOpts'+i+'" class="bb-mod-upgrade-panel">'+(optList||'<div style="color:#94a3b8;font-size:13px;padding:4px">Нет альтернатив</div>')+'</div>' +
     '</div>';
   }).join('');
 
-  if (bbModules.some(function(m){ return m.isAvia; })) {
-    setTimeout(bbAviaSearch3, 400);
+  if (bbModules.some(function(m){ return m.isAvia && m.active && !m.selected; })) {
+    setTimeout(function(){ bbShowFlightSearch(0); }, 400);
   }
   bbCalcTotal3();
 }
 
-async function bbAviaSearch3() {
-  var from   = (document.getElementById('bbFromCity')?.value||'').trim();
-  var toCity = document.getElementById('bbToCity')?.value||'';
-  var d1     = document.getElementById('bbDateFrom')?.value||'';
-  var d2     = document.getElementById('bbDateTo')?.value||'';
-  var pax    = (bbPlan.adults||2)+(bbPlan.kids||0);
-  var fromI  = bbCityToIATA(from)||'TAS';
-  var toI    = bbCityToIATA(toCity)||'SKD';
+// ── Деактивировать → пассивный режим ─────────────────────────
+function bbDeactivate(i) {
+  bbModules[i].active = false;
+  bbModules[i].selected = null;
+  bbRenderModules3();
+}
 
-  var loading = document.getElementById('bbAviaLoading3');
-  var results = document.getElementById('bbAviaResults3');
-  if (!results) return;
+// ── Активировать → показать список ───────────────────────────
+function bbActivateModule(i) {
+  var m = bbModules[i];
+  var opts = document.getElementById('bbOpts'+i);
+  if (!opts) return;
 
-  if (loading) loading.style.display='block';
-  results.innerHTML='';
+  if (m.isAvia) {
+    m.active = true;
+    bbRenderModules3();
+    return;
+  }
+
+  // Показываем список вариантов прямо в пассивной карточке
+  var n=m.nights||1, p=m.pax||1;
+  var html = (m.options||[]).map(function(opt, j) {
+    var optName='', optNote='', optPrice=0;
+    if(m.id==='hotel')      { optName=opt.name+' '+'⭐'.repeat(Math.min(opt.stars||3,5)); optNote=(opt.city||'')+(opt.board?' · '+opt.board:''); optPrice=(opt.price||0)*n*p; }
+    if(m.id==='transfer')   { optName=opt.name; optNote=opt.vehicle||''; optPrice=(opt.price||0)*n; }
+    if(m.id==='sights')     { optName=opt.name; optNote=opt.note||''; optPrice=(opt.price||0)*p; }
+    if(m.id==='restaurant') { optName=opt.name; optNote=(opt.cuisine||'')+(opt.note?' · '+opt.note:''); optPrice=(opt.price||0)*n*p; }
+    return '<div class="bb-mod-upgrade-item" onclick="bbPickOption('+i+','+j+')">' +
+      '<div class="bb-mod-upgrade-info"><div class="bb-mod-upgrade-name">'+optName+'</div><div class="bb-mod-upgrade-note">'+optNote+'</div></div>' +
+      '<div class="bb-mod-upgrade-price">'+(optPrice?'$'+optPrice:'бесплатно')+'</div>' +
+    '</div>';
+  }).join('') || '<div style="color:#94a3b8;font-size:13px;padding:8px">Нет доступных вариантов</div>';
+
+  opts.innerHTML = html;
+  opts.style.display = opts.style.display === 'block' ? 'none' : 'block';
+}
+
+// ── Выбрать из списка → активный режим ───────────────────────
+function bbPickOption(i, j) {
+  var m   = bbModules[i];
+  var opt = (m.options||[])[j];
+  if (!opt) return;
+  var n=m.nights||1, p=m.pax||1;
+
+  m.active = true;
+  if(m.id==='hotel')      m.selected = { name:opt.name, stars:opt.stars||3, price:opt.price||0, board:opt.board||'BB', city:opt.city||'', nights:n, pax:p };
+  if(m.id==='transfer')   m.selected = { name:opt.name, vehicle:opt.vehicle||'', price:opt.price||0, nights:n };
+  if(m.id==='sights')     m.selected = { items:[opt], pax:p };
+  if(m.id==='restaurant') m.selected = { name:opt.name, cuisine:opt.cuisine||'', price:opt.price||0, nights:n, pax:p, note:opt.note||'' };
+
+  bbRenderModules3();
+}
+
+// ── Переключить список вариантов ─────────────────────────────
+function bbToggleOpts(i) {
+  var panel = document.getElementById('bbOpts'+i);
+  if (!panel) return;
+  panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+}
+
+// ── Поиск авиабилетов ────────────────────────────────────────
+async function bbShowFlightSearch(i) {
+  var m = bbModules[i];
+  if (!m) return;
+  var opts = document.getElementById('bbOpts'+i);
+  if (!opts) return;
+
+  if (opts.style.display === 'block' && opts.innerHTML) {
+    opts.style.display = 'none'; return;
+  }
+
+  opts.style.display = 'block';
+  opts.innerHTML = '<div style="text-align:center;padding:12px;color:#94a3b8;font-size:13px">Ищем рейсы...</div>';
+
+  var fromI = bbCityToIATA(m.from||'') || 'TAS';
+  var toI   = bbCityToIATA(m.toCity||'') || 'SKD';
+  var d1=m.d1||'', pax=m.pax||1;
 
   var flights=[];
   try {
     var cfg={};
     try{cfg=JSON.parse(localStorage.getItem('waylo_api_settings')||'{}');}catch(e){}
-    if(cfg.token&&d1) flights=await bbFetchFlightsAPI(fromI,toI,d1,d2,cfg.token);
+    if(cfg.token&&d1) flights=await bbFetchFlightsAPI(fromI,toI,d1,m.d2||'',cfg.token);
   }catch(e){}
-  if(!flights.length) flights=bbGenerateDemoFlights(fromI,toI,from,toCity,d1,d2,pax);
+  if(!flights.length) flights=bbGenerateDemoFlights(fromI,toI,m.from||'',m.toCity||'',d1,m.d2||'',pax);
 
-  if(loading) loading.style.display='none';
-  window._bbFlights3=flights;
+  // Показываем ОДИН самый дешёвый сразу, остальные — по запросу
+  flights.sort(function(a,b){return a.price-b.price;});
+  m.options = flights;
 
-  results.innerHTML=flights.slice(0,5).map(function(f,i){
+  opts.innerHTML = flights.map(function(f,j){
     return '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid #e5e7eb;border-radius:12px;margin-bottom:6px;cursor:pointer;background:#fff" '+
-      'id="bba3-'+i+'" onclick="bbSelectFlight3('+i+')">' +
+      'onclick="bbSelectFlight3('+i+','+j+')">' +
       '<div style="flex:1">' +
-        '<div style="display:flex;align-items:center;gap:10px;margin-bottom:3px">' +
-          '<span style="font-size:16px;font-weight:800;color:#1e293b">'+f.depTime+'</span>' +
-          '<div style="flex:1;text-align:center;position:relative">' +
-            '<div style="height:1px;background:#d1d5db;width:100%"></div>' +
-            '<span style="position:absolute;top:-9px;left:50%;margin-left:-6px;font-size:13px">✈</span>' +
-          '</div>' +
-          '<span style="font-size:16px;font-weight:800;color:#1e293b">'+f.arrTime+'</span>' +
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">' +
+          '<span style="font-size:15px;font-weight:800;color:#1e293b">'+f.depTime+'</span>' +
+          '<div style="flex:1;text-align:center;position:relative;height:1px;background:#d1d5db"><span style="position:absolute;top:-8px;left:50%;font-size:11px">✈</span></div>' +
+          '<span style="font-size:15px;font-weight:800;color:#1e293b">'+f.arrTime+'</span>' +
         '</div>' +
-        '<div style="font-size:11px;color:#94a3b8">'+f.airline+' · '+f.duration+' · '+(f.stops===0?'прямой рейс':f.stops+' пересадка')+'</div>' +
+        '<div style="font-size:11px;color:#64748b">'+f.airline+' · '+f.duration+' · '+(f.stops===0?'прямой':f.stops+' пересадка')+'</div>' +
       '</div>' +
-      '<div style="text-align:right;flex-shrink:0">' +
-        '<div style="font-size:18px;font-weight:800;color:#0d9488">$'+f.price+'</div>' +
-        '<div style="font-size:10px;color:#94a3b8">'+pax+' пасс.</div>' +
-      '</div>' +
+      '<div style="font-size:18px;font-weight:800;color:#0d9488;flex-shrink:0">$'+f.price+'</div>' +
     '</div>';
   }).join('');
 }
 
-function bbSelectFlight3(idx) {
-  var f=(window._bbFlights3||[])[idx];
-  if(!f) return;
-  document.querySelectorAll('[id^="bba3-"]').forEach(function(c){c.style.borderColor='#e5e7eb';c.style.background='#fff';});
-  var card=document.getElementById('bba3-'+idx);
-  if(card){card.style.borderColor='#14b8a6';card.style.background='#f0fdfa';}
-  var av=bbModules.find(function(m){return m.isAvia;});
-  if(av){av.price=f.price;av.priceTotal=f.price;av.selectedFlight=f;}
-  var sel=document.getElementById('bbAviaSelected3');
-  if(sel) sel.innerHTML='<div style="margin-top:6px;padding:8px 10px;background:#f0fdfa;border:1.5px solid #14b8a6;border-radius:10px;font-size:12px;color:#0d9488;font-weight:600">'+
-    'Выбран: '+f.airline+' · '+f.depTime+' – '+f.arrTime+' · $'+f.price+'</div>';
-  bbCalcTotal3();
-}
-function bbToggleUpgrade(i) {
-  var panel = document.getElementById('bbUpg'+i);
-  if (!panel) return;
-  panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
-}
-
-function bbApplyUpgrade(modIdx, upgIdx) {
+function bbSelectFlight3(modIdx, flightIdx) {
   var m = bbModules[modIdx];
-  var u = m.upgrades[upgIdx];
-  if (!u) return;
-  m.sub = u.name;
-  if (u.price) m.price = u.price;
-  m.upgrades = [m.upgrades[upgIdx]].concat(m.upgrades.filter(function(_,i){ return i!==upgIdx; }));
+  var f = (m.options||[])[flightIdx];
+  if(!f) return;
+  m.active = true;
+  m.selected = f;
   bbRenderModules3();
-}
-
-function bbRemoveMod(i) {
-  bbModules.splice(i, 1);
-  bbRenderModules3();
-}
-
-function bbOpenAvia(i) {
-  var toCity = document.getElementById('bbToCity')?.value || '';
-  var from   = document.getElementById('bbFromCity')?.value || '';
-  var d1     = document.getElementById('bbDateFrom')?.value || '';
-  var pax    = (bbPlan.adults||2) + (bbPlan.kids||0);
-  var fromI  = bbCityToIATA(from) || 'TAS';
-  var toI    = bbCityToIATA(toCity) || 'SKD';
-  var link   = 'https://www.aviasales.ru/search/' + fromI + (d1.replace(/-/g,'').substring(2)) + toI + pax + '1';
-  window.open(link, '_blank');
 }
 
 function bbCalcTotal3() {
-  var total = bbModules.reduce(function(s, m){ return s + (m.isAvia ? 0 : (m.price||0)); }, 0);
+  var total = bbModules.reduce(function(s,m){ return s+(m.active?bbModPrice(m):0); }, 0);
   var el = document.getElementById('bbGrandTotal');
-  if (el) el.textContent = '$' + total.toLocaleString() + (bbModules.some(function(m){ return m.isAvia; }) ? ' + авиа' : '');
+  if(el) el.textContent = '$'+total.toLocaleString();
   bbPlan.total = total;
 }
 
