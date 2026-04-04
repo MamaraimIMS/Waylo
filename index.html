@@ -9113,23 +9113,37 @@ function bbRenderModules3() {
   if (!list) return;
 
   list.innerHTML = bbModules.map(function(m, i) {
-    var priceBlock = m.isAvia
-      ? '<div class="bb-mod-price"><div style="font-size:11px;color:#14b8a6;font-weight:600">Aviasales</div></div>'
-      : '<div class="bb-mod-price"><div class="bb-mod-price-val">$'+m.price+'</div><div class="bb-mod-price-per">итого</div></div>';
+    if (m.isAvia) {
+      return '<div class="bb-mod" id="bbMod'+i+'">' +
+        '<div class="bb-mod-header">' +
+          '<div class="bb-mod-icon flight">'+m.icon+'</div>' +
+          '<div class="bb-mod-body">' +
+            '<div class="bb-mod-title">'+m.title+'</div>' +
+            '<div class="bb-mod-sub">'+m.sub+'</div>' +
+          '</div>' +
+          '<div style="flex-shrink:0;font-size:11px;font-weight:700;color:#3b82f6;background:#eff6ff;padding:3px 8px;border-radius:6px">Aviasales</div>' +
+        '</div>' +
+        '<div style="padding:0 14px 14px;">' +
+          '<div style="display:flex;gap:8px;margin-bottom:10px;">' +
+            '<button class="bb-mod-btn upgrade" style="flex:2;background:#eff6ff;color:#1d4ed8;font-size:13px;padding:10px" onclick="bbAviaSearch3()">Найти рейсы</button>' +
+            '<button class="bb-mod-btn remove" style="flex:1" onclick="bbRemoveMod('+i+')">Убрать</button>' +
+          '</div>' +
+          '<div id="bbAviaLoading3" style="display:none;text-align:center;padding:10px;color:#94a3b8;font-size:13px;">Ищем рейсы...</div>' +
+          '<div id="bbAviaResults3"></div>' +
+          '<div id="bbAviaSelected3"></div>' +
+        '</div>' +
+      '</div>';
+    }
 
-    var upgrades = (m.upgrades||[]).map(function(u, j){
+    var upgrades = (m.upgrades||[]).map(function(u,j){
       return '<div class="bb-mod-upgrade-item" onclick="bbApplyUpgrade('+i+','+j+')">' +
         '<div class="bb-mod-upgrade-info">' +
           '<div class="bb-mod-upgrade-name">'+u.name+'</div>' +
           '<div class="bb-mod-upgrade-note">'+u.note+'</div>' +
         '</div>' +
-        '<div class="bb-mod-upgrade-price">'+(u.price?'$'+u.price:'→')+'</div>' +
+        '<div class="bb-mod-upgrade-price">'+(u.price?'$'+u.price:'')+' </div>' +
       '</div>';
     }).join('');
-
-    var aviaBtn = m.isAvia
-      ? '<button class="bb-mod-btn upgrade" style="background:#eff6ff;color:#3b82f6" onclick="bbOpenAvia('+i+')">Поиск билетов</button>'
-      : '<button class="bb-mod-btn upgrade" onclick="bbToggleUpgrade('+i+')">Улучшить ↑</button>';
 
     return '<div class="bb-mod" id="bbMod'+i+'">' +
       '<div class="bb-mod-header">' +
@@ -9139,19 +9153,87 @@ function bbRenderModules3() {
           '<div class="bb-mod-sub">'+m.sub+'</div>' +
           '<div style="font-size:11px;color:#94a3b8;margin-top:3px">'+m.pricePer+'</div>' +
         '</div>' +
-        priceBlock +
+        '<div class="bb-mod-price">' +
+          '<div class="bb-mod-price-val">$'+m.price+'</div>' +
+          '<div class="bb-mod-price-per">итого</div>' +
+        '</div>' +
       '</div>' +
       '<div class="bb-mod-actions">' +
-        aviaBtn +
+        '<button class="bb-mod-btn upgrade" onclick="bbToggleUpgrade('+i+')">Улучшить ↑</button>' +
         '<button class="bb-mod-btn remove" onclick="bbRemoveMod('+i+')">Убрать</button>' +
       '</div>' +
       (upgrades ? '<div class="bb-mod-upgrade-panel" id="bbUpg'+i+'">'+upgrades+'</div>' : '') +
     '</div>';
   }).join('');
 
+  if (bbModules.some(function(m){ return m.isAvia; })) {
+    setTimeout(bbAviaSearch3, 400);
+  }
   bbCalcTotal3();
 }
 
+async function bbAviaSearch3() {
+  var from   = (document.getElementById('bbFromCity')?.value||'').trim();
+  var toCity = document.getElementById('bbToCity')?.value||'';
+  var d1     = document.getElementById('bbDateFrom')?.value||'';
+  var d2     = document.getElementById('bbDateTo')?.value||'';
+  var pax    = (bbPlan.adults||2)+(bbPlan.kids||0);
+  var fromI  = bbCityToIATA(from)||'TAS';
+  var toI    = bbCityToIATA(toCity)||'SKD';
+
+  var loading = document.getElementById('bbAviaLoading3');
+  var results = document.getElementById('bbAviaResults3');
+  if (!results) return;
+
+  if (loading) loading.style.display='block';
+  results.innerHTML='';
+
+  var flights=[];
+  try {
+    var cfg={};
+    try{cfg=JSON.parse(localStorage.getItem('waylo_api_settings')||'{}');}catch(e){}
+    if(cfg.token&&d1) flights=await bbFetchFlightsAPI(fromI,toI,d1,d2,cfg.token);
+  }catch(e){}
+  if(!flights.length) flights=bbGenerateDemoFlights(fromI,toI,from,toCity,d1,d2,pax);
+
+  if(loading) loading.style.display='none';
+  window._bbFlights3=flights;
+
+  results.innerHTML=flights.slice(0,5).map(function(f,i){
+    return '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid #e5e7eb;border-radius:12px;margin-bottom:6px;cursor:pointer;background:#fff" '+
+      'id="bba3-'+i+'" onclick="bbSelectFlight3('+i+')">' +
+      '<div style="flex:1">' +
+        '<div style="display:flex;align-items:center;gap:10px;margin-bottom:3px">' +
+          '<span style="font-size:16px;font-weight:800;color:#1e293b">'+f.depTime+'</span>' +
+          '<div style="flex:1;text-align:center;position:relative">' +
+            '<div style="height:1px;background:#d1d5db;width:100%"></div>' +
+            '<span style="position:absolute;top:-9px;left:50%;margin-left:-6px;font-size:13px">✈</span>' +
+          '</div>' +
+          '<span style="font-size:16px;font-weight:800;color:#1e293b">'+f.arrTime+'</span>' +
+        '</div>' +
+        '<div style="font-size:11px;color:#94a3b8">'+f.airline+' · '+f.duration+' · '+(f.stops===0?'прямой рейс':f.stops+' пересадка')+'</div>' +
+      '</div>' +
+      '<div style="text-align:right;flex-shrink:0">' +
+        '<div style="font-size:18px;font-weight:800;color:#0d9488">$'+f.price+'</div>' +
+        '<div style="font-size:10px;color:#94a3b8">'+pax+' пасс.</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function bbSelectFlight3(idx) {
+  var f=(window._bbFlights3||[])[idx];
+  if(!f) return;
+  document.querySelectorAll('[id^="bba3-"]').forEach(function(c){c.style.borderColor='#e5e7eb';c.style.background='#fff';});
+  var card=document.getElementById('bba3-'+idx);
+  if(card){card.style.borderColor='#14b8a6';card.style.background='#f0fdfa';}
+  var av=bbModules.find(function(m){return m.isAvia;});
+  if(av){av.price=f.price;av.priceTotal=f.price;av.selectedFlight=f;}
+  var sel=document.getElementById('bbAviaSelected3');
+  if(sel) sel.innerHTML='<div style="margin-top:6px;padding:8px 10px;background:#f0fdfa;border:1.5px solid #14b8a6;border-radius:10px;font-size:12px;color:#0d9488;font-weight:600">'+
+    'Выбран: '+f.airline+' · '+f.depTime+' – '+f.arrTime+' · $'+f.price+'</div>';
+  bbCalcTotal3();
+}
 function bbToggleUpgrade(i) {
   var panel = document.getElementById('bbUpg'+i);
   if (!panel) return;
