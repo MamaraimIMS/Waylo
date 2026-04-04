@@ -8151,8 +8151,10 @@ function renderServices() {
 <div class="bb-form-group">
 <label>Основной маршрут</label>
 <div class="bb-form-row" style="gap:0.5rem;">
-<div style="flex:1;">
-  <input type="text" class="bb-form-input" id="bbFromCity" placeholder="Откуда (город/страна)">
+<div style="flex:1;position:relative;">
+  <input type="text" class="bb-form-input" id="bbFromCity" placeholder="Откуда (город/страна)"
+    oninput="bbFromAutocomplete(this.value)" onblur="setTimeout(function(){document.getElementById('bbFromSuggest').style.display='none';},200)" autocomplete="off">
+  <div id="bbFromSuggest" style="display:none;position:absolute;left:0;right:0;top:100%;z-index:999;background:#fff;border:1.5px solid #14b8a6;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.12);max-height:200px;overflow-y:auto;margin-top:4px;"></div>
 </div>
 <div style="display:flex;align-items:center;justify-content:center;flex-shrink:0;">
   <span style="font-size:1.25rem;">→</span>
@@ -8537,6 +8539,66 @@ function bbFormatDateAvia(dateStr) {
 
 // Состояние плана
 var bbPlan = { modules: [], nights: 0, adults: 2, kids: 0, fromIATA: '', toIATA: '', d1: '', d2: '' };
+
+// ══ АВТОДОПОЛНЕНИЕ "ОТКУДА" ══════════════════════════════════
+
+var BB_CITIES = [
+  // СНГ
+  'Москва','Санкт-Петербург','Казань','Екатеринбург','Новосибирск','Уфа','Сочи','Ростов-на-Дону','Краснодар','Нижний Новгород','Пермь','Омск','Волгоград','Воронеж','Красноярск',
+  'Алматы','Астана','Шымкент','Бишкек','Душанбе','Ашхабад','Баку','Тбилиси','Ереван','Минск','Киев','Кишинёв',
+  // Европа
+  'Лондон','Париж','Берлин','Амстердам','Рим','Мадрид','Барселона','Вена','Прага','Варшава','Будапешт','Стокгольм','Хельсинки','Копенгаген','Брюссель','Цюрих','Женева','Лиссабон','Афины','Дублин',
+  // Азия
+  'Стамбул','Анкара','Дубай','Абу-Даби','Доха','Эр-Рияд','Эр-Рияд','Тегеран','Пекин','Шанхай','Токио','Осака','Сеул','Бангкок','Сингапур','Куала-Лумпур','Джакарта','Мумбаи','Дели','Карачи',
+  // Америка
+  'Нью-Йорк','Лос-Анджелес','Чикаго','Майами','Торонто','Монреаль','Мехико','Богота','Сан-Паулу','Буэнос-Айрес','Лима','Сантьяго',
+  // Африка
+  'Каир','Касабланка','Дубай','Найроби','Йоханнесбург',
+  // Узбекистан (для внутренних маршрутов)
+  'Ташкент','Самарканд','Бухара','Хива','Фергана','Наманган','Андижан','Нукус','Карши','Термез',
+  // Английские варианты
+  'Moscow','Saint Petersburg','London','Paris','Berlin','Dubai','Istanbul','New York','Tokyo','Seoul','Beijing','Bangkok','Singapore',
+];
+
+function bbFromAutocomplete(val) {
+  var box = document.getElementById('bbFromSuggest');
+  if (!box) return;
+  val = (val||'').trim();
+  if (val.length < 1) { box.style.display='none'; return; }
+
+  var q = val.toLowerCase();
+  var matches = BB_CITIES.filter(function(c){
+    return c.toLowerCase().indexOf(q) === 0; // starts with
+  }).slice(0,6);
+
+  // fallback: contains
+  if (matches.length < 3) {
+    var extra = BB_CITIES.filter(function(c){
+      return c.toLowerCase().indexOf(q) > 0 && matches.indexOf(c) < 0;
+    }).slice(0, 6-matches.length);
+    matches = matches.concat(extra);
+  }
+
+  if (!matches.length) { box.style.display='none'; return; }
+
+  box.innerHTML = matches.map(function(city){
+    // Подсветим введённые буквы
+    var idx = city.toLowerCase().indexOf(q);
+    var hi  = city.substring(0,idx) +
+              '<b style="color:#0d9488">' + city.substring(idx, idx+val.length) + '</b>' +
+              city.substring(idx+val.length);
+    return '<div data-city="'+city+'" onclick="bbFromPick(this.dataset.city)" style="padding:10px 14px;cursor:pointer;font-size:14px;border-bottom:1px solid #f1f5f9;color:#1e293b;">' + hi + '</div>';
+  }).join('');
+
+  box.style.display = 'block';
+}
+
+function bbFromPick(city) {
+  var input = document.getElementById('bbFromCity');
+  var box   = document.getElementById('bbFromSuggest');
+  if (input) input.value = city;
+  if (box)   box.style.display = 'none';
+}
 
 // ══ ПОДБОР ТУРОВ ═════════════════════════════════════════════
 
@@ -9246,7 +9308,9 @@ function bbRenderModules3() {
       '</div>' +
       '<div class="bb-mod-actions">' +
         '<button class="bb-mod-btn upgrade" onclick="bbToggleOpts('+i+')">Заменить ↑</button>' +
-        '<button class="bb-mod-btn remove" onclick="bbDeactivate('+i+')">Убрать</button>' +
+        (m._customLabel
+          ? '<button class="bb-mod-btn remove" onclick="bbRemoveCataloguemod('+i+')" style="font-size:16px;padding:0;width:36px;flex-shrink:0">✕</button>'
+          : '<button class="bb-mod-btn remove" onclick="bbDeactivate('+i+')">Убрать</button>') +
       '</div>' +
       '<div id="bbOpts'+i+'" class="bb-mod-upgrade-panel">'+(optList||'<div style="color:#94a3b8;font-size:13px;padding:4px">Нет альтернатив</div>')+'</div>' +
     '</div>';
@@ -9258,10 +9322,16 @@ function bbRenderModules3() {
   bbCalcTotal3();
 }
 
-// ── Деактивировать → пассивный режим ─────────────────────────
+// ── Деактивировать → пассивный режим (штатные модули) ────────
 function bbDeactivate(i) {
   bbModules[i].active = false;
   bbModules[i].selected = null;
+  bbRenderModules3();
+}
+
+// ── Удалить каталожный модуль полностью ───────────────────────
+function bbRemoveCataloguemod(i) {
+  bbModules.splice(i, 1);
   bbRenderModules3();
 }
 
