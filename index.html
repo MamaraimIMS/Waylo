@@ -8939,8 +8939,10 @@ function bbRenderModulePage() {
   var adults = bbPlan.adults || 2;
   var kids   = bbPlan.kids   || 0;
   var pax    = adults + kids;
-  var toCity = document.getElementById('bbToCity')?.value || tour.city || 'Узбекистан';
+  var toCity = document.getElementById('bbToCity')?.value || tour.city || 'Самарканд';
   var from   = document.getElementById('bbFromCity')?.value || '';
+  var d1     = document.getElementById('bbDateFrom')?.value || bbPlan.d1 || '';
+  var d2     = document.getElementById('bbDateTo')?.value   || bbPlan.d2 || '';
 
   // Заголовок
   var banner = document.getElementById('bbTourBannerTitle');
@@ -9024,8 +9026,13 @@ function bbRenderModulePage() {
   };
 
   function getDemoKey(obj) {
-    var kw = toCity.substring(0,5);
-    for (var k in obj) { if (k !== 'default' && k.indexOf(kw.substring(0,4)) >= 0) return k; }
+    // Прямое совпадение
+    if (obj[toCity]) return toCity;
+    // Частичное совпадение
+    for (var k in obj) {
+      if (k !== 'default' && toCity.indexOf(k.substring(0,4)) >= 0) return k;
+      if (k !== 'default' && k.indexOf(toCity.substring(0,4)) >= 0) return k;
+    }
     return 'default';
   }
 
