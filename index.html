@@ -9043,46 +9043,53 @@ function bbRenderModulePage() {
 
   // Строим модули
   // ── Новая структура модулей: active/passive ──────────────
+  // Защита от пустых массивов
+  var h0  = dHotels[0]    || { name:'Отель', stars:3, price:80,  board:'BB', city:toCity };
+  var t0  = dTransfers[0] || { name:'Трансфер аэропорт', vehicle:'Sedan', price:30 };
+  var r0  = dRests[0]     || { name:'Ресторан', cuisine:'Узбекская', price:20, note:'' };
+  var hasSights = dSights.length > 0;
+
   bbModules = [
     {
       id:'flight', icon:'✈️', cls:'flight', title:'Авиабилеты (туда-обратно)',
-      active: false,         // passive до поиска
-      isAvia: true,
-      selected: null,        // выбранный рейс
-      options: [],           // загружаются при поиске
+      active: true, isAvia: true,
+      selected: null,
+      options: [],
       pax: pax, from: from, toCity: toCity, d1: d1, d2: d2
     },
     {
       id:'hotel', icon:'🏨', cls:'hotel', title:'Отель',
       active: true,
-      selected: { name:dHotels[0].name, stars:dHotels[0].stars, price:dHotels[0].price, board:dHotels[0].board, city:dHotels[0].city, nights:nights, pax:pax },
+      selected: { name:h0.name, stars:h0.stars||3, price:h0.price||0, board:h0.board||'BB', city:h0.city||toCity, nights:nights, pax:pax },
       options: dHotels,
       nights: nights, pax: pax
     },
     {
       id:'transfer', icon:'🚐', cls:'transfer', title:'Трансфер',
       active: true,
-      selected: { name:dTransfers[0].name, vehicle:dTransfers[0].vehicle, price:dTransfers[0].price, nights:nights },
+      selected: { name:t0.name, vehicle:t0.vehicle||'', price:t0.price||0, nights:nights },
       options: dTransfers,
       nights: nights
     },
     {
       id:'sights', icon:'🎭', cls:'sight', title:'Достопримечательности',
-      active: true,
-      selected: { items: dSights.slice(0,3), pax:pax },
+      active: hasSights,
+      selected: hasSights ? { items:dSights.slice(0,3), pax:pax } : null,
       options: dSights,
       pax: pax
     },
     {
       id:'restaurant', icon:'🍽️', cls:'restaurant', title:'Питание',
       active: true,
-      selected: { name:dRests[0].name, cuisine:dRests[0].cuisine, price:dRests[0].price, nights:nights, pax:pax, note:dRests[0].note||'' },
+      selected: { name:r0.name, cuisine:r0.cuisine||'', price:r0.price||0, nights:nights, pax:pax, note:r0.note||'' },
       options: dRests,
       nights: nights, pax: pax
     }
   ];
 
   bbRenderModules3();
+  // Автопоиск авиабилетов
+  setTimeout(function(){ bbShowFlightSearch(0); }, 600);
 }
 
 // ══ РЕНДЕР МОДУЛЕЙ (Active / Passive) ════════════════════════
