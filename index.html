@@ -8050,6 +8050,40 @@ function renderServices() {
 .bb-booking-icon.train { background-color: #dbeafe; color: #2563eb; }
 .bb-booking-icon.tour { background-color: #fef3c7; color: #f59e0b; }
 @keyframes bbFadeOut { from { opacity: 1; } to { opacity: 0; transform: translateX(-20px); } }
+
+/* BB Tour Cards */
+.bb-tour-card {
+  background:#fff; border-radius:20px; overflow:hidden;
+  box-shadow:0 4px 20px rgba(0,0,0,0.1); margin-bottom:16px;
+  cursor:pointer; transition:transform .2s;
+}
+.bb-tour-card:active { transform:scale(0.98); }
+.bb-tour-card-img {
+  width:100%; height:200px; object-fit:cover; display:block;
+  background:#e2e8f0;
+}
+.bb-tour-card-body { padding:16px; }
+.bb-tour-badge {
+  display:inline-block; background:linear-gradient(135deg,#f59e0b,#f97316);
+  color:#fff; font-size:11px; font-weight:700; padding:3px 10px;
+  border-radius:20px; margin-bottom:8px; text-transform:uppercase;
+}
+.bb-tour-card-title {
+  font-size:17px; font-weight:700; color:#1e293b; margin-bottom:6px; line-height:1.3;
+}
+.bb-tour-card-meta {
+  display:flex; align-items:center; gap:12px; font-size:13px; color:#64748b; margin-bottom:12px;
+}
+.bb-tour-card-footer {
+  display:flex; align-items:center; justify-content:space-between;
+}
+.bb-tour-card-price { font-size:20px; font-weight:800; color:#0d9488; }
+.bb-tour-card-price span { font-size:12px; font-weight:400; color:#94a3b8; }
+.bb-tour-select-btn {
+  background:linear-gradient(135deg,#14b8a6,#0891b2);
+  color:#fff; border:none; border-radius:12px;
+  padding:10px 20px; font-size:14px; font-weight:600; cursor:pointer;
+}
 </style>
 
 <div id="budgetBuilderOverlay">
@@ -8058,55 +8092,68 @@ function renderServices() {
 <div class="bb-page bb-page-1 active" id="bbPage1">
 <div class="bb-home-hero">
 <div class="bb-waylo-badge"><span>✓</span> Waylo AI</div>
-<h1>Собери поездку в Узбекистан</h1>
-<p>AI подберёт самый выгодный вариант</p>
+<h1>Create your Trip</h1>
+<p>Выберите направление и мы подберём тур</p>
 </div>
 <div class="bb-form-section">
+
 <!-- Маршрут -->
 <div class="bb-form-group">
 <label>Основной маршрут</label>
 <div class="bb-form-row" style="gap:0.5rem;">
-<div style="flex:2.25;"><input type="text" class="bb-form-input" id="bbFromCity" placeholder="Откуда" value="Ташкент"></div>
-<div style="display:flex;align-items:center;justify-content:center;flex-shrink:0;"><span style="font-size:1.25rem;">→</span></div>
-<div style="flex:2.25;"><input type="text" class="bb-form-input" id="bbToCity" placeholder="Куда" value="Самарканд"></div>
+<div style="flex:1;">
+  <input type="text" class="bb-form-input" id="bbFromCity" placeholder="Откуда (город/страна)">
+</div>
+<div style="display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+  <span style="font-size:1.25rem;">→</span>
+</div>
+<div style="flex:1;">
+  <select class="bb-form-input" id="bbToCity" style="cursor:pointer;">
+    <option value="">Куда</option>
+    <option value="Ташкент">🏙️ Ташкент</option>
+    <option value="Самарканд">🕌 Самарканд</option>
+    <option value="Бухара">🏺 Бухара</option>
+    <option value="Хива">🏰 Хива</option>
+  </select>
 </div>
 </div>
+</div>
+
 <!-- Даты -->
 <div class="bb-form-group">
 <label>Даты поездки</label>
 <div class="bb-form-row">
-<input type="date" class="bb-form-input" id="bbDateFrom" value="2026-05-10">
-<input type="date" class="bb-form-input" id="bbDateTo" value="2026-05-16">
+<input type="date" class="bb-form-input" id="bbDateFrom">
+<input type="date" class="bb-form-input" id="bbDateTo">
 </div>
 </div>
-<!-- Туристы -->
+
+<!-- С семьёй -->
 <div class="bb-form-group">
-<label><input type="checkbox" id="bbWithFamily" onchange="bbToggleFamilyFields()"> С семьёй</label>
-<div id="bbFamilyFields" class="bb-family-fields" style="display:none;">
+<label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+  <input type="checkbox" id="bbWithFamily" onchange="bbToggleFamilyFields()" style="width:18px;height:18px;accent-color:#0d9488;">
+  <span>С семьёй</span>
+</label>
+<div id="bbFamilyFields" class="bb-family-fields" style="display:none;margin-top:10px;">
 <div class="bb-form-row" style="gap:0.5rem;">
-<div style="flex:2.25;">
-<label style="font-size:0.75rem;margin-bottom:0.25rem;display:block;">Взрослые</label>
-<input type="number" class="bb-form-input" id="bbAdultsCount" value="2" min="1" max="10" style="text-align:center;">
+<div style="flex:1;">
+  <label style="font-size:0.75rem;margin-bottom:0.25rem;display:block;color:#6b7280;">Взрослые</label>
+  <input type="number" class="bb-form-input" id="bbAdultsCount" value="2" min="1" max="10" style="text-align:center;">
 </div>
 <div style="display:flex;align-items:center;justify-content:center;flex-shrink:0;padding-top:1.25rem;">
-<span style="font-size:1.25rem;color:#9ca3af;">+</span>
+  <span style="font-size:1.25rem;color:#9ca3af;">+</span>
 </div>
-<div style="flex:2.25;">
-<label style="font-size:0.75rem;margin-bottom:0.25rem;display:block;">Дети</label>
-<input type="number" class="bb-form-input" id="bbChildrenCount" value="0" min="0" max="10" style="text-align:center;">
-</div>
-</div>
+<div style="flex:1;">
+  <label style="font-size:0.75rem;margin-bottom:0.25rem;display:block;color:#6b7280;">Дети</label>
+  <input type="number" class="bb-form-input" id="bbChildrenCount" value="0" min="0" max="10" style="text-align:center;">
 </div>
 </div>
-<!-- Поиск авиабилетов -->
-<div class="bb-form-group">
-<label>✈️ Авиабилеты</label>
-<button class="bb-btn bb-btn-secondary" id="bbSearchFlightsBtn" onclick="bbSearchFlights()" style="width:100%;margin-bottom:8px;">🔍 Найти билеты</button>
-<div id="bbFlightsLoading" style="display:none;text-align:center;padding:12px;color:#9ca3af;font-size:13px;">⏳ Ищем билеты...</div>
-<div id="bbFlightsList" style="display:none;"></div>
-<div id="bbSelectedFlight" style="display:none;"></div>
 </div>
-<button class="bb-btn bb-btn-primary" onclick="bbGoToPage(2)">Далее — Подобрать сервисы →</button>
+</div>
+
+<button class="bb-btn bb-btn-primary" onclick="bbFindTours()" style="margin-top:8px;">
+  🗺️ Подобрать Тур
+</button>
 </div>
 <div style="text-align:center;padding:1rem;padding-bottom:2rem;position:relative;z-index:1;">
 <button class="bb-btn" style="background:rgba(255,255,255,0.2);color:white;" onclick="closeBudgetBuilder()">← Вернуться</button>
@@ -8117,42 +8164,15 @@ function renderServices() {
 <div class="bb-page" id="bbPage2">
 <div class="bb-header">
 <button class="bb-btn-back" onclick="bbGoToPage(1)">←</button>
-<div class="bb-header-title">AI Trip Brief</div>
+<div class="bb-header-title">Выберите тур</div>
 <button class="bb-btn-back" onclick="closeBudgetBuilder()">✕</button>
 </div>
 <div class="bb-trip-brief-header">
-<h1>🤖 Waylo подобрал</h1>
-<p id="bbRouteSummary">Париж → Самарканд • 2 взрослых</p>
+<h1>🗺️ Туры в <span id="bbDestinationTitle">Узбекистан</span></h1>
+<p id="bbRouteSummary">Выберите тур который вам подходит</p>
 </div>
-<div class="bb-tab-nav">
-<button class="bb-tab-btn active" onclick="bbSwitchTab(event,'bb-plan-tab')">План</button>
-<button class="bb-tab-btn" onclick="bbSwitchTab(event,'bb-options-tab')">Варианты</button>
-<button class="bb-tab-btn" onclick="bbSwitchTab(event,'bb-details-tab')">Детали</button>
-</div>
-<div class="bb-tab-content active" id="bb-plan-tab">
-<div class="bb-ai-hint"><span>💰</span><span>Самый выгодный вариант. Нажмите ↻ чтобы заменить.</span></div>
-<div class="bb-modules-container" id="bbModulesContainer"><div style="text-align:center;padding:2rem;color:#9ca3af;">⏳ Загружаем данные...</div></div>
-</div>
-<div class="bb-tab-content" id="bb-options-tab">
-<div class="bb-ai-hint"><span>🔄</span><span>Альтернативные варианты (+10-30%)</span></div>
-<button class="bb-btn bb-btn-primary" onclick="bbGenerateAlternative()" style="margin-bottom:0.75rem;">🎲 Показать другой вариант</button>
-<div class="bb-alternative-container" id="bbAlternativeContainer">
-<div class="bb-alt-header"><span class="bb-alt-badge" id="bbAltBadge">Вариант #1</span><span id="bbAltType">+18%</span></div>
-<div class="bb-alt-modules" id="bbAltModules"></div>
-<div class="bb-alt-total"><span>Итого:</span><span id="bbAltTotalPrice">$0</span></div>
-<div class="bb-alt-savings" id="bbAltSavings"></div>
-<button class="bb-btn bb-btn-primary" onclick="bbApplyAlternative()" style="margin-top:0.75rem;">✅ Выбрать вариант</button>
-</div>
-</div>
-<div class="bb-tab-content" id="bb-details-tab">
-<div class="bb-ai-hint"><span>📋</span><span>Детали появятся после подтверждения</span></div>
-</div>
-<div style="padding:0.75rem;padding-bottom:2rem;border-top:1px solid #e5e7eb;background:white;">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
-<span style="font-size:0.875rem;color:#374151;font-weight:700;">Итого:</span>
-<span style="font-size:1.125rem;font-weight:700;color:#0d9488;" id="bbTotalPrice">$1,600</span>
-</div>
-<button class="bb-btn bb-btn-primary" onclick="bbGoToPage(3)">Подтвердить план</button>
+<div style="flex:1;overflow-y:auto;padding:16px;padding-bottom:32px;" id="bbToursGrid">
+<div style="text-align:center;padding:3rem;color:#9ca3af;">⏳ Загружаем туры...</div>
 </div>
 </div>
 
@@ -8190,12 +8210,7 @@ function renderServices() {
 <script>
 function openBudgetBuilder(){document.getElementById('budgetBuilderOverlay').classList.add('active');document.body.style.overflow='hidden';}
 function closeBudgetBuilder(){document.getElementById('budgetBuilderOverlay').classList.remove('active');document.body.style.overflow='';document.querySelectorAll('.bb-page').forEach(p=>p.classList.remove('active'));document.getElementById('bbPage1').classList.add('active');}
-async function bbGoToPage(n){
-  document.querySelectorAll('.bb-page').forEach(p=>p.classList.remove('active'));
-  document.getElementById('bbPage'+n).classList.add('active');
-  if(n===2){ bbUpdateRouteSummary(); var tEl=document.getElementById("bbTotalPrice"); if(tEl)tEl.textContent="$0"; await bbBuildPlan(); }
-  if(n===3){ bbRenderSummary(); }
-}
+// bbGoToPage defined above
 function bbToggleFamilyFields(){document.getElementById('bbFamilyFields').style.display=document.getElementById('bbWithFamily').checked?'block':'none';}
 function bbUpdateRouteSummary(){var f=document.getElementById('bbFromCity').value||'A',t=document.getElementById('bbToCity').value||'B',w=document.getElementById('bbWithFamily').checked,tr='2 взрослых';if(w){var a=document.getElementById('bbAdultsCount').value||2,c=document.getElementById('bbChildrenCount').value||0;tr=a+' взр.';if(c>0)tr+=' + '+c+' дет.';}document.getElementById('bbRouteSummary').textContent=f+' → '+t+' • '+tr;}
 function bbSwitchTab(e,n){e.preventDefault();e.target.parentElement.querySelectorAll('.bb-tab-btn').forEach(b=>b.classList.remove('active'));e.target.classList.add('active');document.querySelectorAll('.bb-tab-content').forEach(t=>t.classList.remove('active'));document.getElementById(n).classList.add('active');}
@@ -8443,6 +8458,154 @@ function bbFormatDateAvia(dateStr) {
 
 // Состояние плана
 var bbPlan = { modules: [], nights: 0, adults: 2, kids: 0, fromIATA: '', toIATA: '', d1: '', d2: '' };
+
+// ══ ПОДБОР ТУРОВ ═════════════════════════════════════════════
+
+async function bbFindTours() {
+  var from   = (document.getElementById('bbFromCity')?.value || '').trim();
+  var toCity = document.getElementById('bbToCity')?.value || '';
+  var d1     = document.getElementById('bbDateFrom')?.value || '';
+  var d2     = document.getElementById('bbDateTo')?.value   || '';
+  var family = document.getElementById('bbWithFamily')?.checked;
+  var adults = family ? (parseInt(document.getElementById('bbAdultsCount')?.value)||2) : 2;
+  var kids   = family ? (parseInt(document.getElementById('bbChildrenCount')?.value)||0) : 0;
+
+  if (!toCity) {
+    alert('Пожалуйста, выберите город назначения');
+    return;
+  }
+
+  // Сохраняем в bbPlan
+  var nights = (d1&&d2) ? Math.max(1,Math.round((new Date(d2)-new Date(d1))/86400000)) : 3;
+  bbPlan.adults  = adults;
+  bbPlan.kids    = kids;
+  bbPlan.nights  = nights;
+  bbPlan.d1      = d1;
+  bbPlan.d2      = d2;
+  bbPlan.fromIATA = bbCityToIATA(from);
+  bbPlan.toIATA   = bbCityToIATA(toCity);
+
+  // Переходим на страницу туров
+  document.querySelectorAll('.bb-page').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById('bbPage2').classList.add('active');
+
+  // Заголовок
+  var title = document.getElementById('bbDestinationTitle');
+  if (title) title.textContent = toCity;
+  var summary = document.getElementById('bbRouteSummary');
+  if (summary) {
+    var pax = adults + kids;
+    var paxStr = family ? (adults+' взр.'+(kids?' + '+kids+' дет.':'')) : adults+' взрослых';
+    summary.textContent = (from ? from+' → ' : '') + toCity + ' · ' + paxStr + (d1 ? ' · '+d1 : '');
+  }
+
+  // Загружаем туры
+  await bbLoadTourCards(toCity);
+}
+
+async function bbLoadTourCards(toCity) {
+  var grid = document.getElementById('bbToursGrid');
+  if (!grid) return;
+  grid.innerHTML = '<div style="text-align:center;padding:3rem;color:#9ca3af;">⏳ Загружаем туры...</div>';
+
+  // Загружаем top_tours из Supabase
+  var tours = [];
+  try {
+    var fetched = await api('top_tours', '?approved=eq.true&order=created_at.desc&limit=20');
+    if (fetched && fetched.length) {
+      // Фильтруем по городу (приоритет), показываем все
+      var matched = fetched.filter(function(t){
+        return (t.city||'').toLowerCase().indexOf(toCity.toLowerCase().substring(0,5)) >= 0;
+      });
+      tours = matched.length ? matched : fetched;
+    }
+  } catch(e) { console.warn('tours fetch:', e); }
+
+  // Демо-туры если база пустая
+  if (!tours.length) {
+    var DEMO_TOURS = {
+      'Самарканд': [
+        { id:'d1', display_title:'A city that is 2,700 years old', badge_text:'ХИТ', duration_days:3, total_price:350, city:'Самарканд', description:'Регистан, Гур-Эмир, Шахи-Зинда — величие Тимуридов', image_url:'https://images.unsplash.com/photo-1596484552834-6a58f850e0a1?w=800' },
+        { id:'d2', display_title:'Gastro Uzbekistan Trip', badge_text:'НОВЫЙ', duration_days:4, total_price:420, city:'Самарканд', description:'Плов, самса, нон — гастрономическое путешествие по Самарканду', image_url:'https://images.unsplash.com/photo-1565967511849-76a60a516170?w=800' },
+        { id:'d3', display_title:'Silk Road Explorer', badge_text:'ПОПУЛЯРНЫЙ', duration_days:5, total_price:550, city:'Самарканд', description:'По следам Великого Шёлкового пути', image_url:'https://images.unsplash.com/photo-1580654712603-eb43273aff33?w=800' },
+      ],
+      'Бухара': [
+        { id:'d4', display_title:'Ancient Bukhara Experience', badge_text:'ХИIT', duration_days:3, total_price:320, city:'Бухара', description:'Арк, Пои-Калян, Ляби-Хауз — живая история', image_url:'https://images.unsplash.com/photo-1548013146-72479768bada?w=800' },
+        { id:'d5', display_title:'Bukhara Crafts & Culture', badge_text:'УНИКАЛЬНЫЙ', duration_days:4, total_price:380, city:'Бухара', description:'Мастера шёлка, керамики и ювелирного дела', image_url:'https://images.unsplash.com/photo-1569949381669-ecf31ae8e613?w=800' },
+      ],
+      'Хива': [
+        { id:'d6', display_title:'Khiva — City Museum', badge_text:'UNESCO', duration_days:2, total_price:280, city:'Хива', description:'Ичан-Кала — город внутри крепостных стен', image_url:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800' },
+        { id:'d7', display_title:'Desert & Khiva Adventure', badge_text:'ПРИКЛЮЧЕНИЕ', duration_days:3, total_price:350, city:'Хива', description:'Кызылкум, Хива, закаты пустыни', image_url:'https://images.unsplash.com/photo-1622736338351-a8659db4f32c?w=800' },
+      ],
+      'Ташкент': [
+        { id:'d8', display_title:'Modern Tashkent Discovery', badge_text:'ГОРОДСКОЙ', duration_days:2, total_price:220, city:'Ташкент', description:'Метро, базары, парки и модерн столицы', image_url:'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800' },
+        { id:'d9', display_title:'Tashkent Food & Art Tour', badge_text:'ГАСТРО', duration_days:3, total_price:290, city:'Ташкент', description:'Плов-центр, Чорсу, галереи и рестораны', image_url:'https://images.unsplash.com/photo-1596484552834-6a58f850e0a1?w=800' },
+      ]
+    };
+    tours = DEMO_TOURS[toCity] || DEMO_TOURS['Самарканд'];
+  }
+
+  var nights = bbPlan.nights || 3;
+  var html = tours.map(function(t) {
+    var img = t.image_url || 'https://images.unsplash.com/photo-1596484552834-6a58f850e0a1?w=800';
+    var badge = t.badge_text ? '<div class="bb-tour-badge">'+t.badge_text+'</div>' : '';
+    var duration = t.duration_days ? t.duration_days + ' дней' : nights + ' дней';
+    var price = t.total_price || 0;
+    return '<div class="bb-tour-card" onclick="bbSelectTour(this)" data-id="'+t.id+'">'+
+      '<img class="bb-tour-card-img" src="'+img+'" alt="tour">'+
+      '<div class="bb-tour-card-body">'+
+        badge+
+        '<div class="bb-tour-card-title">'+t.display_title+'</div>'+
+        '<div class="bb-tour-card-meta">'+
+          '<span>📍 '+t.city+'</span>'+
+          '<span>🗓 '+duration+'</span>'+
+        '</div>'+
+        (t.description ? '<div style="font-size:13px;color:#64748b;margin-bottom:12px;line-height:1.5">'+t.description+'</div>' : '')+
+        '<div class="bb-tour-card-footer">'+
+          '<div class="bb-tour-card-price">$'+price+'<span> /чел</span></div>'+
+          '<button class="bb-tour-select-btn" data-tid="'+t.id+'" onclick="event.stopPropagation();bbSelectTourById(this.dataset.tid)">Выбрать →</button>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+
+  // Сохраняем туры для выбора
+  window._bbTours = tours;
+  grid.innerHTML = html || '<div style="text-align:center;padding:3rem;color:#9ca3af">Туры не найдены</div>';
+}
+
+function bbSelectTour(el) {
+  var id = el ? el.closest('.bb-tour-card')?.dataset?.id : null;
+  if (id) bbSelectTourById(id);
+}
+
+function bbSelectTourById(id, confirm) {
+  var tours = window._bbTours || [];
+  var tour = tours.find(function(t){ return String(t.id) === String(id); });
+  if (!tour) return;
+
+  // Сохраняем выбранный тур в план
+  bbPlan.selectedTour = tour;
+  bbPlan.modules = [{
+    icon: '🗺️', type: 'tour', title: tour.display_title,
+    subtitle: tour.city + ' · ' + (tour.duration_days||bbPlan.nights) + ' дней',
+    price: tour.total_price || 0,
+    priceTotal: tour.total_price || 0,
+    per: '/чел',
+    detail: tour.description || '',
+    canDelete: false
+  }];
+  bbPlan.total = tour.total_price || 0;
+
+  // Переходим на страницу подтверждения (страница 3)
+  bbGoToPage(3);
+}
+
+async function bbGoToPage(n){
+  document.querySelectorAll('.bb-page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('bbPage'+n).classList.add('active');
+  if(n===3){ bbRenderSummary(); }
+}
 
 async function bbBuildPlan() {
   var from   = (document.getElementById('bbFromCity')?.value || '').trim();
